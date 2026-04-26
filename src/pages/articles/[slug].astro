@@ -1,0 +1,599 @@
+---
+import BaseLayout from '../../layouts/Base.astro';
+import { sanityClient, renderPortableText } from '../../lib/sanity.js';
+import { getArticleBySlugQuery, getAllArticlesQuery } from '../../lib/queries.js';
+import { STATIC_ARTICLES } from '../../lib/staticData.js';
+
+export async function getStaticPaths() {
+  let articles: any[] = [];
+  try {
+    const fetched = await sanityClient.fetch(getAllArticlesQuery);
+    articles = fetched && fetched.length > 0 ? fetched : STATIC_ARTICLES;
+  } catch {
+    articles = STATIC_ARTICLES;
+  }
+  return articles.map((a: any) => {
+    const s = typeof a.slug === 'object' ? a.slug.current : a.slug;
+    return { params: { slug: s }, props: { slug: s } };
+  });
+}
+
+const { slug } = Astro.params;
+let article: any = null;
+
+try {
+  article = await sanityClient.fetch(getArticleBySlugQuery, { slug });
+} catch { /* fall through */ }
+
+if (!article) {
+  article = STATIC_ARTICLES.find((a: any) => {
+    const s = typeof a.slug === 'object' ? a.slug.current : a.slug;
+    return s === slug;
+  });
+}
+
+if (!article) return Astro.redirect('/articles');
+
+function formatDate(dateStr: string) {
+  if (!dateStr) return '';
+  try {
+    return new Date(dateStr).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+  } catch { return dateStr; }
+}
+
+function authorInitial(name: string) {
+  return name ? name.charAt(0).toUpperCase() : '?';
+}
+
+// Render body: handles static [{type, text}] format and Sanity portable text
+function renderBody(body: any[]) {
+  if (!body || !Array.isArray(body)) return '';
+
+  // Static format
+  if (body.length > 0 && body[0].type) {
+    return body.map((block: any) => {
+      if (block.type === 'paragraph') {
+        return `<p class="article-p">${block.text}</p>`;
+      }
+      if (block.type === 'h2') {
+        return `<h2 class="article-h2">${block.text}</h2>`;
+      }
+      if (block.type === 'pullQuote') {
+        return `<div class="pull-quote"><blockquote><p>${block.text}</p></blockquote>${block.attribution ? `<p class="pull-quote-attr">${block.attribution}</p>` : ''}</div>`;
+      }
+      if (block.type === 'sectionBreak') {
+        return `<div class="section-break"><div class="section-break-line"></div><span class="section-break-dots">&middot; &middot; &middot;</span><div class="section-break-line"></div></div>`;
+      }
+      if (block.type === 'callout') {
+        return `<div class="callout-block"><span class="callout-label">${block.label || ''}</span><p>${block.body || ''}</p></div>`;
+      }
+      if (block.type === 'dataBlock') {
+        return `<div class="data-block">
+          <div class="data-stat"><span class="data-number">${block.stat1number || ''}</span><span class="data-label">${block.stat1label || ''}</span></div>
+          <div class="data-stat"><span class="data-number">${block.stat2number || ''}</span><span class="data-label">${block.stat2label || ''}</span></div>
+          <div class="data-stat"><span class="data-number">${block.stat3number || ''}</span><span class="data-label">${block.stat3label || ''}</span></div>
+        </div>`;
+      }
+      return '';
+    }).join('');
+  }
+
+  // Sanity portable text
+  return renderPortableText(body);
+}
+
+const bodyHtml = renderBody(article.body);
+const relatedArticles = article.relatedArticles ||
+  STATIC_ARTICLES.filter((a: any) => {
+    const s = typeof a.slug === 'object' ? a.slug.current : a.slug;
+    return s !== slug;
+  }).slice(0, 2);
+
+const referencedLaws = article.referencedLaws || [];
+---
+
+<BaseLayout title={`${article.title} — hredd.org`} activePage="articles">
+
+  <!-- ARTICLE HEADER -->
+  <header class="article-header">
+    <p class="article-category">{article.category}</p>
+    <h1 class="article-title">{article.title}</h1>
+    {article.deck && <p class="article-deck">{article.deck}</p>}
+
+    <div class="article-meta-row">
+      <div class="author-meta">
+        <span class="author-name">{article.authorName}</span>
+        {article.authorRole && <span class="author-role">{article.authorRole}</span>}
+      </div>
+      <div class="meta-divider"></div>
+      <div class="article-dates">
+        {article.publishedAt && <span class="article-date">{formatDate(article.publishedAt)}</span>}
+        {article.readTime && <span class="article-read-time">{article.readTime} min read</span>}
+      </div>
+    </div>
+  </header>
+
+  <!-- ARTICLE BODY -->
+  <div class="article-body-wrapper">
+    <div class="article-body" set:html={bodyHtml} />
+  </div>
+
+  <!-- ARTICLE FOOTER -->
+  <footer class="article-footer">
+
+    <!-- FULL WIDTH RULE -->
+    <div class="footer-rule"></div>
+
+    <!-- AUTHOR BLOCK -->
+    <div class="author-block">
+      <div class="author-initial">{authorInitial(article.authorName)}</div>
+      <div class="author-info">
+        <p class="author-full-name">{article.authorName}</p>
+        {article.authorRole && <p class="author-role-full">{article.authorRole}</p>}
+        {article.authorBio && <p class="author-bio">{article.authorBio}</p>}
+        <p class="author-disclaimer">The views expressed are the author's own. hredd.org is an independent platform.</p>
+      </div>
+    </div>
+
+    <!-- REFERENCED LAWS -->
+    {referencedLaws.length > 0 && (
+      <div class="laws-referenced">
+        <p class="laws-label">Laws referenced in this article</p>
+        <div class="laws-pills">
+          {referencedLaws.map((law: any) => {
+            const lSlug = typeof law === 'string' ? law : (law.slug?.current || law.slug);
+            const lName = typeof law === 'string' ? law : (law.shortName || law.name || law);
+            return (
+              <a href={`/tracker/${lSlug}`} class="law-pill">{lName}</a>
+            );
+          })}
+        </div>
+      </div>
+    )}
+
+    <!-- RELATED ARTICLES -->
+    {relatedArticles.length > 0 && (
+      <div class="related-reading">
+        <p class="related-label">Continue reading</p>
+        <div class="related-grid">
+          {relatedArticles.slice(0, 2).map((rel: any) => {
+            const rSlug = rel.slug?.current || rel.slug;
+            return (
+              <article class="related-card">
+                <p class="related-card-category">{rel.category}</p>
+                <h3 class="related-card-title">
+                  <a href={`/articles/${rSlug}`}>{rel.title}</a>
+                </h3>
+                {rel.excerpt && <p class="related-card-excerpt">{rel.excerpt}</p>}
+                <p class="related-card-byline">{rel.authorName} &middot; {rel.readTime} min read</p>
+              </article>
+            );
+          })}
+        </div>
+      </div>
+    )}
+
+  </footer>
+
+</BaseLayout>
+
+<style>
+  /* ====================================================
+     ARTICLE HEADER
+     ==================================================== */
+
+  .article-header {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 56px 56px 40px;
+    border-bottom: 1px solid var(--rule-light);
+  }
+
+  .article-category {
+    font-family: var(--font-sans);
+    font-size: var(--text-10);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+
+  .article-title {
+    font-family: var(--font-serif);
+    font-size: var(--text-56);
+    font-weight: 400;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 20px;
+  }
+
+  .article-deck {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: var(--text-22);
+    color: var(--text-mid);
+    line-height: 1.5;
+    margin-bottom: 28px;
+  }
+
+  .article-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .author-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .author-name {
+    font-family: var(--font-sans);
+    font-size: var(--text-14);
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .author-role {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: var(--text-13);
+    color: var(--text-muted);
+  }
+
+  .meta-divider {
+    width: 1px;
+    height: 32px;
+    background: var(--rule-light);
+    flex-shrink: 0;
+  }
+
+  .article-dates {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .article-date,
+  .article-read-time {
+    font-family: var(--font-sans);
+    font-size: var(--text-12);
+    color: var(--text-muted);
+  }
+
+  /* ====================================================
+     ARTICLE BODY
+     ==================================================== */
+
+  .article-body-wrapper {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 0 56px 56px;
+  }
+
+  .article-body :global(.article-p) {
+    font-family: var(--font-serif);
+    font-size: var(--text-20);
+    line-height: 1.7;
+    color: #1A1510;
+    margin-bottom: 28px;
+  }
+
+  .article-body :global(.article-h2) {
+    font-family: var(--font-serif);
+    font-size: var(--text-32);
+    font-weight: 400;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    margin: 56px 0 20px;
+    color: var(--text);
+  }
+
+  /* Pull quote */
+  .article-body :global(.pull-quote) {
+    margin: 48px -80px;
+    padding: 40px 80px;
+    border-top: 2px solid var(--text);
+    border-bottom: 2px solid var(--text);
+  }
+
+  .article-body :global(.pull-quote blockquote p) {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: var(--text-30);
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+    color: var(--text);
+    margin-bottom: 0;
+  }
+
+  .article-body :global(.pull-quote-attr) {
+    font-family: var(--font-sans);
+    font-size: var(--text-11);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--accent);
+    margin-top: 16px;
+  }
+
+  /* Section break */
+  .article-body :global(.section-break) {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 48px 0;
+  }
+
+  .article-body :global(.section-break-line) {
+    flex: 1;
+    height: 1px;
+    background: var(--rule-light);
+  }
+
+  .article-body :global(.section-break-dots) {
+    font-family: var(--font-serif);
+    color: var(--accent);
+    font-size: var(--text-16);
+    letter-spacing: 0.2em;
+  }
+
+  /* Callout block */
+  .article-body :global(.callout-block) {
+    background: var(--surface);
+    border-left: 3px solid var(--accent);
+    padding: 32px 36px;
+    margin: 40px 0;
+  }
+
+  .article-body :global(.callout-label) {
+    display: block;
+    font-family: var(--font-sans);
+    font-size: var(--text-10);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+
+  .article-body :global(.callout-block p) {
+    font-family: var(--font-serif);
+    font-size: var(--text-17);
+    line-height: 1.6;
+    color: var(--text);
+    margin-bottom: 0;
+  }
+
+  /* Data block */
+  .article-body :global(.data-block) {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    border: 1px solid var(--rule);
+    padding: 32px 36px;
+    margin: 40px 0;
+    gap: 24px;
+  }
+
+  .article-body :global(.data-stat) {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .article-body :global(.data-number) {
+    font-family: var(--font-serif);
+    font-size: var(--text-48);
+    font-weight: 400;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .article-body :global(.data-label) {
+    font-family: var(--font-sans);
+    font-size: var(--text-12);
+    color: var(--text-mid);
+  }
+
+  /* Law reference inline tag */
+  .article-body :global(.law-ref) {
+    font-family: var(--font-sans);
+    font-size: var(--text-11);
+    font-weight: 500;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 2px 8px;
+    transition: background 0.15s, color 0.15s;
+  }
+
+  .article-body :global(.law-ref:hover) {
+    background: var(--accent);
+    color: var(--inverse-text);
+  }
+
+  /* ====================================================
+     ARTICLE FOOTER
+     ==================================================== */
+
+  .article-footer {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 0 56px 56px;
+  }
+
+  .footer-rule {
+    height: 1px;
+    background: var(--text);
+    margin-bottom: 40px;
+  }
+
+  /* Author block */
+  .author-block {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 48px;
+    padding-bottom: 48px;
+    border-bottom: 1px solid var(--rule-light);
+  }
+
+  .author-initial {
+    width: 52px;
+    height: 52px;
+    background: var(--text);
+    color: var(--inverse-text);
+    font-family: var(--font-serif);
+    font-size: var(--text-24);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .author-info {
+    flex: 1;
+  }
+
+  .author-full-name {
+    font-family: var(--font-sans);
+    font-size: var(--text-15);
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+
+  .author-role-full {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: var(--text-14);
+    color: var(--text-muted);
+    margin-bottom: 10px;
+  }
+
+  .author-bio {
+    font-family: var(--font-sans);
+    font-size: var(--text-13);
+    color: var(--text-mid);
+    line-height: 1.6;
+    margin-bottom: 10px;
+  }
+
+  .author-disclaimer {
+    font-family: var(--font-sans);
+    font-size: var(--text-13);
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
+  /* Laws referenced */
+  .laws-referenced {
+    margin-bottom: 48px;
+    padding-bottom: 48px;
+    border-bottom: 1px solid var(--rule-light);
+  }
+
+  .laws-label {
+    font-family: var(--font-sans);
+    font-size: var(--text-10);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    margin-bottom: 14px;
+  }
+
+  .laws-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .law-pill {
+    font-family: var(--font-sans);
+    font-size: var(--text-12);
+    border: 1px solid var(--rule);
+    padding: 6px 14px;
+    color: var(--text);
+    transition: border-color 0.15s, color 0.15s;
+  }
+
+  .law-pill:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* Related articles */
+  .related-reading {
+    margin-bottom: 0;
+  }
+
+  .related-label {
+    font-family: var(--font-sans);
+    font-size: var(--text-10);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    margin-bottom: 24px;
+  }
+
+  .related-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+
+  .related-card {
+    padding: 28px 24px 28px 0;
+    border-top: 1px solid var(--rule-light);
+  }
+
+  .related-card:nth-child(even) {
+    padding-left: 24px;
+    padding-right: 0;
+    border-left: 1px solid var(--rule-light);
+  }
+
+  .related-card-category {
+    font-family: var(--font-sans);
+    font-size: var(--text-10);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+
+  .related-card-title {
+    font-family: var(--font-serif);
+    font-size: var(--text-20);
+    font-weight: 400;
+    line-height: 1.2;
+    margin-bottom: 10px;
+  }
+
+  .related-card-title a {
+    color: var(--text);
+    transition: color 0.15s;
+  }
+
+  .related-card-title a:hover {
+    color: var(--accent);
+  }
+
+  .related-card-excerpt {
+    font-family: var(--font-sans);
+    font-size: var(--text-13);
+    line-height: 1.6;
+    color: var(--text-mid);
+    margin-bottom: 12px;
+  }
+
+  .related-card-byline {
+    font-family: var(--font-sans);
+    font-size: var(--text-11);
+    color: var(--text-muted);
+  }
+</style>

@@ -1,0 +1,351 @@
+/* ============================================================
+   CSS CUSTOM PROPERTIES
+   ============================================================ */
+
+:root {
+  /* Colours */
+  --bg:           #EEE9DD;
+  --text:         #161210;
+  --text-mid:     #4A3F32;
+  --text-muted:   #6B5D4F;
+  --accent:       #B8460E;
+  --rule:         #B8B0A2;
+  --rule-light:   #DCD3C0;
+  --surface:      #E5DFCE;
+  --inverse-bg:   #161210;
+  --inverse-text: #EEE9DD;
+
+  /* Typography */
+  --font-serif:   'EB Garamond', Georgia, serif;
+  --font-sans:    'Inter', system-ui, sans-serif;
+
+  /* Type scale */
+  --text-10:  10px;
+  --text-11:  11px;
+  --text-12:  12px;
+  --text-13:  13px;
+  --text-14:  14px;
+  --text-15:  15px;
+  --text-16:  16px;
+  --text-17:  17px;
+  --text-18:  18px;
+  --text-19:  19px;
+  --text-20:  20px;
+  --text-22:  22px;
+  --text-24:  24px;
+  --text-28:  28px;
+  --text-30:  30px;
+  --text-32:  32px;
+  --text-38:  38px;
+  --text-48:  48px;
+  --text-56:  56px;
+  --text-72:  72px;
+  --text-88:  88px;
+}
+
+/* ============================================================
+   RESET
+   ============================================================ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: var(--text-15);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+ul, ol {
+  list-style: none;
+}
+
+button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+}
+
+input {
+  font: inherit;
+  outline: none;
+}
+
+/* ============================================================
+   BASE TYPOGRAPHY
+   ============================================================ */
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-serif);
+  font-weight: 400;
+}
+
+/* ============================================================
+   LAYOUT UTILITIES
+   ============================================================ */
+
+.page-margins {
+  padding-left: 56px;
+  padding-right: 56px;
+}
+
+.section-padding {
+  padding-top: 56px;
+  padding-bottom: 56px;
+}
+
+/* ============================================================
+   STATUS TAGS
+   ============================================================ */
+
+.tag {
+  display: inline-block;
+  font-family: var(--font-sans);
+  font-size: var(--text-10);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+}
+
+.tag-force {
+  background: var(--text);
+  color: var(--inverse-text);
+}
+
+.tag-pending {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+}
+
+.tag-delayed {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--text-muted);
+}
+
+.tag-proposed {
+  background: transparent;
+  color: var(--text-mid);
+  border: 1px solid var(--text-mid);
+}
+
+/* ============================================================
+   CATEGORY TAGS
+   ============================================================ */
+
+.cat-tag {
+  font-family: var(--font-sans);
+  font-size: var(--text-10);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--accent);
+}
+
+/* ============================================================
+   TRACKER TABLE
+   ============================================================ */
+
+.tracker-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tracker-table th {
+  font-family: var(--font-sans);
+  font-size: var(--text-10);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--text-muted);
+  padding: 10px 0;
+  border-bottom: 1px solid var(--rule);
+  text-align: left;
+}
+
+.tracker-table th:last-child {
+  text-align: right;
+}
+
+.tracker-table td {
+  padding: 18px 0;
+  border-bottom: 1px solid var(--rule-light);
+  vertical-align: top;
+}
+
+.tracker-table .law-name {
+  font-family: var(--font-serif);
+  font-size: var(--text-18);
+  font-weight: 500;
+  color: var(--text);
+}
+
+.tracker-table .law-jurisdiction {
+  font-family: var(--font-sans);
+  font-size: var(--text-12);
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.tracker-table .law-update {
+  font-family: var(--font-sans);
+  font-size: var(--text-13);
+  color: var(--text-mid);
+  line-height: 1.5;
+}
+
+.tracker-table .law-date {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: var(--text-12);
+  color: var(--text-muted);
+  text-align: right;
+}
+
+/* ============================================================
+   ARTICLE CARDS
+   ============================================================ */
+
+.article-card {
+  padding: 40px 32px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.article-card:nth-child(odd) {
+  border-right: 1px solid var(--rule);
+  padding-left: 0;
+}
+
+.article-card:nth-child(even) {
+  padding-right: 0;
+}
+
+.article-card .card-category {
+  font-family: var(--font-sans);
+  font-size: var(--text-10);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--accent);
+  margin-bottom: 14px;
+}
+
+.article-card .card-title {
+  font-family: var(--font-serif);
+  font-size: var(--text-28);
+  font-weight: 400;
+  line-height: 1.18;
+  letter-spacing: -0.005em;
+  margin-bottom: 14px;
+}
+
+.article-card .card-excerpt {
+  font-family: var(--font-sans);
+  font-size: var(--text-14);
+  line-height: 1.65;
+  color: var(--text-mid);
+  margin-bottom: 16px;
+}
+
+.article-card .card-byline {
+  font-family: var(--font-sans);
+  font-size: var(--text-11);
+  color: var(--text-muted);
+  padding-top: 14px;
+  border-top: 1px solid var(--rule-light);
+}
+
+/* ============================================================
+   FILTER TABS
+   ============================================================ */
+
+.filter-tabs {
+  display: flex;
+  gap: 32px;
+  align-items: center;
+}
+
+.filter-tab {
+  font-family: var(--font-sans);
+  font-size: var(--text-12);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  padding-bottom: 8px;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.filter-tab.active {
+  color: var(--text);
+  border-bottom-color: var(--accent);
+}
+
+.filter-tab:hover {
+  color: var(--text);
+}
+
+/* ============================================================
+   SECTION LABELS
+   ============================================================ */
+
+.section-label {
+  font-family: var(--font-sans);
+  font-size: var(--text-10);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--accent);
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--rule-light);
+}
+
+/* ============================================================
+   BREADCRUMB
+   ============================================================ */
+
+.breadcrumb {
+  font-family: var(--font-sans);
+  font-size: var(--text-12);
+  color: var(--text-muted);
+  padding: 16px 0;
+}
+
+.breadcrumb a {
+  color: var(--text-muted);
+}
+
+.breadcrumb a:hover {
+  color: var(--accent);
+}
+
+.breadcrumb span {
+  margin: 0 8px;
+}

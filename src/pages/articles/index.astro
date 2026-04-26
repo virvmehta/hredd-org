@@ -1,0 +1,231 @@
+---
+import BaseLayout from '../../layouts/Base.astro';
+import { sanityClient } from '../../lib/sanity.js';
+import { getAllArticlesQuery } from '../../lib/queries.js';
+import { STATIC_ARTICLES } from '../../lib/staticData.js';
+
+let articles: any[] = [];
+try {
+  const fetched = await sanityClient.fetch(getAllArticlesQuery);
+  articles = fetched && fetched.length > 0 ? fetched : STATIC_ARTICLES;
+} catch {
+  articles = STATIC_ARTICLES;
+}
+
+const categories = ['All', 'From the Field', 'Legal Analysis', 'Implementation', 'Case Studies'];
+---
+
+<BaseLayout title="Articles — hredd.org" activePage="articles">
+
+  <!-- PAGE HEADER -->
+  <section class="page-header">
+    <h1 class="page-title">Articles</h1>
+    <p class="page-deck">Practitioner analysis, legal briefings, and field reports from the supply chains HREDD law is about.</p>
+  </section>
+
+  <!-- CATEGORY FILTER + COUNT -->
+  <div class="articles-controls page-margins">
+    <div class="filter-tabs" id="cat-tabs">
+      {categories.map(cat => (
+        <button class={`filter-tab${cat === 'All' ? ' active' : ''}`} data-category={cat}>{cat}</button>
+      ))}
+    </div>
+    <span class="article-count" id="article-count">Showing {articles.length} articles</span>
+  </div>
+
+  <!-- ARTICLE GRID -->
+  <div class="articles-section page-margins">
+    <div class="articles-grid" id="articles-grid">
+      {articles.map((article: any, i: number) => {
+        const slug = article.slug?.current || article.slug;
+        const isLastRow = i >= articles.length - 2;
+        return (
+          <article
+            class={`article-card${isLastRow ? ' article-card--no-bottom' : ''}`}
+            data-category={article.category}
+          >
+            <p class="card-category">{article.category}</p>
+            <h2 class="card-title">
+              <a href={`/articles/${slug}`}>{article.title}</a>
+            </h2>
+            <p class="card-excerpt">{article.excerpt}</p>
+            <p class="card-byline">{article.authorName} &middot; {article.readTime} min read</p>
+          </article>
+        );
+      })}
+    </div>
+  </div>
+
+</BaseLayout>
+
+<style>
+  /* ====================================================
+     PAGE HEADER
+     ==================================================== */
+
+  .page-header {
+    text-align: center;
+    padding: 56px;
+    border-bottom: 1px solid var(--text);
+  }
+
+  .page-title {
+    font-family: var(--font-serif);
+    font-size: var(--text-72);
+    font-weight: 400;
+    line-height: 1.0;
+    letter-spacing: -0.02em;
+    margin-bottom: 20px;
+  }
+
+  .page-deck {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: var(--text-19);
+    color: var(--text-mid);
+    max-width: 620px;
+    margin: 0 auto;
+    line-height: 1.5;
+  }
+
+  /* ====================================================
+     CONTROLS
+     ==================================================== */
+
+  .articles-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 32px;
+    padding-bottom: 0;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 0;
+  }
+
+  .article-count {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: var(--text-13);
+    color: var(--text-muted);
+    white-space: nowrap;
+    padding-bottom: 8px;
+  }
+
+  /* ====================================================
+     ARTICLES GRID
+     ==================================================== */
+
+  .articles-section {
+    border-bottom: 1px solid var(--text);
+    padding-bottom: 0;
+  }
+
+  .articles-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .article-card {
+    padding: 40px 32px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .article-card:nth-child(odd) {
+    border-right: 1px solid var(--rule);
+    padding-left: 0;
+  }
+
+  .article-card:nth-child(even) {
+    padding-right: 0;
+  }
+
+  .article-card--no-bottom {
+    border-bottom: none;
+  }
+
+  .article-card[hidden] {
+    display: none;
+  }
+
+  .card-category {
+    font-family: var(--font-sans);
+    font-size: var(--text-10);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--accent);
+    margin-bottom: 14px;
+  }
+
+  .card-title {
+    font-family: var(--font-serif);
+    font-size: var(--text-28);
+    font-weight: 400;
+    line-height: 1.18;
+    letter-spacing: -0.005em;
+    margin-bottom: 14px;
+  }
+
+  .card-title a {
+    color: var(--text);
+    transition: color 0.15s;
+  }
+
+  .card-title a:hover {
+    color: var(--accent);
+  }
+
+  .card-excerpt {
+    font-family: var(--font-sans);
+    font-size: var(--text-14);
+    line-height: 1.65;
+    color: var(--text-mid);
+    margin-bottom: 16px;
+  }
+
+  .card-byline {
+    font-family: var(--font-sans);
+    font-size: var(--text-11);
+    color: var(--text-muted);
+    padding-top: 14px;
+    border-top: 1px solid var(--rule-light);
+  }
+</style>
+
+<script>
+  const catTabs = document.getElementById('cat-tabs');
+  const grid = document.getElementById('articles-grid');
+  const countEl = document.getElementById('article-count');
+
+  if (catTabs && grid) {
+    catTabs.querySelectorAll<HTMLButtonElement>('.filter-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        catTabs.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+
+        const cat = tab.dataset.category || 'All';
+        const cards = grid.querySelectorAll<HTMLElement>('[data-category]');
+        let visible = 0;
+
+        cards.forEach((card, i) => {
+          const match = cat === 'All' || card.dataset.category === cat;
+          card.hidden = !match;
+          if (match) visible++;
+        });
+
+        // Fix border classes after filtering
+        const visibleCards = Array.from(cards).filter(c => !c.hidden);
+        visibleCards.forEach((card, i) => {
+          card.classList.remove('article-card--no-bottom');
+          if (i >= visibleCards.length - 2) {
+            card.classList.add('article-card--no-bottom');
+          }
+        });
+
+        if (countEl) {
+          countEl.textContent = `Showing ${visible} article${visible !== 1 ? 's' : ''}`;
+        }
+      });
+    });
+  }
+</script>

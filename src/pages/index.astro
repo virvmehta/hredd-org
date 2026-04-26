@@ -1,0 +1,432 @@
+---
+import BaseLayout from '../layouts/Base.astro';
+import { sanityClient } from '../lib/sanity.js';
+import { getAllArticlesQuery, getAllLawSlugsQuery, getSiteSettingsQuery } from '../lib/queries.js';
+import { STATIC_ARTICLES, STATIC_LAWS, STATIC_SITE_SETTINGS } from '../lib/staticData.js';
+
+let articles = [];
+let laws = [];
+let settings = STATIC_SITE_SETTINGS;
+
+try {
+  const [fetchedArticles, fetchedLaws, fetchedSettings] = await Promise.all([
+    sanityClient.fetch(getAllArticlesQuery),
+    sanityClient.fetch(getAllLawSlugsQuery),
+    sanityClient.fetch(getSiteSettingsQuery),
+  ]);
+  articles = fetchedArticles && fetchedArticles.length > 0 ? fetchedArticles : STATIC_ARTICLES;
+  laws = fetchedLaws && fetchedLaws.length > 0 ? fetchedLaws : STATIC_LAWS;
+  if (fetchedSettings) settings = fetchedSettings;
+} catch {
+  articles = STATIC_ARTICLES;
+  laws = STATIC_LAWS;
+}
+
+const previewLaws = laws.slice(0, 5);
+const previewArticles = articles.slice(0, 4);
+
+function getStatusTag(law: any) {
+  const type = law.statusType || 'proposed';
+  return `tag-${type}`;
+}
+
+function formatDate(dateStr: string) {
+  if (!dateStr) return '';
+  try {
+    return new Date(dateStr).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  } catch {
+    return dateStr;
+  }
+}
+---
+
+<BaseLayout title="hredd.org" activePage="home">
+
+  <!-- MASTHEAD -->
+  <section class="masthead">
+    <p class="masthead-eyebrow">Established 2026 &middot; Independent &middot; Monthly</p>
+    <h1 class="masthead-title">
+      Human rights<br />
+      <em>due diligence</em>
+    </h1>
+    <p class="masthead-deck">Tracking global HREDD legislation and its implications for those most affected and least consulted.</p>
+  </section>
+
+  <!-- ARTICLES SECTION -->
+  <section class="articles-section">
+    <div class="section-header">
+      <h2 class="section-header-title">This issue</h2>
+      <span class="section-header-meta">{settings.currentMonth || 'June 2026'} &middot; Four new pieces</span>
+    </div>
+    <div class="articles-grid">
+      {previewArticles.map((article: any, i: number) => (
+        <article class={`article-card${i >= previewArticles.length - 2 ? ' article-card--no-bottom' : ''}`}>
+          <p class="card-category">{article.category}</p>
+          <h3 class="card-title">
+            <a href={`/articles/${article.slug?.current || article.slug}`}>{article.title}</a>
+          </h3>
+          <p class="card-excerpt">{article.excerpt}</p>
+          <p class="card-byline">{article.authorName} &middot; {article.readTime} min read</p>
+        </article>
+      ))}
+    </div>
+    <div class="articles-cta">
+      <a href="/articles" class="cta-link">View all articles</a>
+    </div>
+  </section>
+
+  <!-- TRACKER PREVIEW -->
+  <section class="tracker-preview">
+    <div class="section-header">
+      <h2 class="section-header-title">The tracker</h2>
+      <span class="section-header-meta">
+        Updated {settings.trackerLastUpdated || 'June 2026'} &middot; 18 laws &middot; Next update {settings.trackerNextUpdate || 'July 2026'}
+      </span>
+    </div>
+    <table class="tracker-table">
+      <colgroup>
+        <col class="col-law" />
+        <col class="col-status" />
+        <col />
+        <col class="col-date" />
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Law</th>
+          <th>Status</th>
+          <th>Latest movement</th>
+          <th>Updated</th>
+        </tr>
+      </thead>
+      <tbody>
+        {previewLaws.map((law: any) => (
+          <tr>
+            <td>
+              <a href={`/tracker/${law.slug?.current || law.slug}`} class="law-name">{law.shortName || law.name}</a>
+              <p class="law-jurisdiction">{law.jurisdiction}</p>
+            </td>
+            <td>
+              <span class={`tag ${getStatusTag(law)}`}>{law.status}</span>
+            </td>
+            <td>
+              <p class="law-update">{law.tableUpdateText}</p>
+            </td>
+            <td>
+              <p class="law-date">{formatDate(law.lastUpdated)}</p>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+    <div class="tracker-cta">
+      <a href="/tracker" class="cta-link">View all 18 laws</a>
+    </div>
+  </section>
+
+  <!-- EDITORIAL QUOTE STRIP -->
+  <section class="quote-strip">
+    <blockquote class="quote-text">
+      &ldquo;{settings.editorialQuote}&rdquo;
+    </blockquote>
+    <p class="quote-attribution">From our editorial mission</p>
+  </section>
+
+  <!-- NEWSLETTER SECTION -->
+  <section class="newsletter-section" id="subscribe">
+    <p class="newsletter-eyebrow">The Monthly Brief</p>
+    <h2 class="newsletter-title">What moved this month, <em>and what it means</em></h2>
+    <p class="newsletter-deck">One email, the first Monday of every month. Tracker updates, new analysis, and the developments that matter most for Global South actors.</p>
+    <form class="newsletter-form" action="https://buttondown.email/hredd" method="post" target="_blank">
+      <input type="email" name="email" placeholder="your@email.com" class="newsletter-input" required />
+      <button type="submit" class="newsletter-button">Subscribe</button>
+    </form>
+  </section>
+
+</BaseLayout>
+
+<style>
+  /* ====================================================
+     MASTHEAD
+     ==================================================== */
+
+  .masthead {
+    text-align: center;
+    padding: 56px 56px;
+    border-bottom: 1px solid var(--text);
+    margin: 0 0px;
+  }
+
+  .masthead-eyebrow {
+    font-family: var(--font-sans);
+    font-size: var(--text-10);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    margin-bottom: 28px;
+  }
+
+  .masthead-title {
+    font-family: var(--font-serif);
+    font-size: var(--text-88);
+    font-weight: 400;
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    margin-bottom: 28px;
+  }
+
+  .masthead-deck {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: var(--text-20);
+    color: var(--text-mid);
+    max-width: 580px;
+    margin: 0 auto;
+    line-height: 1.5;
+  }
+
+  /* ====================================================
+     ARTICLES SECTION
+     ==================================================== */
+
+  .articles-section {
+    padding: 0 56px;
+    border-bottom: 1px solid var(--text);
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 56px 0 24px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .section-header-title {
+    font-family: var(--font-serif);
+    font-size: var(--text-32);
+    font-weight: 400;
+  }
+
+  .section-header-meta {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: var(--text-13);
+    color: var(--text-muted);
+  }
+
+  .articles-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .article-card {
+    padding: 40px 32px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .article-card:nth-child(odd) {
+    border-right: 1px solid var(--rule);
+    padding-left: 0;
+  }
+
+  .article-card:nth-child(even) {
+    padding-right: 0;
+  }
+
+  .article-card--no-bottom {
+    border-bottom: none;
+  }
+
+  .card-category {
+    font-family: var(--font-sans);
+    font-size: var(--text-10);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--accent);
+    margin-bottom: 14px;
+  }
+
+  .card-title {
+    font-family: var(--font-serif);
+    font-size: var(--text-28);
+    font-weight: 400;
+    line-height: 1.18;
+    letter-spacing: -0.005em;
+    margin-bottom: 14px;
+  }
+
+  .card-title a {
+    color: var(--text);
+  }
+
+  .card-title a:hover {
+    color: var(--accent);
+  }
+
+  .card-excerpt {
+    font-family: var(--font-sans);
+    font-size: var(--text-14);
+    line-height: 1.65;
+    color: var(--text-mid);
+    margin-bottom: 16px;
+  }
+
+  .card-byline {
+    font-family: var(--font-sans);
+    font-size: var(--text-11);
+    color: var(--text-muted);
+    padding-top: 14px;
+    border-top: 1px solid var(--rule-light);
+  }
+
+  .articles-cta {
+    text-align: center;
+    padding: 32px 0 56px;
+  }
+
+  .cta-link {
+    font-family: var(--font-sans);
+    font-size: var(--text-12);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text);
+    border-bottom: 1px solid var(--text);
+    padding-bottom: 2px;
+    transition: color 0.15s, border-color 0.15s;
+  }
+
+  .cta-link:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  /* ====================================================
+     TRACKER PREVIEW
+     ==================================================== */
+
+  .tracker-preview {
+    padding: 0 56px;
+    border-bottom: 1px solid var(--text);
+  }
+
+  .col-law    { width: 32%; }
+  .col-status { width: 18%; }
+  .col-date   { width: 18%; }
+
+  .tracker-cta {
+    text-align: center;
+    padding: 32px 0 56px;
+  }
+
+  /* ====================================================
+     EDITORIAL QUOTE STRIP
+     ==================================================== */
+
+  .quote-strip {
+    padding: 80px 56px;
+    text-align: center;
+    border-bottom: 1px solid var(--text);
+  }
+
+  .quote-text {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: var(--text-32);
+    line-height: 1.35;
+    max-width: 720px;
+    margin: 0 auto;
+    letter-spacing: -0.01em;
+    font-weight: 400;
+  }
+
+  .quote-attribution {
+    font-family: var(--font-sans);
+    font-size: var(--text-11);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--accent);
+    margin-top: 24px;
+  }
+
+  /* ====================================================
+     NEWSLETTER
+     ==================================================== */
+
+  .newsletter-section {
+    padding: 64px 56px;
+    text-align: center;
+    border-bottom: 1px solid var(--text);
+  }
+
+  .newsletter-eyebrow {
+    font-family: var(--font-sans);
+    font-size: var(--text-10);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+
+  .newsletter-title {
+    font-family: var(--font-serif);
+    font-size: var(--text-38);
+    font-weight: 400;
+    line-height: 1.15;
+    margin-bottom: 20px;
+  }
+
+  .newsletter-deck {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: var(--text-17);
+    color: var(--text-mid);
+    max-width: 480px;
+    margin: 0 auto 32px;
+    line-height: 1.5;
+  }
+
+  .newsletter-form {
+    display: flex;
+    max-width: 460px;
+    margin: 0 auto;
+  }
+
+  .newsletter-input {
+    flex: 1;
+    padding: 12px 16px;
+    background: transparent;
+    border: 1px solid var(--text);
+    border-right: none;
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-size: var(--text-14);
+  }
+
+  .newsletter-input::placeholder {
+    color: #8B7E6E;
+  }
+
+  .newsletter-button {
+    padding: 12px 24px;
+    background: var(--text);
+    color: var(--inverse-text);
+    font-family: var(--font-sans);
+    font-size: var(--text-11);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    border: 1px solid var(--text);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .newsletter-button:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+</style>

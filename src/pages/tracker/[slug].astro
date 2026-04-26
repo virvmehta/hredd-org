@@ -1,0 +1,803 @@
+---
+import BaseLayout from '../../layouts/Base.astro';
+import { sanityClient, renderPortableText } from '../../lib/sanity.js';
+import { getLawBySlugQuery, getAllLawSlugsQuery } from '../../lib/queries.js';
+import { STATIC_LAWS } from '../../lib/staticData.js';
+
+export async function getStaticPaths() {
+  let laws: any[] = [];
+  try {
+    const fetched = await sanityClient.fetch(getAllLawSlugsQuery);
+    laws = fetched && fetched.length > 0 ? fetched : STATIC_LAWS;
+  } catch {
+    laws = STATIC_LAWS;
+  }
+  return laws.map((law: any) => {
+    const s = typeof law.slug === 'object' ? law.slug.current : law.slug;
+    return { params: { slug: s }, props: { slug: s } };
+  });
+}
+
+const { slug } = Astro.params;
+let law: any = null;
+
+try {
+  law = await sanityClient.fetch(getLawBySlugQuery, { slug });
+} catch { /* fall through */ }
+
+if (!law) {
+  law = STATIC_LAWS.find((l: any) => {
+    const s = typeof l.slug === 'object' ? l.slug.current : l.slug;
+    return s === slug;
+  });
+}
+
+if (!law) return Astro.redirect('/tracker');
+
+const allLaws = STATIC_LAWS;
+const currentIndex = allLaws.findIndex((l: any) => {
+  const s = typeof l.slug === 'object' ? l.slug.current : l.slug;
+  return s === slug;
+});
+const prevLaw = currentIndex > 0 ? allLaws[currentIndex - 1] : null;
+const nextLaw = currentIndex < allLaws.length - 1 ? allLaws[currentIndex + 1] : null;
+
+function lawSlug(l: any) {
+  return typeof l.slug === 'object' ? l.slug.current : l.slug;
+}
+
+function getStatusTag(statusType: string) {
+  return `tag-${statusType || 'proposed'}`;
+}
+
+function formatDate(dateStr: string) {
+  if (!dateStr) return '';
+  try {
+    return new Date(dateStr).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+  } catch { return dateStr; }
+}
+
+// Render summary - handles both Sanity portable text and static array
+function renderSummary(summary: any[]) {
+  if (!summary || !Array.isArray(summary)) return '';
+  // Static data format: [{type: 'paragraph', text: '...'}]
+  if (summary.length > 0 && summary[0].type === 'paragraph') {
+    return summary.map((b: any) => {
+      if (b.type === 'paragraph') return `<p>${b.text}</p>`;
+      if (b.type === 'h2') return `<h2>${b.text}</h2>`;
+      return '';
+    }).join('');
+  }
+  // Sanity portable text
+  return renderPortableText(summary);
+}
+---
+
+<BaseLayout title={`${law.shortName || law.name} — hredd.org`} activePage="tracker">
+
+  <!-- BREADCRUMB -->
+  <div class="breadcrumb page-margins">
+    <a href="/tracker">Tracker</a>
+    <span>&rsaquo;</span>
+    <span>{law.region}</span>
+    <span>&rsaquo;</span>
+    <span>{law.shortName || law.name}</span>
+  </div>
+
+  <!-- LAW HEADER (full width) -->
+  <header class="law-header">
+    <p class="law-region-tag">{law.region}</p>
+    <h1 class="law-title">{law.name}</h1>
+    {law.shortName && <p class="law-subtitle">{law.shortName} &middot; {law.jurisdiction}</p>}
+    <div class="law-header-meta">
+      <span class={`tag ${getStatusTag(law.statusType)}`}>{law.status}</span>
+      {law.lastUpdated && <span class="law-updated">Last updated {formatDate(law.lastUpdated)}</span>}
+    </div>
+  </header>
+
+  <!-- TWO-COLUMN LAYOUT -->
+  <div class="law-body page-margins">
+
+    <!-- MAIN COLUMN -->
+    <main class="law-main">
+
+      <!-- PLAIN-LANGUAGE SUMMARY -->
+      <section class="law-section">
+        <p class="section-label">Plain-language summary</p>
+        <div class="summary-body" set:html={renderSummary(law.summary)} />
+      </section>
+
+      <!-- KEY OBLIGATIONS -->
+      {law.obligations && law.obligations.length > 0 && (
+        <section class="law-section">
+          <p class="section-label">Key obligations</p>
+          <ol class="obligations-list">
+            {law.obligations.map((ob: any, i: number) => (
+              <li class="obligation-item">
+                <span class="obligation-number">{i + 1}</span>
+                <div class="obligation-content">
+                  <p class="obligation-title">{ob.title}</p>
+                  <p class="obligation-detail">{ob.detail}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
+
+      <!-- IMPLEMENTATION TIMELINE -->
+      {law.timeline && law.timeline.length > 0 && (
+        <section class="law-section">
+          <p class="section-label">Implementation timeline</p>
+          <div class="timeline">
+            {law.timeline.map((entry: any) => (
+              <div class={`timeline-entry${entry.isFuture ? ' timeline-entry--future' : ''}`}>
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                  <p class="timeline-date">{entry.date}</p>
+                  <p class="timeline-event">{entry.event}</p>
+                  {entry.detail && <p class="timeline-detail">{entry.detail}</p>}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <!-- CHANGE LOG -->
+      {law.changelog && law.changelog.length > 0 && (
+        <section class="law-section">
+          <p class="section-label">Change log</p>
+          <div class="changelog" id="changelog">
+            {law.changelog.map((entry: any, i: number) => (
+              <div class="changelog-entry">
+                <button class="changelog-header" data-index={i} aria-expanded="false">
+                  <span class="changelog-date">{formatDate(entry.date)}</span>
+                  <span class="changelog-summary">{entry.summary}</span>
+                  <span class="changelog-toggle" aria-hidden="true">+</span>
+                </button>
+                <div class="changelog-body" id={`changelog-body-${i}`} hidden>
+                  <p>{entry.detail}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <!-- OFFICIAL SOURCES -->
+      {law.sources && law.sources.length > 0 && (
+        <section class="law-section">
+          <p class="section-label">Official sources</p>
+          <ul class="sources-list">
+            {law.sources.map((source: any) => (
+              <li class="source-item">
+                <span class="source-type-tag">{source.type}</span>
+                <a href={source.url} target="_blank" rel="noopener noreferrer" class="source-link">{source.title}</a>
+                <span class="source-org">{source.organisation}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+    </main>
+
+    <!-- SIDEBAR -->
+    <aside class="law-sidebar">
+
+      <!-- QUICK FACTS -->
+      <section class="sidebar-section">
+        <p class="section-label">Quick facts</p>
+        <dl class="quick-facts">
+          {law.jurisdiction && (
+            <>
+              <dt class="fact-label">Jurisdiction</dt>
+              <dd class="fact-value">{law.jurisdiction}</dd>
+            </>
+          )}
+          {law.status && (
+            <>
+              <dt class="fact-label">Status</dt>
+              <dd class="fact-value">{law.status}</dd>
+            </>
+          )}
+          {law.enactedDate && (
+            <>
+              <dt class="fact-label">Enacted</dt>
+              <dd class="fact-value">{law.enactedDate}</dd>
+            </>
+          )}
+          {law.firstComplianceDeadline && (
+            <>
+              <dt class="fact-label">First compliance deadline</dt>
+              <dd class="fact-value">{law.firstComplianceDeadline}</dd>
+            </>
+          )}
+          {law.companiesInScope && (
+            <>
+              <dt class="fact-label">Companies in scope</dt>
+              <dd class="fact-value">{law.companiesInScope}</dd>
+            </>
+          )}
+          {law.maxPenalty && (
+            <>
+              <dt class="fact-label">Maximum penalty</dt>
+              <dd class="fact-value">{law.maxPenalty}</dd>
+            </>
+          )}
+          {law.civilLiability && (
+            <>
+              <dt class="fact-label">Civil liability</dt>
+              <dd class="fact-value">{law.civilLiability}</dd>
+            </>
+          )}
+        </dl>
+      </section>
+
+      <!-- SECTORS MOST AFFECTED -->
+      {law.sectorsAffected && law.sectorsAffected.length > 0 && (
+        <section class="sidebar-section">
+          <p class="section-label">Sectors most affected</p>
+          <div class="tag-cloud">
+            {law.sectorsAffected.map((s: string) => (
+              <span class="small-tag">{s}</span>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <!-- SUPPLIER COUNTRIES AFFECTED -->
+      {law.supplierCountries && law.supplierCountries.length > 0 && (
+        <section class="sidebar-section">
+          <p class="section-label">Supplier countries affected</p>
+          <div class="tag-cloud">
+            {law.supplierCountries.map((c: string) => (
+              <span class="small-tag">{c}</span>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <!-- RELATED ARTICLES -->
+      {law.relatedArticles && law.relatedArticles.length > 0 && (
+        <section class="sidebar-section">
+          <p class="section-label">Related articles</p>
+          <div class="related-articles">
+            {law.relatedArticles.map((article: any) => (
+              <div class="related-article">
+                <span class="cat-tag">{article.category}</span>
+                <a href={`/articles/${article.slug?.current || article.slug}`} class="related-article-title">{article.title}</a>
+                <p class="related-article-byline">{article.authorName} &middot; {article.readTime} min read</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+    </aside>
+  </div>
+
+  <!-- BOTTOM NAVIGATION -->
+  <nav class="law-nav page-margins">
+    <div class="law-nav-inner">
+      {prevLaw ? (
+        <a href={`/tracker/${lawSlug(prevLaw)}`} class="law-nav-link law-nav-link--prev">
+          <span class="law-nav-dir">Previous law</span>
+          <span class="law-nav-name">{prevLaw.shortName || prevLaw.name}</span>
+        </a>
+      ) : <span></span>}
+      <a href="/tracker" class="law-nav-back">Back to tracker</a>
+      {nextLaw ? (
+        <a href={`/tracker/${lawSlug(nextLaw)}`} class="law-nav-link law-nav-link--next">
+          <span class="law-nav-dir">Next law</span>
+          <span class="law-nav-name">{nextLaw.shortName || nextLaw.name}</span>
+        </a>
+      ) : <span></span>}
+    </div>
+  </nav>
+
+</BaseLayout>
+
+<style>
+  /* ====================================================
+     LAW HEADER
+     ==================================================== */
+
+  .law-header {
+    padding: 48px 56px;
+    border-bottom: 1px solid var(--text);
+    max-width: 800px;
+  }
+
+  .law-region-tag {
+    font-family: var(--font-sans);
+    font-size: var(--text-10);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+
+  .law-title {
+    font-family: var(--font-serif);
+    font-size: var(--text-56);
+    font-weight: 400;
+    line-height: 1.0;
+    letter-spacing: -0.02em;
+    margin-bottom: 16px;
+  }
+
+  .law-subtitle {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: var(--text-18);
+    color: var(--text-muted);
+    margin-bottom: 20px;
+  }
+
+  .law-header-meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .law-updated {
+    font-family: var(--font-sans);
+    font-size: var(--text-12);
+    color: var(--text-muted);
+  }
+
+  /* ====================================================
+     TWO-COLUMN BODY
+     ==================================================== */
+
+  .law-body {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    align-items: start;
+  }
+
+  .law-main {
+    padding-right: 48px;
+    padding-top: 0;
+  }
+
+  .law-sidebar {
+    position: sticky;
+    top: 24px;
+    border-left: 1px solid var(--rule-light);
+    padding-left: 40px;
+    padding-top: 0;
+  }
+
+  /* ====================================================
+     LAW SECTIONS
+     ==================================================== */
+
+  .law-section {
+    padding: 48px 0;
+    border-bottom: 1px solid var(--rule-light);
+  }
+
+  .law-section:last-child {
+    border-bottom: none;
+  }
+
+  .summary-body p {
+    font-family: var(--font-serif);
+    font-size: var(--text-19);
+    line-height: 1.65;
+    color: #1A1510;
+    margin-bottom: 20px;
+  }
+
+  .summary-body p:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Obligations */
+  .obligations-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .obligation-item {
+    display: flex;
+    gap: 20px;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--rule-light);
+  }
+
+  .obligation-item:last-child {
+    border-bottom: none;
+  }
+
+  .obligation-number {
+    font-family: var(--font-serif);
+    font-size: var(--text-18);
+    font-weight: 500;
+    color: var(--accent);
+    flex-shrink: 0;
+    min-width: 24px;
+    line-height: 1.4;
+  }
+
+  .obligation-content {
+    flex: 1;
+  }
+
+  .obligation-title {
+    font-family: var(--font-sans);
+    font-size: var(--text-14);
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 6px;
+    line-height: 1.4;
+  }
+
+  .obligation-detail {
+    font-family: var(--font-sans);
+    font-size: var(--text-13);
+    color: var(--text-mid);
+    line-height: 1.6;
+  }
+
+  /* Timeline */
+  .timeline {
+    position: relative;
+    padding-left: 24px;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 10px;
+    bottom: 10px;
+    width: 1px;
+    background: var(--rule);
+  }
+
+  .timeline-entry {
+    position: relative;
+    padding-left: 24px;
+    padding-bottom: 28px;
+  }
+
+  .timeline-entry:last-child {
+    padding-bottom: 0;
+  }
+
+  .timeline-dot {
+    position: absolute;
+    left: -19px;
+    top: 4px;
+    width: 12px;
+    height: 12px;
+    background: var(--accent);
+    border: 2px solid var(--accent);
+  }
+
+  .timeline-entry--future .timeline-dot {
+    background: transparent;
+    border-color: #C9C0AE;
+  }
+
+  .timeline-entry--future .timeline-date,
+  .timeline-entry--future .timeline-event,
+  .timeline-entry--future .timeline-detail {
+    color: var(--text-muted);
+  }
+
+  .timeline-date {
+    font-family: var(--font-sans);
+    font-size: var(--text-11);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+
+  .timeline-event {
+    font-family: var(--font-sans);
+    font-size: var(--text-14);
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .timeline-detail {
+    font-family: var(--font-sans);
+    font-size: var(--text-13);
+    color: var(--text-mid);
+    line-height: 1.6;
+  }
+
+  /* Changelog */
+  .changelog {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .changelog-entry {
+    border-bottom: 1px solid var(--rule-light);
+  }
+
+  .changelog-entry:last-child {
+    border-bottom: none;
+  }
+
+  .changelog-header {
+    display: flex;
+    align-items: baseline;
+    gap: 20px;
+    width: 100%;
+    padding: 16px 0;
+    text-align: left;
+    cursor: pointer;
+    background: none;
+    border: none;
+  }
+
+  .changelog-date {
+    font-family: var(--font-serif);
+    font-size: var(--text-16);
+    font-weight: 500;
+    color: var(--text);
+    min-width: 120px;
+    flex-shrink: 0;
+  }
+
+  .changelog-summary {
+    font-family: var(--font-sans);
+    font-size: var(--text-13);
+    color: var(--text-mid);
+    flex: 1;
+    line-height: 1.4;
+  }
+
+  .changelog-toggle {
+    font-family: var(--font-sans);
+    font-size: var(--text-16);
+    color: var(--accent);
+    flex-shrink: 0;
+    line-height: 1;
+  }
+
+  .changelog-body {
+    font-family: var(--font-sans);
+    font-size: var(--text-14);
+    line-height: 1.65;
+    color: var(--text-mid);
+    padding: 0 0 20px 140px;
+  }
+
+  .changelog-body[hidden] {
+    display: none;
+  }
+
+  /* Sources */
+  .sources-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .source-item {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .source-type-tag {
+    font-family: var(--font-sans);
+    font-size: var(--text-10);
+    text-transform: uppercase;
+    border: 1px solid var(--rule);
+    padding: 2px 6px;
+    color: var(--text-muted);
+    flex-shrink: 0;
+  }
+
+  .source-link {
+    font-family: var(--font-sans);
+    font-size: var(--text-14);
+    color: var(--accent);
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    transition: text-decoration-color 0.15s;
+  }
+
+  .source-link:hover {
+    text-decoration-color: var(--accent);
+  }
+
+  .source-org {
+    font-family: var(--font-sans);
+    font-size: var(--text-12);
+    color: var(--text-muted);
+  }
+
+  /* ====================================================
+     SIDEBAR
+     ==================================================== */
+
+  .sidebar-section {
+    padding: 32px 0;
+    border-bottom: 1px solid var(--rule-light);
+  }
+
+  .sidebar-section:first-child {
+    padding-top: 48px;
+  }
+
+  .sidebar-section:last-child {
+    border-bottom: none;
+  }
+
+  .quick-facts {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .fact-label {
+    font-family: var(--font-sans);
+    font-size: var(--text-10);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+    margin-top: 14px;
+    margin-bottom: 2px;
+  }
+
+  .fact-label:first-child {
+    margin-top: 0;
+  }
+
+  .fact-value {
+    font-family: var(--font-serif);
+    font-size: var(--text-16);
+    color: var(--text);
+    line-height: 1.4;
+  }
+
+  .tag-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .small-tag {
+    font-family: var(--font-sans);
+    font-size: var(--text-11);
+    padding: 3px 8px;
+    background: var(--rule-light);
+    color: var(--text-mid);
+  }
+
+  .related-articles {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .related-article {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .related-article-title {
+    font-family: var(--font-serif);
+    font-size: var(--text-15);
+    color: var(--text);
+    line-height: 1.35;
+    transition: color 0.15s;
+  }
+
+  .related-article-title:hover {
+    color: var(--accent);
+  }
+
+  .related-article-byline {
+    font-family: var(--font-sans);
+    font-size: var(--text-11);
+    color: var(--text-muted);
+  }
+
+  /* ====================================================
+     BOTTOM NAVIGATION
+     ==================================================== */
+
+  .law-nav {
+    padding: 40px 56px;
+    border-top: 1px solid var(--text);
+    border-bottom: 1px solid var(--text);
+    margin-bottom: 0;
+  }
+
+  .law-nav-inner {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .law-nav-link {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    color: var(--text);
+  }
+
+  .law-nav-link--next {
+    text-align: right;
+    margin-left: auto;
+  }
+
+  .law-nav-dir {
+    font-family: var(--font-sans);
+    font-size: var(--text-10);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-muted);
+  }
+
+  .law-nav-name {
+    font-family: var(--font-serif);
+    font-size: var(--text-18);
+    color: var(--text);
+    transition: color 0.15s;
+  }
+
+  .law-nav-link:hover .law-nav-name {
+    color: var(--accent);
+  }
+
+  .law-nav-back {
+    font-family: var(--font-sans);
+    font-size: var(--text-12);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-muted);
+    text-align: center;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 2px;
+    transition: color 0.15s, border-color 0.15s;
+  }
+
+  .law-nav-back:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+</style>
+
+<script>
+  // Changelog accordion
+  const changelog = document.getElementById('changelog');
+  if (changelog) {
+    changelog.querySelectorAll<HTMLButtonElement>('.changelog-header').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = btn.dataset.index;
+        const body = document.getElementById(`changelog-body-${idx}`);
+        const toggle = btn.querySelector('.changelog-toggle');
+        if (!body || !toggle) return;
+
+        const isOpen = !body.hidden;
+        body.hidden = isOpen;
+        toggle.textContent = isOpen ? '+' : '−';
+        btn.setAttribute('aria-expanded', String(!isOpen));
+      });
+    });
+  }
+</script>
