@@ -5,6 +5,7 @@ export const getAllArticlesQuery = `*[_type == "article"] | order(publishedAt de
   publishedAt,
   readTime,
   excerpt,
+  deck,
   authorName
 }`;
 
@@ -34,6 +35,7 @@ export const getAllLawSlugsQuery = `*[_type == "trackerLaw"] | order(order asc) 
   statusType,
   lastUpdated,
   tableUpdateText,
+  countryCode,
   order
 }`;
 
@@ -55,6 +57,7 @@ export const getLawBySlugQuery = `*[_type == "trackerLaw" && slug.current == $sl
   enforcementBody,
   sectorsAffected,
   supplierCountries,
+  countryCode,
   summary,
   obligations,
   timeline,
@@ -71,6 +74,7 @@ export const getSiteSettingsQuery = `*[_type == "siteSettings"][0] {
   trackerLastUpdated,
   trackerNextUpdate,
   editorialQuote,
+  articleDisclaimer,
   movementsThisMonth
 }`;
 
@@ -84,5 +88,6 @@ export const getAllLawRegionsQuery = `*[_type == "trackerLaw"] | order(order asc
   statusType,
   lastUpdated,
   tableUpdateText,
+  countryCode,
   order
 }`;

@@ -3,8 +3,11 @@ import BaseLayout from '../../layouts/Base.astro';
 import { sanityClient } from '../../lib/sanity.js';
 import { getAllLawRegionsQuery, getSiteSettingsQuery } from '../../lib/queries.js';
 import { STATIC_LAWS, STATIC_SITE_SETTINGS } from '../../lib/staticData.js';
+import { feature } from 'topojson-client';
+import { geoEqualEarth, geoPath } from 'd3-geo';
+import worldData from 'world-atlas/countries-110m.json';
 
-let laws = [];
+let laws: any[] = [];
 let settings = STATIC_SITE_SETTINGS;
 
 try {
@@ -42,16 +45,85 @@ const pending = laws.filter((l: any) => l.statusType === 'pending').length;
 const proposed = laws.filter((l: any) => l.statusType === 'proposed' || l.statusType === 'delayed').length;
 
 const movements = settings.movementsThisMonth || STATIC_SITE_SETTINGS.movementsThisMonth;
+
+// Dynamic banner dates
+const MONTH_NAMES = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+];
+
+function mostRecentUpdateDate(lawsList: any[]): Date | null {
+  let latest: Date | null = null;
+  for (const l of lawsList) {
+    if (!l.lastUpdated) continue;
+    const d = new Date(l.lastUpdated);
+    if (!latest || d > latest) latest = d;
+  }
+  return latest;
+}
+
+const latestUpdateDate = mostRecentUpdateDate(laws);
+const updatedLabel = latestUpdateDate
+  ? `${MONTH_NAMES[latestUpdateDate.getMonth()]} ${latestUpdateDate.getFullYear()}`
+  : (settings.trackerLastUpdated || 'June 2026');
+
+const nextUpdateDate = latestUpdateDate
+  ? new Date(latestUpdateDate.getFullYear(), latestUpdateDate.getMonth() + 1, 1)
+  : null;
+const nextUpdateLabel = nextUpdateDate
+  ? `${MONTH_NAMES[nextUpdateDate.getMonth()]} ${nextUpdateDate.getFullYear()}`
+  : (settings.trackerNextUpdate || 'July 2026');
+
+// ====================================================
+// WORLD MAP: server-side SVG generation via d3-geo
+// ISO 3166-1 numeric codes for countries with HREDD laws
+// ====================================================
+
+// Map: ISO numeric -> country key used in lawsByCountry JS object
+const isoNumericToKey: Record<number, string> = {
+  276: 'germany',
+  250: 'france',
+  528: 'netherlands',
+  578: 'norway',
+  826: 'uk',
+  756: 'switzerland',
+  840: 'usa',
+  124: 'canada',
+  76: 'brazil',
+  356: 'india',
+  392: 'japan',
+  410: 'korea',
+  36: 'australia',
+};
+
+const lawCountryIds = new Set(Object.keys(isoNumericToKey).map(Number));
+
+// Generate SVG paths from Natural Earth 110m TopoJSON (world-atlas package)
+// Uses Equal Earth projection (no Mercator distortion of the Global South)
+const countriesGeo = feature(worldData as any, (worldData as any).objects.countries);
+const projection = geoEqualEarth().fitExtent([[2, 2], [958, 478]], countriesGeo as any);
+const pathGen = geoPath().projection(projection);
+
+const countryPaths = (countriesGeo as any).features.map((feat: any) => {
+  const id = typeof feat.id === 'string' ? parseInt(feat.id, 10) : feat.id;
+  const hasLaws = lawCountryIds.has(id);
+  const key = isoNumericToKey[id] || null;
+  const d = pathGen(feat) || '';
+  return { id, hasLaws, key, d };
+}).filter((c: any) => c.d);
 ---
 
-<BaseLayout title="The Tracker — hredd.org" activePage="tracker">
+<BaseLayout
+  title="The Tracker — hredd.org"
+  description="Eighteen pieces of HREDD legislation across twelve jurisdictions, tracked monthly."
+  activePage="tracker"
+>
 
-  <!-- BREADCRUMB -->
-  <div class="breadcrumb page-margins">Tracker</div>
-
-  <!-- PAGE HEADER -->
-  <section class="page-header">
-    <p class="page-eyebrow">Updated {settings.trackerLastUpdated || 'June 2026'} &middot; Next update {settings.trackerNextUpdate || 'July 2026'}</p>
+  <!-- SECTION 1: PAGE HEADER -->
+  <section class="page-header snap-section" id="tracker-header">
+    <a href="#movements" class="date-banner" id="date-banner">
+      UPDATED {updatedLabel.toUpperCase()} &middot; NEXT UPDATE {nextUpdateLabel.toUpperCase()}
+    </a>
     <h1 class="page-title">The <em>tracker</em></h1>
     <p class="page-deck">Eighteen pieces of HREDD legislation across twelve jurisdictions, tracked monthly.</p>
     <p class="page-meta">
@@ -65,8 +137,9 @@ const movements = settings.movementsThisMonth || STATIC_SITE_SETTINGS.movementsT
     </p>
   </section>
 
-  <!-- THIS MONTH'S MOVEMENTS -->
-  <section class="movements-section page-margins">
+  <!-- SECTION 2: THIS MONTH'S MOVEMENTS -->
+  <section class="movements-section page-margins snap-section" id="movements">
+    <p class="movements-heading section-label">This month's movements</p>
     <div class="movements-grid">
       {movements.map((m: any) => (
         <div class="movement-card">
@@ -78,186 +151,31 @@ const movements = settings.movementsThisMonth || STATIC_SITE_SETTINGS.movementsT
     </div>
   </section>
 
-  <!-- INTERACTIVE MAP -->
-  <section class="map-section page-margins">
+  <!-- SECTION 3: WORLD MAP + DETAIL PANEL -->
+  <section class="map-section page-margins snap-section" id="map">
     <p class="map-instruction">Highlighted countries have HREDD legislation. Click to explore.</p>
 
     <div class="map-container">
-      <!-- SVG World Map: equirectangular projection, viewBox 0 0 960 500 -->
-      <!-- x = (lon + 180) * 2.667 | y = (90 - lat) * 2.778 -->
       <svg
         id="world-map"
-        viewBox="0 0 960 500"
+        viewBox="0 0 960 480"
         xmlns="http://www.w3.org/2000/svg"
         aria-label="Interactive world map showing countries with HREDD legislation"
       >
         <!-- Ocean background -->
-        <rect width="960" height="500" fill="#D6CDB8" />
+        <rect width="960" height="480" fill="#C8C0AE" />
 
-        <!-- ======================================
-             BACKGROUND LAND MASSES (non-interactive)
-             ====================================== -->
-
-        <!-- Greenland -->
-        <polygon class="land" points="338,22 395,15 432,22 436,50 418,65 388,70 358,58 338,44"/>
-
-        <!-- North America (background, includes Mexico/Central America not covered by specific countries) -->
-        <polygon class="land" points="32,58 108,30 195,22 265,22 315,40 335,80 315,90 315,150 295,150 245,168 205,175 165,155 140,155 115,105 88,93"/>
-
-        <!-- Caribbean / small islands (simplified dot) -->
-        <circle class="land" cx="290" cy="248" r="4"/>
-        <circle class="land" cx="305" cy="250" r="3"/>
-
-        <!-- South America -->
-        <polygon class="land" points="205,250 278,238 328,238 388,253 396,298 390,350 368,400 332,448 293,460 258,432 238,393 228,335 218,282"/>
-
-        <!-- Iceland -->
-        <polygon class="land" points="396,75 420,70 432,80 420,90 400,88"/>
-
-        <!-- Europe (background land mass) -->
-        <polygon class="land" points="430,82 460,78 465,90 472,80 490,52 538,47 565,52 560,80 542,95 548,108 582,108 588,142 578,178 542,198 510,200 488,190 460,204 435,188 435,150 453,140 455,115 440,107"/>
-
-        <!-- Iberian Peninsula extension -->
-        <polygon class="land" points="430,155 458,148 460,170 445,180 430,172"/>
-
-        <!-- Italy boot (simplified) -->
-        <polygon class="land" points="490,148 510,145 515,172 505,195 495,190 488,165"/>
-
-        <!-- Africa -->
-        <polygon class="land" points="435,202 465,197 508,197 570,208 588,235 600,295 578,375 558,448 498,480 445,445 428,383 425,312 430,252"/>
-
-        <!-- Arabian Peninsula -->
-        <polygon class="land" points="572,218 620,210 638,232 628,268 608,280 588,265 572,245"/>
-
-        <!-- Russia / Northern Asia -->
-        <polygon class="land" points="515,30 722,28 888,25 950,42 950,145 900,162 862,158 828,125 792,122 768,140 745,158 715,170 688,163 660,180 638,158 618,148 600,158 578,152 558,122 515,100"/>
-
-        <!-- Central and South Asia -->
-        <polygon class="land" points="558,152 620,148 660,182 692,180 748,172 770,200 803,238 818,270 795,298 758,300 748,278 725,285 700,275 675,295 642,275 618,252 595,275 578,248 558,205"/>
-
-        <!-- Southeast Asia (Indochina/Malaysia simplified) -->
-        <polygon class="land" points="748,278 770,265 800,270 810,295 795,310 768,318 748,305"/>
-
-        <!-- East Asia mainland (China/Korea) -->
-        <polygon class="land" points="745,158 800,135 828,125 828,162 800,172 768,175 748,165"/>
-
-        <!-- Taiwan -->
-        <polygon class="land" points="842,198 850,195 853,210 845,212"/>
-
-        <!-- Indonesia / Philippines (simplified blobs) -->
-        <ellipse class="land" cx="815" cy="335" rx="30" ry="10"/>
-        <ellipse class="land" cx="850" cy="320" rx="20" ry="8"/>
-        <ellipse class="land" cx="855" cy="280" rx="12" ry="6"/>
-
-        <!-- New Zealand (simplified) -->
-        <polygon class="land" points="900,415 910,408 920,420 912,432 900,428"/>
-        <polygon class="land" points="905,440 915,435 918,448 908,452"/>
-
-        <!-- Sri Lanka -->
-        <ellipse class="land" cx="690" cy="250" rx="6" ry="9"/>
-
-        <!-- Madagascar -->
-        <polygon class="land" points="570,338 582,328 590,358 582,385 570,378"/>
-
-        <!-- ======================================
-             INTERACTIVE COUNTRIES WITH HREDD LAWS
-             ====================================== -->
-
-        <!-- Canada -->
-        <polygon
-          class="country has-laws"
-          data-country="canada"
-          points="108,60 195,22 265,22 315,42 315,88 295,95 295,150 255,150 235,165 205,168 165,155 140,155 110,105"
-        />
-
-        <!-- USA (continental) -->
-        <polygon
-          class="country has-laws"
-          data-country="usa"
-          points="148,150 295,150 308,162 312,182 295,198 255,198 215,192 170,198 152,185 148,165"
-        />
-
-        <!-- Brazil -->
-        <polygon
-          class="country has-laws"
-          data-country="brazil"
-          points="278,238 388,255 394,298 388,350 365,398 330,445 292,458 257,430 237,393 228,335 218,282 255,252"
-        />
-
-        <!-- UK (Great Britain, simplified) -->
-        <polygon
-          class="country has-laws"
-          data-country="uk"
-          points="448,90 472,87 477,100 472,117 458,118 447,108"
-        />
-        <!-- Ireland (not clickable, context only) -->
-        <polygon class="land" points="432,100 445,97 447,110 440,115 432,110"/>
-
-        <!-- Norway (mainland, simplified) -->
-        <polygon
-          class="country has-laws"
-          data-country="norway"
-          points="490,52 538,47 565,52 560,80 540,95 510,92 490,82"
-        />
-
-        <!-- Netherlands (small) -->
-        <polygon
-          class="country has-laws"
-          data-country="netherlands"
-          points="490,103 503,101 505,111 490,111"
-        />
-
-        <!-- Germany -->
-        <polygon
-          class="country has-laws"
-          data-country="germany"
-          points="498,100 522,98 527,108 522,122 510,125 498,118"
-        />
-
-        <!-- France (including Corsica omitted for simplicity) -->
-        <polygon
-          class="country has-laws"
-          data-country="france"
-          points="458,110 500,108 504,122 493,133 472,134 458,122"
-        />
-
-        <!-- Switzerland (tiny) -->
-        <polygon
-          class="country has-laws"
-          data-country="switzerland"
-          points="498,118 512,117 513,125 498,125"
-        />
-
-        <!-- India (simplified peninsular shape) -->
-        <polygon
-          class="country has-laws"
-          data-country="india"
-          points="660,152 737,152 742,185 735,228 715,240 692,235 668,218 660,185"
-        />
-
-        <!-- Japan (main islands, simplified) -->
-        <polygon
-          class="country has-laws"
-          data-country="japan"
-          points="828,128 862,125 868,150 852,168 828,160"
-        />
-
-        <!-- South Korea (small) -->
-        <polygon
-          class="country has-laws"
-          data-country="korea"
-          points="816,147 828,145 828,160 816,158"
-        />
-
-        <!-- Australia -->
-        <polygon
-          class="country has-laws"
-          data-country="australia"
-          points="780,280 892,278 895,368 850,390 795,375 778,338"
-        />
-
-        <!-- Tasmania -->
-        <polygon class="land" points="830,395 845,390 848,405 835,408"/>
+        {countryPaths.map((c: any) => (
+          <path
+            d={c.d}
+            class={c.hasLaws ? 'country has-laws' : 'country'}
+            data-country={c.key}
+            data-country-id={String(c.id)}
+            tabindex={c.hasLaws ? '0' : undefined}
+            role={c.hasLaws ? 'button' : undefined}
+            aria-label={c.hasLaws ? `View HREDD laws for ${c.key}` : undefined}
+          />
+        ))}
       </svg>
     </div>
 
@@ -283,25 +201,8 @@ const movements = settings.movementsThisMonth || STATIC_SITE_SETTINGS.movementsT
     </div>
   </section>
 
-  <!-- SUPPLIER FILTER SECTION -->
-  <section class="supplier-filter">
-    <div class="filter-intro">
-      <h2 class="filter-title">What applies to your buyers</h2>
-      <p class="filter-deck">Select the countries you export to. We will show you which HREDD laws your buyers are subject to.</p>
-    </div>
-    <p class="filter-label">My buyers are in</p>
-    <div class="filter-pills" id="filter-pills">
-      {['Germany', 'France', 'Netherlands', 'Norway', 'United Kingdom', 'Switzerland', 'United States', 'Canada', 'Japan', 'Australia', 'South Korea', 'EU-wide'].map(country => (
-        <button class="filter-pill" data-country={country}>{country}</button>
-      ))}
-    </div>
-    <div class="filter-summary" id="filter-summary">
-      <p class="filter-summary-text" id="filter-summary-text">Select one or more buyer countries above to see what applies.</p>
-    </div>
-  </section>
-
-  <!-- FULL TABLE SECTION -->
-  <section class="full-table-section page-margins">
+  <!-- SECTION 4: FULL TABLE -->
+  <section class="full-table-section page-margins snap-section" id="full-table">
     <div class="table-controls">
       <div class="filter-tabs" id="status-tabs">
         <button class="filter-tab active" data-status="all">All</button>
@@ -360,23 +261,56 @@ const movements = settings.movementsThisMonth || STATIC_SITE_SETTINGS.movementsT
 
 <style>
   /* ====================================================
+     SCROLL SNAP
+     ==================================================== */
+
+  :global(html) {
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+  }
+
+  @media (max-width: 768px) {
+    :global(html) {
+      scroll-snap-type: y proximity;
+    }
+  }
+
+  .snap-section {
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  /* ====================================================
      PAGE HEADER
      ==================================================== */
 
   .page-header {
     text-align: center;
-    padding: 56px;
+    padding: 40px 56px 48px;
     border-bottom: 1px solid var(--text);
   }
 
-  .page-eyebrow {
+  .date-banner {
+    display: inline-block;
+    background: var(--accent);
+    color: var(--inverse-text);
     font-family: var(--font-sans);
     font-size: var(--text-10);
     font-weight: 500;
-    text-transform: uppercase;
     letter-spacing: 0.2em;
-    color: var(--accent);
-    margin-bottom: 20px;
+    padding: 8px 20px;
+    margin-bottom: 32px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+
+  .date-banner:hover {
+    opacity: 0.85;
   }
 
   .page-title {
@@ -423,6 +357,10 @@ const movements = settings.movementsThisMonth || STATIC_SITE_SETTINGS.movementsT
     border-bottom: 1px solid var(--text);
   }
 
+  .movements-heading {
+    margin-bottom: 32px;
+  }
+
   .movements-grid {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
@@ -464,8 +402,8 @@ const movements = settings.movementsThisMonth || STATIC_SITE_SETTINGS.movementsT
      ==================================================== */
 
   .map-section {
-    padding-top: 48px;
-    padding-bottom: 48px;
+    padding-top: 40px;
+    padding-bottom: 40px;
     border-bottom: 1px solid var(--text);
   }
 
@@ -475,12 +413,14 @@ const movements = settings.movementsThisMonth || STATIC_SITE_SETTINGS.movementsT
     font-size: var(--text-14);
     color: var(--text-muted);
     text-align: center;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
   }
 
+  /* Constrain map width so height stays under 50vh (~460px at common screen widths) */
   .map-container {
+    max-width: 900px;
+    margin: 0 auto;
     background: var(--surface);
-    padding: 24px;
     border: 1px solid var(--rule);
     overflow: hidden;
   }
@@ -491,27 +431,25 @@ const movements = settings.movementsThisMonth || STATIC_SITE_SETTINGS.movementsT
     display: block;
   }
 
-  /* Land and country base styles */
-  .land {
-    fill: #C9C0AE;
-    stroke: #EEE9DD;
-    stroke-width: 0.5;
-  }
-
+  /* Country styles */
   .country {
+    fill: #D8CFB8;
     stroke: #EEE9DD;
-    stroke-width: 0.5;
+    stroke-width: 0.4;
     cursor: default;
-    transition: fill 0.15s;
   }
 
   .country.has-laws {
-    fill: #4A3F32;
+    fill: #3D332B;
     cursor: pointer;
+    transition: stroke 0.15s, stroke-width 0.15s;
   }
 
-  .country.has-laws:hover {
-    fill: #B8460E;
+  .country.has-laws:hover,
+  .country.has-laws:focus {
+    stroke: #B8460E;
+    stroke-width: 1.5;
+    outline: none;
   }
 
   .country.selected {
@@ -523,7 +461,7 @@ const movements = settings.movementsThisMonth || STATIC_SITE_SETTINGS.movementsT
     display: flex;
     justify-content: center;
     gap: 24px;
-    margin-top: 16px;
+    margin-top: 12px;
     font-family: var(--font-sans);
     font-size: var(--text-12);
     color: var(--text-muted);
@@ -542,8 +480,8 @@ const movements = settings.movementsThisMonth || STATIC_SITE_SETTINGS.movementsT
     flex-shrink: 0;
   }
 
-  .legend-swatch--laws     { background: #4A3F32; }
-  .legend-swatch--none     { background: #C9C0AE; }
+  .legend-swatch--laws     { background: #3D332B; }
+  .legend-swatch--none     { background: #D8CFB8; }
   .legend-swatch--selected { background: #B8460E; }
 
   /* COUNTRY DETAIL PANEL */
@@ -551,7 +489,10 @@ const movements = settings.movementsThisMonth || STATIC_SITE_SETTINGS.movementsT
     border: 1px solid var(--rule);
     padding: 24px;
     background: var(--bg);
-    margin-top: 24px;
+    margin-top: 16px;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   .country-panel-default {
@@ -562,7 +503,9 @@ const movements = settings.movementsThisMonth || STATIC_SITE_SETTINGS.movementsT
     text-align: center;
   }
 
-  .panel-country-name {
+  /* Panel inner classes are dynamically injected via JS innerHTML,
+     so they must be global to bypass Astro's scoped attribute selector. */
+  :global(.panel-country-name) {
     font-family: var(--font-serif);
     font-size: var(--text-24);
     font-weight: 500;
@@ -570,112 +513,67 @@ const movements = settings.movementsThisMonth || STATIC_SITE_SETTINGS.movementsT
     color: var(--text);
   }
 
-  .panel-law-list {
+  :global(.panel-law-list) {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 0;
   }
 
-  .panel-law-item {
+  :global(.panel-law-item) {
     display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 0;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 0;
     border-bottom: 1px solid var(--rule-light);
   }
 
-  .panel-law-item:last-child {
+  :global(.panel-law-item:last-child) {
     border-bottom: none;
   }
 
-  .panel-law-name {
-    font-family: var(--font-serif);
-    font-size: var(--text-16);
-    color: var(--text);
+  :global(.panel-law-info) {
     flex: 1;
   }
 
-  /* ====================================================
-     SUPPLIER FILTER
-     ==================================================== */
-
-  .supplier-filter {
-    background: var(--inverse-bg);
-    padding: 32px 56px;
-    border-bottom: 1px solid var(--rule);
-  }
-
-  .filter-intro {
-    margin-bottom: 24px;
-  }
-
-  .filter-title {
+  :global(.panel-law-name) {
     font-family: var(--font-serif);
-    font-size: var(--text-28);
-    font-weight: 400;
-    color: var(--inverse-text);
-    margin-bottom: 10px;
+    font-size: var(--text-17);
+    color: var(--text);
+    display: block;
+    margin-bottom: 4px;
+    transition: color 0.15s;
   }
 
-  .filter-deck {
-    font-family: var(--font-serif);
-    font-style: italic;
-    font-size: var(--text-16);
-    color: #C9C0AE;
-    line-height: 1.5;
-    max-width: 580px;
-  }
-
-  .filter-label {
-    font-family: var(--font-sans);
-    font-size: var(--text-10);
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.16em;
+  :global(.panel-law-name:hover) {
     color: var(--accent);
-    margin-bottom: 14px;
   }
 
-  .filter-pills {
+  :global(.panel-law-summary) {
+    font-family: var(--font-sans);
+    font-size: var(--text-13);
+    color: var(--text-mid);
+    line-height: 1.5;
+  }
+
+  :global(.panel-law-meta) {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: flex-end;
     gap: 8px;
-    margin-bottom: 20px;
+    flex-shrink: 0;
   }
 
-  .filter-pill {
+  :global(.panel-read-more) {
     font-family: var(--font-sans);
     font-size: var(--text-12);
-    padding: 8px 16px;
-    background: transparent;
-    border: 1px solid #6B5D4F;
-    color: #C9C0AE;
-    cursor: pointer;
-    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    color: var(--accent);
+    white-space: nowrap;
+    transition: opacity 0.15s;
   }
 
-  .filter-pill:hover {
-    border-color: var(--accent);
-    color: var(--inverse-text);
-  }
-
-  .filter-pill.active {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: var(--inverse-text);
-  }
-
-  .filter-summary {
-    border-top: 1px solid #4A3F32;
-    padding-top: 20px;
-  }
-
-  .filter-summary-text {
-    font-family: var(--font-serif);
-    font-style: italic;
-    font-size: var(--text-15);
-    color: #8B7E6E;
-    line-height: 1.5;
+  :global(.panel-read-more:hover) {
+    opacity: 0.7;
   }
 
   /* ====================================================
@@ -683,8 +581,9 @@ const movements = settings.movementsThisMonth || STATIC_SITE_SETTINGS.movementsT
      ==================================================== */
 
   .full-table-section {
-    padding-top: 48px;
-    padding-bottom: 48px;
+    padding-top: 40px;
+    padding-bottom: 60px;
+    overflow-y: auto;
   }
 
   .table-controls {
@@ -718,36 +617,162 @@ const movements = settings.movementsThisMonth || STATIC_SITE_SETTINGS.movementsT
     letter-spacing: 0.2em;
     color: var(--accent);
   }
+
+  /* ====================================================
+     MOBILE
+     ==================================================== */
+
+  @media (max-width: 768px) {
+    .snap-section {
+      min-height: unset;
+      scroll-snap-align: none;
+    }
+
+    .page-header {
+      padding: 32px 20px 40px;
+    }
+
+    .movements-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .map-section,
+    .movements-section,
+    .full-table-section {
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+  }
 </style>
 
 <script>
   /* ======================================================
-     LAWS BY COUNTRY DATA (mirrors brief specification)
+     LAWS BY COUNTRY DATA
      ====================================================== */
 
-  const lawsByCountry: Record<string, Array<{name: string; status: string; tag: string; slug: string}>> = {
-    germany: [{name: 'German Supply Chain Act (LkSG)', status: 'In force', tag: 'tag-force', slug: 'german-supply-chain-act-lksg'}],
-    france: [{name: 'French Duty of Vigilance Law', status: 'In force', tag: 'tag-force', slug: 'french-duty-of-vigilance-law'}],
-    netherlands: [{name: 'Dutch Child Labour Due Diligence Act', status: 'In force', tag: 'tag-force', slug: 'dutch-child-labour-due-diligence-act'}],
-    norway: [{name: 'Norwegian Transparency Act', status: 'In force', tag: 'tag-force', slug: 'norwegian-transparency-act'}],
-    uk: [{name: 'UK Modern Slavery Act', status: 'Updates pending', tag: 'tag-pending', slug: 'uk-modern-slavery-act'}],
-    switzerland: [{name: 'Swiss Responsible Business Ordinance', status: 'Under review', tag: 'tag-proposed', slug: 'swiss-responsible-business-ordinance'}],
+  const lawsByCountry: Record<string, Array<{
+    name: string;
+    status: string;
+    tag: string;
+    slug: string;
+    summary: string;
+  }>> = {
+    germany: [{
+      name: 'German Supply Chain Act (LkSG)',
+      status: 'In force',
+      tag: 'tag-force',
+      slug: 'german-supply-chain-act-lksg',
+      summary: 'BAFA issues seventh enforcement action',
+    }],
+    france: [{
+      name: 'French Duty of Vigilance Law',
+      status: 'In force',
+      tag: 'tag-force',
+      slug: 'french-duty-of-vigilance-law',
+      summary: 'First court ruling under the law upheld',
+    }],
+    netherlands: [{
+      name: 'Dutch Child Labour Due Diligence Act',
+      status: 'In force',
+      tag: 'tag-force',
+      slug: 'dutch-child-labour-due-diligence-act',
+      summary: 'Enforcement regime fully operational',
+    }],
+    norway: [{
+      name: 'Norwegian Transparency Act',
+      status: 'In force',
+      tag: 'tag-force',
+      slug: 'norwegian-transparency-act',
+      summary: 'Second annual reporting cycle complete',
+    }],
+    uk: [{
+      name: 'UK Modern Slavery Act',
+      status: 'Updates pending',
+      tag: 'tag-pending',
+      slug: 'uk-modern-slavery-act',
+      summary: 'Reform proposals under government review',
+    }],
+    switzerland: [{
+      name: 'Swiss Responsible Business Ordinance',
+      status: 'Under review',
+      tag: 'tag-proposed',
+      slug: 'swiss-responsible-business-ordinance',
+      summary: 'Alignment with CSDDD under consultation',
+    }],
     usa: [
-      {name: 'US UFLPA', status: 'In force', tag: 'tag-force', slug: 'us-uflpa'},
-      {name: 'California SB 253 / SB 261', status: 'Implementing', tag: 'tag-pending', slug: 'california-sb-253-261'},
+      {
+        name: 'US UFLPA',
+        status: 'In force',
+        tag: 'tag-force',
+        slug: 'us-uflpa',
+        summary: 'Enforcement expanded to new product categories',
+      },
+      {
+        name: 'California SB 253 / SB 261',
+        status: 'Implementing',
+        tag: 'tag-pending',
+        slug: 'california-sb-253-261',
+        summary: 'First reporting cycle begins 2026',
+      },
     ],
-    canada: [{name: 'Canada FLCCA', status: 'In force', tag: 'tag-force', slug: 'canada-flcca'}],
-    brazil: [{name: 'Brazil Supply Chain Due Diligence Bill', status: 'In Congress', tag: 'tag-pending', slug: 'brazil-supply-chain-due-diligence-bill'}],
-    india: [{name: 'India BRSR Core', status: 'Expanding', tag: 'tag-pending', slug: 'india-brsr-core'}],
-    japan: [{name: 'Japan HRDD Guidelines', status: 'Voluntary', tag: 'tag-proposed', slug: 'japan-hrdd-guidelines'}],
-    korea: [{name: 'South Korea Business and Human Rights Act', status: 'In committee', tag: 'tag-proposed', slug: 'south-korea-business-and-human-rights-act'}],
-    australia: [{name: 'Australia Modern Slavery Act', status: 'Reform proposed', tag: 'tag-pending', slug: 'australia-modern-slavery-act'}],
+    canada: [{
+      name: 'Canada FLCCA',
+      status: 'In force',
+      tag: 'tag-force',
+      slug: 'canada-flcca',
+      summary: 'First annual reports submitted to government',
+    }],
+    brazil: [{
+      name: 'Brazil Supply Chain Due Diligence Bill',
+      status: 'In Congress',
+      tag: 'tag-pending',
+      slug: 'brazil-supply-chain-due-diligence-bill',
+      summary: 'Committee review ongoing in the Senate',
+    }],
+    india: [{
+      name: 'India BRSR Core',
+      status: 'Expanding',
+      tag: 'tag-pending',
+      slug: 'india-brsr-core',
+      summary: 'Mandatory scope expanded to top 1,000 listed companies',
+    }],
+    japan: [{
+      name: 'Japan HRDD Guidelines',
+      status: 'Voluntary',
+      tag: 'tag-proposed',
+      slug: 'japan-hrdd-guidelines',
+      summary: 'Revised guidelines issued by METI',
+    }],
+    korea: [{
+      name: 'South Korea Business and Human Rights Act',
+      status: 'In committee',
+      tag: 'tag-proposed',
+      slug: 'south-korea-business-and-human-rights-act',
+      summary: 'National Assembly committee review continues',
+    }],
+    australia: [{
+      name: 'Australia Modern Slavery Act',
+      status: 'Reform proposed',
+      tag: 'tag-pending',
+      slug: 'australia-modern-slavery-act',
+      summary: 'Government response to statutory review tabled',
+    }],
   };
 
   const countryNames: Record<string, string> = {
-    germany: 'Germany', france: 'France', netherlands: 'Netherlands', norway: 'Norway',
-    uk: 'United Kingdom', switzerland: 'Switzerland', usa: 'United States', canada: 'Canada',
-    brazil: 'Brazil', india: 'India', japan: 'Japan', korea: 'South Korea', australia: 'Australia',
+    germany: 'Germany',
+    france: 'France',
+    netherlands: 'Netherlands',
+    norway: 'Norway',
+    uk: 'United Kingdom',
+    switzerland: 'Switzerland',
+    usa: 'United States',
+    canada: 'Canada',
+    brazil: 'Brazil',
+    india: 'India',
+    japan: 'Japan',
+    korea: 'South Korea',
+    australia: 'Australia',
   };
 
   /* ======================================================
@@ -759,35 +784,50 @@ const movements = settings.movementsThisMonth || STATIC_SITE_SETTINGS.movementsT
   let selectedCountry: string | null = null;
 
   if (mapEl && panelEl) {
-    mapEl.querySelectorAll<SVGElement>('.country.has-laws').forEach(el => {
-      el.addEventListener('click', () => {
-        const country = el.dataset.country || '';
-
-        // Deselect previous
-        mapEl.querySelectorAll('.country.selected').forEach(c => c.classList.remove('selected'));
-
-        if (selectedCountry === country) {
-          // Toggle off
-          selectedCountry = null;
-          panelEl.innerHTML = '<p class="country-panel-default">Select a highlighted country to view its HREDD legislation.</p>';
-        } else {
-          selectedCountry = country;
-          el.classList.add('selected');
-          renderPanel(country);
+    mapEl.querySelectorAll<SVGPathElement>('.country.has-laws').forEach(el => {
+      el.addEventListener('click', () => handleCountryClick(el));
+      el.addEventListener('keydown', (e: KeyboardEvent) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleCountryClick(el);
         }
       });
     });
   }
 
+  function handleCountryClick(el: SVGPathElement) {
+    if (!panelEl || !mapEl) return;
+    const country = el.dataset.country || '';
+
+    mapEl.querySelectorAll('.country.selected').forEach(c => c.classList.remove('selected'));
+
+    if (selectedCountry === country) {
+      selectedCountry = null;
+      panelEl.innerHTML = '<p class="country-panel-default">Select a highlighted country to view its HREDD legislation.</p>';
+    } else {
+      selectedCountry = country;
+      el.classList.add('selected');
+      renderPanel(country);
+    }
+  }
+
   function renderPanel(country: string) {
     if (!panelEl) return;
     const laws = lawsByCountry[country] || [];
+    if (laws.length === 0) return;
+
     const name = countryNames[country] || country;
 
     const lawsHtml = laws.map(law =>
       `<div class="panel-law-item">
-        <a href="/tracker/${law.slug}" class="panel-law-name">${law.name}</a>
-        <span class="tag ${law.tag}">${law.status}</span>
+        <div class="panel-law-info">
+          <a href="/tracker/${law.slug}" class="panel-law-name">${law.name}</a>
+          ${law.summary ? `<p class="panel-law-summary">${law.summary}</p>` : ''}
+        </div>
+        <div class="panel-law-meta">
+          <span class="tag ${law.tag}">${law.status}</span>
+          <a href="/tracker/${law.slug}" class="panel-read-more">Read more &rarr;</a>
+        </div>
       </div>`
     ).join('');
 
@@ -798,69 +838,18 @@ const movements = settings.movementsThisMonth || STATIC_SITE_SETTINGS.movementsT
   }
 
   /* ======================================================
-     SUPPLIER FILTER PILLS
+     DATE BANNER: anchor-scroll to movements section
      ====================================================== */
 
-  const pillCountryMap: Record<string, string[]> = {
-    'Germany': ['germany'],
-    'France': ['france'],
-    'Netherlands': ['netherlands'],
-    'Norway': ['norway'],
-    'United Kingdom': ['uk'],
-    'Switzerland': ['switzerland'],
-    'United States': ['usa'],
-    'Canada': ['canada'],
-    'Japan': ['japan'],
-    'Australia': ['australia'],
-    'South Korea': ['korea'],
-    'EU-wide': ['germany', 'france', 'netherlands', 'norway', 'switzerland'],
-  };
-
-  const pillsContainer = document.getElementById('filter-pills');
-  const summaryText = document.getElementById('filter-summary-text');
-  const activePills = new Set<string>();
-
-  if (pillsContainer && summaryText) {
-    pillsContainer.querySelectorAll<HTMLButtonElement>('.filter-pill').forEach(pill => {
-      pill.addEventListener('click', () => {
-        const country = pill.dataset.country || '';
-        if (activePills.has(country)) {
-          activePills.delete(country);
-          pill.classList.remove('active');
-        } else {
-          activePills.add(country);
-          pill.classList.add('active');
-        }
-        updateFilterSummary();
-      });
+  const bannerEl = document.getElementById('date-banner');
+  if (bannerEl) {
+    bannerEl.addEventListener('click', (e) => {
+      e.preventDefault();
+      const target = document.getElementById('movements');
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth' });
+      }
     });
-  }
-
-  function updateFilterSummary() {
-    if (!summaryText) return;
-    if (activePills.size === 0) {
-      summaryText.innerHTML = 'Select one or more buyer countries above to see what applies.';
-      summaryText.style.color = '#8B7E6E';
-      summaryText.style.fontStyle = 'italic';
-      return;
-    }
-
-    const countryCodes = new Set<string>();
-    activePills.forEach(pill => {
-      (pillCountryMap[pill] || []).forEach(code => countryCodes.add(code));
-    });
-
-    const lawSet = new Set<string>();
-    countryCodes.forEach(code => {
-      (lawsByCountry[code] || []).forEach(law => lawSet.add(law.name));
-    });
-
-    const names = Array.from(activePills).join(', ');
-    const count = lawSet.size;
-
-    summaryText.style.fontStyle = 'normal';
-    summaryText.style.color = '#C9C0AE';
-    summaryText.innerHTML = `Your buyers in <strong style="color:#EEE9DD;font-family:var(--font-sans);font-weight:500">${names}</strong> are subject to <strong style="color:#EEE9DD;font-family:var(--font-sans);font-weight:500">${count}</strong> HREDD ${count === 1 ? 'law' : 'laws'}. Scroll to the table below to see them.`;
   }
 
   /* ======================================================
@@ -902,7 +891,6 @@ const movements = settings.movementsThisMonth || STATIC_SITE_SETTINGS.movementsT
 
         // Show/hide region headers based on visible rows
         tableEl.querySelectorAll<HTMLElement>('[data-region-row]').forEach(regionRow => {
-          // Check if next sibling rows are visible
           let next = regionRow.nextElementSibling as HTMLElement;
           let hasVisible = false;
           while (next && !next.dataset.regionRow) {

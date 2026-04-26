@@ -1,0 +1,76 @@
+---
+import BaseLayout from '../../layouts/Base.astro';
+---
+
+<BaseLayout title="Privacy — hredd.org" description="Privacy policy for hredd.org." activePage="">
+
+  <section class="privacy-header">
+    <p class="page-eyebrow">Legal</p>
+    <h1 class="page-title">Privacy</h1>
+  </section>
+
+  <section class="privacy-body">
+    <div class="privacy-inner">
+      <p class="section-label">Policy</p>
+      <div class="privacy-content">
+        <p>This privacy policy will be updated shortly. hredd.org does not sell or share personal data with third parties.</p>
+        <p>For any privacy-related enquiries, contact <a href="mailto:contact@hredd.org" class="privacy-link">contact@hredd.org</a>.</p>
+      </div>
+    </div>
+  </section>
+
+</BaseLayout>
+
+<style>
+  .privacy-header {
+    text-align: center;
+    padding: 64px 56px 48px;
+    border-bottom: 1px solid var(--text);
+  }
+
+  .page-eyebrow {
+    font-family: var(--font-sans);
+    font-size: var(--text-10);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    margin-bottom: 20px;
+  }
+
+  .page-title {
+    font-family: var(--font-serif);
+    font-size: var(--text-72);
+    font-weight: 400;
+    line-height: 1.0;
+    letter-spacing: -0.02em;
+  }
+
+  .privacy-body {
+    padding: 64px 56px;
+  }
+
+  .privacy-inner {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .privacy-content p {
+    font-family: var(--font-serif);
+    font-size: var(--text-19);
+    line-height: 1.65;
+    color: var(--text);
+    margin-bottom: 24px;
+  }
+
+  .privacy-link {
+    color: var(--accent);
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    transition: text-decoration-color 0.15s;
+  }
+
+  .privacy-link:hover {
+    text-decoration-color: var(--accent);
+  }
+</style>

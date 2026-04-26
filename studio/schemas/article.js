@@ -1,3 +1,6 @@
+// After making changes to this schema, redeploy the studio:
+// cd studio && npx sanity deploy
+
 export default {
   name: 'article',
   title: 'Article',

@@ -209,6 +209,12 @@ export default {
       of: [{ type: 'reference', to: [{ type: 'article' }] }],
     },
     {
+      name: 'countryCode',
+      title: 'Country Code (ISO 3166-1 alpha-3)',
+      type: 'string',
+      description: 'e.g. DEU, FRA, GBR. Used to highlight this law on the world map.',
+    },
+    {
       name: 'order',
       title: 'Display Order',
       type: 'number',

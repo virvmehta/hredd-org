@@ -6,7 +6,7 @@ import { schemaTypes } from './schemas/index.js';
 export default defineConfig({
   name: 'hredd-org',
   title: 'hredd.org',
-  projectId: 'jw8lak18',
+  projectId: 'jw8lakl8',
   dataset: 'production',
   plugins: [
     structureTool({

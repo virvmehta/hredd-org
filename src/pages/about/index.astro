@@ -2,32 +2,35 @@
 import BaseLayout from '../../layouts/Base.astro';
 ---
 
-<BaseLayout title="About — hredd.org" activePage="about">
+<BaseLayout
+  title="About — hredd.org"
+  description="A practitioner resource for understanding HREDD legislation from the perspective of those most affected by it."
+  activePage="about"
+>
 
-  <!-- PAGE HEADER -->
-  <section class="page-header">
-    <p class="page-eyebrow">Independent &middot; Since 2026</p>
-    <h1 class="page-title">
-      About<br />
-      <em>hredd.org</em>
-    </h1>
-    <p class="page-deck">A practitioner resource for understanding HREDD legislation from the perspective of those most affected by it.</p>
-  </section>
-
-  <!-- MISSION -->
-  <section class="about-section">
+  <!-- SECTION 1: HEADER + MISSION -->
+  <section class="about-section snap-section">
     <div class="about-inner">
-      <p class="section-label">Our mission</p>
-      <div class="about-body">
-        <p>hredd.org exists because the global conversation about human rights and environmental due diligence is missing the voices of the people it most affects. The legislation emerging from Europe, North America, and increasingly Asia-Pacific will reshape the conditions under which millions of workers, farmers, and suppliers operate. Most of them have had no seat at the table where these laws were written.</p>
-        <p>We track eighteen pieces of HREDD legislation, update the tracker every month, and publish analysis written by and for practitioners in the Global South. We do not speak for governments, certification bodies, or brands. We speak from supply chains.</p>
-        <p>This is not a legal service and nothing here constitutes legal advice. It is a practitioner resource, built on the understanding that the first condition of engaging with these laws on your own terms is understanding what they actually say.</p>
+      <p class="page-eyebrow">Independent &middot; Since 2026</p>
+      <h1 class="page-title">
+        About<br />
+        <em>hredd.org</em>
+      </h1>
+      <p class="page-deck">A practitioner resource for understanding HREDD legislation from the perspective of those most affected by it.</p>
+
+      <div class="mission-body">
+        <p class="section-label">Our mission</p>
+        <div class="about-body">
+          <p>hredd.org exists because the global conversation about human rights and environmental due diligence is missing the voices of the people it most affects. The legislation emerging from Europe, North America, and increasingly Asia-Pacific will reshape the conditions under which millions of workers, farmers, and suppliers operate. Most of them have had no seat at the table where these laws were written.</p>
+          <p>We track eighteen pieces of HREDD legislation, update the tracker every month, and publish analysis written by and for practitioners in the Global South. We do not speak for governments, certification bodies, or brands. We speak from supply chains.</p>
+          <p>This is not a legal service and nothing here constitutes legal advice. It is a practitioner resource, built on the understanding that the first condition of engaging with these laws on your own terms is understanding what they actually say.</p>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- EDITORIAL POSITION -->
-  <section class="about-section">
+  <!-- SECTION 2: EDITORIAL POSITION -->
+  <section class="about-section snap-section">
     <div class="about-inner">
       <p class="section-label">Our position</p>
       <div class="about-body">
@@ -38,8 +41,8 @@ import BaseLayout from '../../layouts/Base.astro';
     </div>
   </section>
 
-  <!-- ABOUT THE EDITOR -->
-  <section class="about-section">
+  <!-- SECTION 3: EDITOR BIO -->
+  <section class="about-section snap-section">
     <div class="about-inner">
       <p class="section-label">The editor</p>
       <div class="editor-block">
@@ -53,8 +56,8 @@ import BaseLayout from '../../layouts/Base.astro';
     </div>
   </section>
 
-  <!-- CONTRIBUTE -->
-  <section class="about-section">
+  <!-- SECTION 4: CONTRIBUTE + CONTACT -->
+  <section class="about-section about-section--last snap-section">
     <div class="about-inner">
       <p class="section-label">Write for us</p>
       <div class="about-body">
@@ -63,15 +66,10 @@ import BaseLayout from '../../layouts/Base.astro';
         <p>To pitch, send a 2-3 sentence summary of your proposed piece, your name and affiliation, and one example of your writing to contact@hredd.org.</p>
       </div>
       <a href="mailto:contact@hredd.org" class="pitch-button">Pitch an article</a>
-    </div>
-  </section>
 
-  <!-- CONTACT -->
-  <section class="about-section about-section--last">
-    <div class="about-inner">
-      <p class="section-label">Contact</p>
-      <div class="about-body">
-        <p>For general enquiries, corrections, or to flag a legislative update we may have missed: <a href="mailto:contact@hredd.org" class="contact-link">contact@hredd.org</a></p>
+      <div class="contact-block">
+        <p class="section-label" style="margin-top: 48px;">Contact</p>
+        <p class="about-body-p">For general enquiries, corrections, or to flag a legislative update we may have missed: <a href="mailto:contact@hredd.org" class="contact-link">contact@hredd.org</a></p>
         <p class="contact-note">hredd.org is an independent platform. It is not affiliated with any organisation, certification body, or government agency.</p>
       </div>
     </div>
@@ -81,13 +79,45 @@ import BaseLayout from '../../layouts/Base.astro';
 
 <style>
   /* ====================================================
-     PAGE HEADER
+     SCROLL SNAP
      ==================================================== */
 
-  .page-header {
-    text-align: center;
-    padding: 64px 56px 48px;
-    border-bottom: 1px solid var(--text);
+  :global(html) {
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+  }
+
+  @media (max-width: 768px) {
+    :global(html) {
+      scroll-snap-type: y proximity;
+    }
+  }
+
+  .snap-section {
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  /* ====================================================
+     PAGE HEADER (inside section 1)
+     ==================================================== */
+
+  .about-section {
+    border-bottom: 1px solid var(--rule-light);
+    padding: 56px 56px;
+  }
+
+  .about-section--last {
+    border-bottom: none;
+  }
+
+  .about-inner {
+    max-width: 720px;
+    margin: 0 auto;
   }
 
   .page-eyebrow {
@@ -106,7 +136,7 @@ import BaseLayout from '../../layouts/Base.astro';
     font-weight: 400;
     line-height: 1.0;
     letter-spacing: -0.02em;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
   }
 
   .page-deck {
@@ -115,27 +145,18 @@ import BaseLayout from '../../layouts/Base.astro';
     font-size: var(--text-19);
     color: var(--text-mid);
     max-width: 580px;
-    margin: 0 auto;
     line-height: 1.5;
+    margin-bottom: 48px;
+  }
+
+  .mission-body {
+    border-top: 1px solid var(--rule-light);
+    padding-top: 32px;
   }
 
   /* ====================================================
-     ABOUT SECTIONS
+     ABOUT BODY TEXT
      ==================================================== */
-
-  .about-section {
-    border-bottom: 1px solid var(--rule-light);
-    padding: 64px 56px;
-  }
-
-  .about-section--last {
-    border-bottom: none;
-  }
-
-  .about-inner {
-    max-width: 720px;
-    margin: 0 auto;
-  }
 
   .about-body {
     display: flex;
@@ -143,7 +164,8 @@ import BaseLayout from '../../layouts/Base.astro';
     gap: 0;
   }
 
-  .about-body p {
+  .about-body p,
+  .about-body-p {
     font-family: var(--font-serif);
     font-size: var(--text-19);
     line-height: 1.65;
@@ -231,6 +253,10 @@ import BaseLayout from '../../layouts/Base.astro';
      CONTACT
      ==================================================== */
 
+  .contact-block {
+    margin-top: 0;
+  }
+
   .contact-link {
     color: var(--accent);
     text-decoration: underline;
@@ -243,10 +269,28 @@ import BaseLayout from '../../layouts/Base.astro';
   }
 
   .contact-note {
-    font-family: var(--font-sans) !important;
-    font-size: var(--text-13) !important;
-    color: var(--text-muted) !important;
-    margin-top: 16px;
-    font-style: normal !important;
+    font-family: var(--font-sans);
+    font-size: var(--text-13);
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
+  /* ====================================================
+     MOBILE
+     ==================================================== */
+
+  @media (max-width: 768px) {
+    .snap-section {
+      min-height: unset;
+      scroll-snap-align: none;
+    }
+
+    .about-section {
+      padding: 48px 20px;
+    }
+
+    .page-title {
+      font-size: var(--text-48);
+    }
   }
 </style>

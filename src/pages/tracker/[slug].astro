@@ -57,10 +57,8 @@ function formatDate(dateStr: string) {
   } catch { return dateStr; }
 }
 
-// Render summary - handles both Sanity portable text and static array
 function renderSummary(summary: any[]) {
   if (!summary || !Array.isArray(summary)) return '';
-  // Static data format: [{type: 'paragraph', text: '...'}]
   if (summary.length > 0 && summary[0].type === 'paragraph') {
     return summary.map((b: any) => {
       if (b.type === 'paragraph') return `<p>${b.text}</p>`;
@@ -68,12 +66,18 @@ function renderSummary(summary: any[]) {
       return '';
     }).join('');
   }
-  // Sanity portable text
   return renderPortableText(summary);
 }
+
+const ogDescription = law.tableUpdateText || `${law.status} HREDD law in ${law.jurisdiction}. Tracked monthly on hredd.org.`;
 ---
 
-<BaseLayout title={`${law.shortName || law.name} — hredd.org`} activePage="tracker">
+<BaseLayout
+  title={`${law.shortName || law.name} — hredd.org`}
+  description={ogDescription}
+  activePage="tracker"
+  ogType="article"
+>
 
   <!-- BREADCRUMB -->
   <div class="breadcrumb page-margins">
@@ -101,13 +105,11 @@ function renderSummary(summary: any[]) {
     <!-- MAIN COLUMN -->
     <main class="law-main">
 
-      <!-- PLAIN-LANGUAGE SUMMARY -->
       <section class="law-section">
         <p class="section-label">Plain-language summary</p>
         <div class="summary-body" set:html={renderSummary(law.summary)} />
       </section>
 
-      <!-- KEY OBLIGATIONS -->
       {law.obligations && law.obligations.length > 0 && (
         <section class="law-section">
           <p class="section-label">Key obligations</p>
@@ -125,7 +127,6 @@ function renderSummary(summary: any[]) {
         </section>
       )}
 
-      <!-- IMPLEMENTATION TIMELINE -->
       {law.timeline && law.timeline.length > 0 && (
         <section class="law-section">
           <p class="section-label">Implementation timeline</p>
@@ -144,7 +145,6 @@ function renderSummary(summary: any[]) {
         </section>
       )}
 
-      <!-- CHANGE LOG -->
       {law.changelog && law.changelog.length > 0 && (
         <section class="law-section">
           <p class="section-label">Change log</p>
@@ -165,7 +165,6 @@ function renderSummary(summary: any[]) {
         </section>
       )}
 
-      <!-- OFFICIAL SOURCES -->
       {law.sources && law.sources.length > 0 && (
         <section class="law-section">
           <p class="section-label">Official sources</p>
@@ -183,10 +182,12 @@ function renderSummary(summary: any[]) {
 
     </main>
 
-    <!-- SIDEBAR -->
+    <!-- SIDEBAR
+         Sticky: sticks to top, constrained by law-body height so it doesn't orphan
+         below the article content. Uses position: sticky + align-items: start on
+         the parent grid. -->
     <aside class="law-sidebar">
 
-      <!-- QUICK FACTS -->
       <section class="sidebar-section">
         <p class="section-label">Quick facts</p>
         <dl class="quick-facts">
@@ -235,7 +236,6 @@ function renderSummary(summary: any[]) {
         </dl>
       </section>
 
-      <!-- SECTORS MOST AFFECTED -->
       {law.sectorsAffected && law.sectorsAffected.length > 0 && (
         <section class="sidebar-section">
           <p class="section-label">Sectors most affected</p>
@@ -247,7 +247,6 @@ function renderSummary(summary: any[]) {
         </section>
       )}
 
-      <!-- SUPPLIER COUNTRIES AFFECTED -->
       {law.supplierCountries && law.supplierCountries.length > 0 && (
         <section class="sidebar-section">
           <p class="section-label">Supplier countries affected</p>
@@ -259,7 +258,6 @@ function renderSummary(summary: any[]) {
         </section>
       )}
 
-      <!-- RELATED ARTICLES -->
       {law.relatedArticles && law.relatedArticles.length > 0 && (
         <section class="sidebar-section">
           <p class="section-label">Related articles</p>
@@ -351,6 +349,9 @@ function renderSummary(summary: any[]) {
 
   /* ====================================================
      TWO-COLUMN BODY
+     The parent uses align-items: start so the sidebar
+     doesn't stretch past the main column height.
+     The sidebar uses position: sticky so it tracks scroll.
      ==================================================== */
 
   .law-body {
@@ -365,14 +366,34 @@ function renderSummary(summary: any[]) {
   .law-main {
     padding-right: 48px;
     padding-top: 0;
+    /* Establish stacking context so sidebar's sticky doesn't extend below */
+    min-height: 0;
   }
 
   .law-sidebar {
     position: sticky;
     top: 24px;
+    /* max-height prevents sidebar from extending past viewport */
+    max-height: calc(100vh - 48px);
+    overflow-y: auto;
     border-left: 1px solid var(--rule-light);
     padding-left: 40px;
     padding-top: 0;
+    /* Scrollbar styling */
+    scrollbar-width: thin;
+    scrollbar-color: var(--rule) transparent;
+  }
+
+  .law-sidebar::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .law-sidebar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .law-sidebar::-webkit-scrollbar-thumb {
+    background: var(--rule);
   }
 
   /* ====================================================
@@ -400,7 +421,6 @@ function renderSummary(summary: any[]) {
     margin-bottom: 0;
   }
 
-  /* Obligations */
   .obligations-list {
     display: flex;
     flex-direction: column;
@@ -630,7 +650,7 @@ function renderSummary(summary: any[]) {
      ==================================================== */
 
   .sidebar-section {
-    padding: 32px 0;
+    padding: 28px 0;
     border-bottom: 1px solid var(--rule-light);
   }
 
@@ -640,6 +660,7 @@ function renderSummary(summary: any[]) {
 
   .sidebar-section:last-child {
     border-bottom: none;
+    padding-bottom: 48px;
   }
 
   .quick-facts {
@@ -780,10 +801,46 @@ function renderSummary(summary: any[]) {
     color: var(--accent);
     border-color: var(--accent);
   }
+
+  /* ====================================================
+     MOBILE
+     ==================================================== */
+
+  @media (max-width: 768px) {
+    .law-header {
+      padding: 32px 20px;
+    }
+
+    .law-title {
+      font-size: var(--text-38);
+    }
+
+    .law-body {
+      grid-template-columns: 1fr;
+    }
+
+    .law-main {
+      padding-right: 0;
+      padding: 0 20px;
+    }
+
+    .law-sidebar {
+      position: static;
+      max-height: none;
+      border-left: none;
+      border-top: 1px solid var(--text);
+      padding-left: 20px;
+      padding-right: 20px;
+      padding-top: 32px;
+    }
+
+    .law-nav {
+      padding: 32px 20px;
+    }
+  }
 </style>
 
 <script>
-  // Changelog accordion
   const changelog = document.getElementById('changelog');
   if (changelog) {
     changelog.querySelectorAll<HTMLButtonElement>('.changelog-header').forEach(btn => {

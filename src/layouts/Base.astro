@@ -1,12 +1,66 @@
 ---
 import '../styles/global.css';
+import { sanityClient } from '../lib/sanity.js';
+import { getAllArticlesQuery } from '../lib/queries.js';
+import { STATIC_ARTICLES } from '../lib/staticData.js';
 
 interface Props {
   title?: string;
+  description?: string;
   activePage?: string;
+  ogType?: string;
 }
 
-const { title = 'hredd.org', activePage = '' } = Astro.props;
+const { title = 'hredd.org', description = '', activePage = '', ogType = 'website' } = Astro.props;
+
+// Compute dynamic volume / issue / date from article data at build time
+let articles: any[] = [];
+try {
+  const fetched = await sanityClient.fetch(getAllArticlesQuery);
+  articles = fetched && fetched.length > 0 ? fetched : STATIC_ARTICLES;
+} catch {
+  articles = STATIC_ARTICLES;
+}
+
+const MONTH_NAMES = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+];
+
+function toRoman(n: number): string {
+  if (n <= 0) return 'I';
+  const vals = [1000,900,500,400,100,90,50,40,10,9,5,4,1];
+  const syms = ['M','CM','D','CD','C','XC','L','XL','X','IX','V','IV','I'];
+  let result = '';
+  for (let i = 0; i < vals.length; i++) {
+    while (n >= vals[i]) { result += syms[i]; n -= vals[i]; }
+  }
+  return result;
+}
+
+const now = new Date();
+const buildYear = now.getFullYear();
+const buildMonth = now.getMonth(); // 0-indexed
+
+// Volume = years since 2025 (Vol. I = 2026, Vol. II = 2027, ...)
+const volume = toRoman(buildYear - 2025);
+
+// Issue = count of distinct months in the current year that had at least one published article
+// Only counts months up to and including the build month
+const monthsWithArticles = new Set<number>();
+for (const a of articles) {
+  if (!a.publishedAt) continue;
+  const d = new Date(a.publishedAt);
+  if (d.getFullYear() === buildYear && d.getMonth() <= buildMonth) {
+    monthsWithArticles.add(d.getMonth());
+  }
+}
+const issueNumber = monthsWithArticles.size > 0 ? monthsWithArticles.size : 1;
+const issueDisplay = String(issueNumber).padStart(2, '0');
+
+// Date = current month and year
+const navDate = `${MONTH_NAMES[buildMonth]} ${buildYear}`;
+const autoYear = buildYear;
 ---
 
 <!doctype html>
@@ -15,6 +69,11 @@ const { title = 'hredd.org', activePage = '' } = Astro.props;
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
+    {description && <meta name="description" content={description} />}
+    {description && <meta property="og:description" content={description} />}
+    <meta property="og:title" content={title} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content="hredd.org" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -35,11 +94,12 @@ const { title = 'hredd.org', activePage = '' } = Astro.props;
         <div class="nav-right">
           <div class="nav-links">
             <a href="/tracker" class={`nav-link${activePage === 'tracker' ? ' nav-link--active' : ''}`}>Tracker</a>
+            <a href="/buyer-compliance" class={`nav-link${activePage === 'buyer-compliance' ? ' nav-link--active' : ''}`}>Buyer Mapping</a>
             <a href="/articles" class={`nav-link${activePage === 'articles' ? ' nav-link--active' : ''}`}>Articles</a>
             <a href="/about" class={`nav-link${activePage === 'about' ? ' nav-link--active' : ''}`}>About</a>
             <a href="/#subscribe" class={`nav-link${activePage === 'subscribe' ? ' nav-link--active' : ''}`}>Subscribe</a>
           </div>
-          <span class="nav-issue">Vol. I &middot; Issue 01 &middot; June 2026</span>
+          <span class="nav-issue">Vol. {volume} &middot; Issue {issueDisplay} &middot; {navDate}</span>
         </div>
       </div>
       <div class="nav-rule"></div>
@@ -53,31 +113,36 @@ const { title = 'hredd.org', activePage = '' } = Astro.props;
     <!-- FOOTER -->
     <footer class="site-footer">
       <div class="footer-main">
-        <div class="footer-brand">
-          <span class="footer-wordmark">hredd.org</span>
-          <p class="footer-tagline">A Global South perspective on human rights due diligence.</p>
+        <div class="footer-newsletter">
+          <p class="footer-newsletter-label">The Monthly Brief</p>
+          <p class="footer-newsletter-deck">One email, the first Monday of every month.</p>
+          <form class="footer-newsletter-form" action="https://buttondown.email/hredd" method="post" target="_blank">
+            <input type="email" name="email" placeholder="your@email.com" class="footer-newsletter-input" required />
+            <button type="submit" class="footer-newsletter-button">Subscribe</button>
+          </form>
         </div>
         <div class="footer-cols">
           <div class="footer-col">
             <span class="footer-col-label">Resources</span>
             <ul class="footer-col-links">
               <li><a href="/tracker">Tracker</a></li>
+              <li><a href="/buyer-compliance">Buyer Mapping</a></li>
               <li><a href="/articles">Articles</a></li>
-              <li><a href="/articles">Plain-language explainers</a></li>
             </ul>
           </div>
           <div class="footer-col">
             <span class="footer-col-label">About</span>
             <ul class="footer-col-links">
               <li><a href="/about">Mission</a></li>
-              <li><a href="mailto:contact@hredd.org">Contact</a></li>
+              <li><a href="mailto:contact@hredd.org">contact@hredd.org</a></li>
+              <li><a href="/privacy">Privacy</a></li>
             </ul>
           </div>
         </div>
       </div>
       <div class="footer-bottom">
-        <span>&copy; 2026 hredd.org &middot; Independent and reader-supported</span>
-        <span>Built with care from Noida, India</span>
+        <span>&copy; {autoYear} hredd.org &middot; Independent and reader-supported</span>
+        <span class="footer-location">Built with care from Noida, India &middot; A Global South perspective</span>
       </div>
     </footer>
 
@@ -161,7 +226,6 @@ const { title = 'hredd.org', activePage = '' } = Astro.props;
   .nav-rule {
     height: 1px;
     background: var(--text);
-    margin: 0 0px;
   }
 
   /* ====================================================
@@ -178,28 +242,71 @@ const { title = 'hredd.org', activePage = '' } = Astro.props;
     justify-content: space-between;
     align-items: flex-start;
     padding: 48px 56px 40px;
+    gap: 40px;
   }
 
-  .footer-brand {
+  .footer-newsletter {
     display: flex;
     flex-direction: column;
     gap: 10px;
+    max-width: 320px;
   }
 
-  .footer-wordmark {
-    font-family: var(--font-serif);
+  .footer-newsletter-label {
+    font-family: var(--font-sans);
+    font-size: var(--text-10);
     font-weight: 500;
-    font-size: var(--text-22);
-    color: var(--text);
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--accent);
   }
 
-  .footer-tagline {
+  .footer-newsletter-deck {
     font-family: var(--font-serif);
     font-style: italic;
-    font-size: var(--text-13);
+    font-size: var(--text-14);
     color: var(--text-muted);
-    max-width: 240px;
-    line-height: 1.5;
+    line-height: 1.4;
+  }
+
+  .footer-newsletter-form {
+    display: flex;
+  }
+
+  .footer-newsletter-input {
+    flex: 1;
+    min-width: 0;
+    padding: 10px 12px;
+    background: transparent;
+    border: 1px solid var(--text);
+    border-right: none;
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-size: var(--text-13);
+  }
+
+  .footer-newsletter-input::placeholder {
+    color: var(--text-muted);
+  }
+
+  .footer-newsletter-button {
+    padding: 10px 16px;
+    background: var(--text);
+    color: var(--inverse-text);
+    font-family: var(--font-sans);
+    font-size: var(--text-10);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    border: 1px solid var(--text);
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+  }
+
+  .footer-newsletter-button:hover {
+    background: var(--accent);
+    border-color: var(--accent);
   }
 
   .footer-cols {
@@ -248,5 +355,58 @@ const { title = 'hredd.org', activePage = '' } = Astro.props;
     font-family: var(--font-sans);
     font-size: var(--text-11);
     color: var(--text-muted);
+  }
+
+  .footer-location {
+    text-align: right;
+  }
+
+  /* ====================================================
+     MOBILE
+     ==================================================== */
+
+  @media (max-width: 768px) {
+    .site-nav {
+      padding: 16px 20px 0;
+    }
+
+    .nav-inner {
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .nav-links {
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .nav-issue {
+      font-size: var(--text-11);
+    }
+
+    .footer-main {
+      flex-direction: column;
+      padding: 32px 20px 24px;
+      gap: 32px;
+    }
+
+    .footer-newsletter {
+      max-width: 100%;
+    }
+
+    .footer-cols {
+      gap: 32px;
+    }
+
+    .footer-bottom {
+      flex-direction: column;
+      gap: 8px;
+      padding: 16px 20px 32px;
+      text-align: center;
+    }
+
+    .footer-location {
+      text-align: center;
+    }
   }
 </style>

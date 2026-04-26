@@ -1,8 +1,8 @@
 ---
 import BaseLayout from '../../layouts/Base.astro';
 import { sanityClient, renderPortableText } from '../../lib/sanity.js';
-import { getArticleBySlugQuery, getAllArticlesQuery } from '../../lib/queries.js';
-import { STATIC_ARTICLES } from '../../lib/staticData.js';
+import { getArticleBySlugQuery, getAllArticlesQuery, getSiteSettingsQuery } from '../../lib/queries.js';
+import { STATIC_ARTICLES, STATIC_SITE_SETTINGS } from '../../lib/staticData.js';
 
 export async function getStaticPaths() {
   let articles: any[] = [];
@@ -20,9 +20,15 @@ export async function getStaticPaths() {
 
 const { slug } = Astro.params;
 let article: any = null;
+let settings: any = STATIC_SITE_SETTINGS;
 
 try {
-  article = await sanityClient.fetch(getArticleBySlugQuery, { slug });
+  const [fetchedArticle, fetchedSettings] = await Promise.all([
+    sanityClient.fetch(getArticleBySlugQuery, { slug }),
+    sanityClient.fetch(getSiteSettingsQuery),
+  ]);
+  article = fetchedArticle;
+  if (fetchedSettings) settings = fetchedSettings;
 } catch { /* fall through */ }
 
 if (!article) {
@@ -33,6 +39,11 @@ if (!article) {
 }
 
 if (!article) return Astro.redirect('/articles');
+
+// The deck shows on the article page; the excerpt shows on cards.
+// If deck is not set, fall back to excerpt on the article page.
+const articleDeck = article.deck || article.excerpt || '';
+const articleDisclaimer = settings.articleDisclaimer || 'The views expressed are the author\'s own. hredd.org is an independent platform.';
 
 function formatDate(dateStr: string) {
   if (!dateStr) return '';
@@ -45,11 +56,9 @@ function authorInitial(name: string) {
   return name ? name.charAt(0).toUpperCase() : '?';
 }
 
-// Render body: handles static [{type, text}] format and Sanity portable text
 function renderBody(body: any[]) {
   if (!body || !Array.isArray(body)) return '';
 
-  // Static format
   if (body.length > 0 && body[0].type) {
     return body.map((block: any) => {
       if (block.type === 'paragraph') {
@@ -78,7 +87,6 @@ function renderBody(body: any[]) {
     }).join('');
   }
 
-  // Sanity portable text
   return renderPortableText(body);
 }
 
@@ -90,15 +98,22 @@ const relatedArticles = article.relatedArticles ||
   }).slice(0, 2);
 
 const referencedLaws = article.referencedLaws || [];
+
+const ogDescription = article.deck || article.excerpt || '';
 ---
 
-<BaseLayout title={`${article.title} — hredd.org`} activePage="articles">
+<BaseLayout
+  title={`${article.title} — hredd.org`}
+  description={ogDescription}
+  activePage="articles"
+  ogType="article"
+>
 
   <!-- ARTICLE HEADER -->
   <header class="article-header">
     <p class="article-category">{article.category}</p>
     <h1 class="article-title">{article.title}</h1>
-    {article.deck && <p class="article-deck">{article.deck}</p>}
+    {articleDeck && <p class="article-deck">{articleDeck}</p>}
 
     <div class="article-meta-row">
       <div class="author-meta">
@@ -121,7 +136,6 @@ const referencedLaws = article.referencedLaws || [];
   <!-- ARTICLE FOOTER -->
   <footer class="article-footer">
 
-    <!-- FULL WIDTH RULE -->
     <div class="footer-rule"></div>
 
     <!-- AUTHOR BLOCK -->
@@ -131,7 +145,7 @@ const referencedLaws = article.referencedLaws || [];
         <p class="author-full-name">{article.authorName}</p>
         {article.authorRole && <p class="author-role-full">{article.authorRole}</p>}
         {article.authorBio && <p class="author-bio">{article.authorBio}</p>}
-        <p class="author-disclaimer">The views expressed are the author's own. hredd.org is an independent platform.</p>
+        {articleDisclaimer && <p class="author-disclaimer">{articleDisclaimer}</p>}
       </div>
     </div>
 
@@ -208,13 +222,16 @@ const referencedLaws = article.referencedLaws || [];
     margin-bottom: 20px;
   }
 
+  /* Deck: subtitle below headline, italic, generous spacing (New Yorker style) */
   .article-deck {
     font-family: var(--font-serif);
     font-style: italic;
     font-size: var(--text-22);
-    color: var(--text-mid);
+    color: #4A3F32;
     line-height: 1.5;
-    margin-bottom: 28px;
+    margin-bottom: 32px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--rule-light);
   }
 
   .article-meta-row {
@@ -264,7 +281,7 @@ const referencedLaws = article.referencedLaws || [];
   }
 
   /* ====================================================
-     ARTICLE BODY
+     ARTICLE BODY with text justification
      ==================================================== */
 
   .article-body-wrapper {
@@ -279,6 +296,9 @@ const referencedLaws = article.referencedLaws || [];
     line-height: 1.7;
     color: #1A1510;
     margin-bottom: 28px;
+    text-align: justify;
+    hyphens: auto;
+    word-break: normal;
   }
 
   .article-body :global(.article-h2) {
@@ -291,7 +311,6 @@ const referencedLaws = article.referencedLaws || [];
     color: var(--text);
   }
 
-  /* Pull quote */
   .article-body :global(.pull-quote) {
     margin: 48px -80px;
     padding: 40px 80px;
@@ -319,7 +338,6 @@ const referencedLaws = article.referencedLaws || [];
     margin-top: 16px;
   }
 
-  /* Section break */
   .article-body :global(.section-break) {
     display: flex;
     align-items: center;
@@ -340,7 +358,6 @@ const referencedLaws = article.referencedLaws || [];
     letter-spacing: 0.2em;
   }
 
-  /* Callout block */
   .article-body :global(.callout-block) {
     background: var(--surface);
     border-left: 3px solid var(--accent);
@@ -367,7 +384,6 @@ const referencedLaws = article.referencedLaws || [];
     margin-bottom: 0;
   }
 
-  /* Data block */
   .article-body :global(.data-block) {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
@@ -397,7 +413,6 @@ const referencedLaws = article.referencedLaws || [];
     color: var(--text-mid);
   }
 
-  /* Law reference inline tag */
   .article-body :global(.law-ref) {
     font-family: var(--font-sans);
     font-size: var(--text-11);
@@ -430,7 +445,6 @@ const referencedLaws = article.referencedLaws || [];
     margin-bottom: 40px;
   }
 
-  /* Author block */
   .author-block {
     display: flex;
     gap: 24px;
@@ -487,7 +501,6 @@ const referencedLaws = article.referencedLaws || [];
     font-style: italic;
   }
 
-  /* Laws referenced */
   .laws-referenced {
     margin-bottom: 48px;
     padding-bottom: 48px;
@@ -524,7 +537,6 @@ const referencedLaws = article.referencedLaws || [];
     color: var(--accent);
   }
 
-  /* Related articles */
   .related-reading {
     margin-bottom: 0;
   }

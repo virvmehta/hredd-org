@@ -1,22 +1,19 @@
 ---
 import BaseLayout from '../layouts/Base.astro';
 import { sanityClient } from '../lib/sanity.js';
-import { getAllArticlesQuery, getAllLawSlugsQuery, getSiteSettingsQuery } from '../lib/queries.js';
-import { STATIC_ARTICLES, STATIC_LAWS, STATIC_SITE_SETTINGS } from '../lib/staticData.js';
+import { getAllArticlesQuery, getAllLawSlugsQuery } from '../lib/queries.js';
+import { STATIC_ARTICLES, STATIC_LAWS } from '../lib/staticData.js';
 
-let articles = [];
-let laws = [];
-let settings = STATIC_SITE_SETTINGS;
+let articles: any[] = [];
+let laws: any[] = [];
 
 try {
-  const [fetchedArticles, fetchedLaws, fetchedSettings] = await Promise.all([
+  const [fetchedArticles, fetchedLaws] = await Promise.all([
     sanityClient.fetch(getAllArticlesQuery),
     sanityClient.fetch(getAllLawSlugsQuery),
-    sanityClient.fetch(getSiteSettingsQuery),
   ]);
   articles = fetchedArticles && fetchedArticles.length > 0 ? fetchedArticles : STATIC_ARTICLES;
   laws = fetchedLaws && fetchedLaws.length > 0 ? fetchedLaws : STATIC_LAWS;
-  if (fetchedSettings) settings = fetchedSettings;
 } catch {
   articles = STATIC_ARTICLES;
   laws = STATIC_LAWS;
@@ -25,9 +22,56 @@ try {
 const previewLaws = laws.slice(0, 5);
 const previewArticles = articles.slice(0, 4);
 
+// "This month" block counts
+const now = new Date();
+const buildMonth = now.getMonth();
+const buildYear = now.getFullYear();
+
+const lawsTracked = laws.length;
+
+const newMovements = laws.filter((l: any) => {
+  if (!l.lastUpdated) return false;
+  const d = new Date(l.lastUpdated);
+  return d.getMonth() === buildMonth && d.getFullYear() === buildYear;
+}).length;
+
+const newPieces = articles.filter((a: any) => {
+  if (!a.publishedAt) return false;
+  const d = new Date(a.publishedAt);
+  return d.getMonth() === buildMonth && d.getFullYear() === buildYear;
+}).length;
+
+// "Latest" section: most recent publish month and count
+const MONTH_NAMES = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+];
+
+let latestMonthLabel = '';
+let latestMonthCount = 0;
+
+const sortedArticles = [...articles].sort((a: any, b: any) =>
+  new Date(b.publishedAt || 0).getTime() - new Date(a.publishedAt || 0).getTime()
+);
+
+if (sortedArticles.length > 0 && sortedArticles[0].publishedAt) {
+  const d = new Date(sortedArticles[0].publishedAt);
+  const latestM = d.getMonth();
+  const latestY = d.getFullYear();
+  latestMonthLabel = `${MONTH_NAMES[latestM]} ${latestY}`;
+  latestMonthCount = articles.filter((a: any) => {
+    if (!a.publishedAt) return false;
+    const ad = new Date(a.publishedAt);
+    return ad.getMonth() === latestM && ad.getFullYear() === latestY;
+  }).length;
+}
+
+const latestSubtitle = latestMonthLabel
+  ? `${latestMonthLabel} · ${latestMonthCount} ${latestMonthCount === 1 ? 'piece' : 'pieces'}`
+  : '';
+
 function getStatusTag(law: any) {
-  const type = law.statusType || 'proposed';
-  return `tag-${type}`;
+  return `tag-${law.statusType || 'proposed'}`;
 }
 
 function formatDate(dateStr: string) {
@@ -40,23 +84,51 @@ function formatDate(dateStr: string) {
 }
 ---
 
-<BaseLayout title="hredd.org" activePage="home">
+<BaseLayout
+  title="hredd.org"
+  description="Tracking global HREDD legislation and its implications for those most affected and least consulted."
+  activePage="home"
+>
 
-  <!-- MASTHEAD -->
-  <section class="masthead">
-    <p class="masthead-eyebrow">Established 2026 &middot; Independent &middot; Monthly</p>
-    <h1 class="masthead-title">
-      Human rights<br />
-      <em>due diligence</em>
-    </h1>
-    <p class="masthead-deck">Tracking global HREDD legislation and its implications for those most affected and least consulted.</p>
+  <!-- SECTION 1: MASTHEAD + THIS MONTH BLOCK -->
+  <section class="masthead snap-section">
+    <div class="masthead-inner">
+      <div class="masthead-content">
+        <p class="masthead-eyebrow">Established 2026 &middot; Independent &middot; Monthly</p>
+        <h1 class="masthead-title">
+          Human rights<br />
+          <em>&amp; environmental</em><br />
+          due diligence
+        </h1>
+        <p class="masthead-deck">Tracking global HREDD legislation and its implications for those most affected and least consulted.</p>
+      </div>
+
+      <aside class="this-month-block">
+        <p class="this-month-label">This month</p>
+        <ul class="this-month-stats">
+          <li class="this-month-stat">
+            <span class="stat-number">{lawsTracked}</span>
+            <span class="stat-label">laws tracked</span>
+          </li>
+          <li class="this-month-stat">
+            <span class="stat-number">{newMovements}</span>
+            <span class="stat-label">new movements</span>
+          </li>
+          <li class="this-month-stat">
+            <span class="stat-number">{newPieces}</span>
+            <span class="stat-label">new pieces</span>
+          </li>
+        </ul>
+        <a href="/articles" class="this-month-cta">&rarr; Read the issue</a>
+      </aside>
+    </div>
   </section>
 
-  <!-- ARTICLES SECTION -->
-  <section class="articles-section">
+  <!-- SECTION 2: LATEST ARTICLES -->
+  <section class="articles-section snap-section">
     <div class="section-header">
-      <h2 class="section-header-title">This issue</h2>
-      <span class="section-header-meta">{settings.currentMonth || 'June 2026'} &middot; Four new pieces</span>
+      <h2 class="section-header-title">Latest</h2>
+      {latestSubtitle && <span class="section-header-meta">{latestSubtitle}</span>}
     </div>
     <div class="articles-grid">
       {previewArticles.map((article: any, i: number) => (
@@ -65,7 +137,9 @@ function formatDate(dateStr: string) {
           <h3 class="card-title">
             <a href={`/articles/${article.slug?.current || article.slug}`}>{article.title}</a>
           </h3>
-          <p class="card-excerpt">{article.excerpt}</p>
+          {(article.excerpt || article.deck) && (
+            <p class="card-excerpt">{article.excerpt || article.deck}</p>
+          )}
           <p class="card-byline">{article.authorName} &middot; {article.readTime} min read</p>
         </article>
       ))}
@@ -75,12 +149,12 @@ function formatDate(dateStr: string) {
     </div>
   </section>
 
-  <!-- TRACKER PREVIEW -->
-  <section class="tracker-preview">
+  <!-- SECTION 3: TRACKER PREVIEW -->
+  <section class="tracker-preview snap-section">
     <div class="section-header">
       <h2 class="section-header-title">The tracker</h2>
       <span class="section-header-meta">
-        Updated {settings.trackerLastUpdated || 'June 2026'} &middot; 18 laws &middot; Next update {settings.trackerNextUpdate || 'July 2026'}
+        {laws.length} laws &middot; Updated {MONTH_NAMES[buildMonth]} {buildYear}
       </span>
     </div>
     <table class="tracker-table">
@@ -119,20 +193,12 @@ function formatDate(dateStr: string) {
       </tbody>
     </table>
     <div class="tracker-cta">
-      <a href="/tracker" class="cta-link">View all 18 laws</a>
+      <a href="/tracker" class="cta-link">View all {laws.length} laws</a>
     </div>
   </section>
 
-  <!-- EDITORIAL QUOTE STRIP -->
-  <section class="quote-strip">
-    <blockquote class="quote-text">
-      &ldquo;{settings.editorialQuote}&rdquo;
-    </blockquote>
-    <p class="quote-attribution">From our editorial mission</p>
-  </section>
-
-  <!-- NEWSLETTER SECTION -->
-  <section class="newsletter-section" id="subscribe">
+  <!-- SECTION 4: NEWSLETTER -->
+  <section class="newsletter-section snap-section" id="subscribe">
     <p class="newsletter-eyebrow">The Monthly Brief</p>
     <h2 class="newsletter-title">What moved this month, <em>and what it means</em></h2>
     <p class="newsletter-deck">One email, the first Monday of every month. Tracker updates, new analysis, and the developments that matter most for Global South actors.</p>
@@ -146,14 +212,47 @@ function formatDate(dateStr: string) {
 
 <style>
   /* ====================================================
+     SCROLL SNAP
+     ==================================================== */
+
+  :global(html) {
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+  }
+
+  @media (max-width: 768px) {
+    :global(html) {
+      scroll-snap-type: y proximity;
+    }
+  }
+
+  .snap-section {
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  /* ====================================================
      MASTHEAD
      ==================================================== */
 
   .masthead {
-    text-align: center;
-    padding: 56px 56px;
     border-bottom: 1px solid var(--text);
-    margin: 0 0px;
+    padding: 56px 56px;
+  }
+
+  .masthead-inner {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 48px;
+  }
+
+  .masthead-content {
+    flex: 1;
   }
 
   .masthead-eyebrow {
@@ -168,9 +267,9 @@ function formatDate(dateStr: string) {
 
   .masthead-title {
     font-family: var(--font-serif);
-    font-size: var(--text-88);
+    font-size: var(--text-72);
     font-weight: 400;
-    line-height: 0.95;
+    line-height: 0.97;
     letter-spacing: -0.02em;
     margin-bottom: 28px;
   }
@@ -180,9 +279,72 @@ function formatDate(dateStr: string) {
     font-style: italic;
     font-size: var(--text-20);
     color: var(--text-mid);
-    max-width: 580px;
-    margin: 0 auto;
+    max-width: 560px;
     line-height: 1.5;
+  }
+
+  /* "This month" block */
+  .this-month-block {
+    flex-shrink: 0;
+    width: 200px;
+    border: 1px solid var(--rule);
+    background: var(--surface);
+    padding: 20px 20px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    align-self: flex-start;
+    margin-top: 8px;
+  }
+
+  .this-month-label {
+    font-family: var(--font-sans);
+    font-size: var(--text-10);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+  }
+
+  .this-month-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    list-style: none;
+  }
+
+  .this-month-stat {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+  }
+
+  .stat-number {
+    font-family: var(--font-serif);
+    font-size: var(--text-22);
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-family: var(--font-sans);
+    font-size: var(--text-12);
+    color: var(--text-mid);
+  }
+
+  .this-month-cta {
+    font-family: var(--font-sans);
+    font-size: var(--text-12);
+    font-weight: 500;
+    color: var(--accent);
+    border-top: 1px solid var(--rule-light);
+    padding-top: 12px;
+    transition: opacity 0.15s;
+  }
+
+  .this-month-cta:hover {
+    opacity: 0.7;
   }
 
   /* ====================================================
@@ -192,13 +354,14 @@ function formatDate(dateStr: string) {
   .articles-section {
     padding: 0 56px;
     border-bottom: 1px solid var(--text);
+    justify-content: flex-start;
   }
 
   .section-header {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
-    padding: 56px 0 24px;
+    padding: 40px 0 24px;
     border-bottom: 1px solid var(--rule);
   }
 
@@ -221,7 +384,7 @@ function formatDate(dateStr: string) {
   }
 
   .article-card {
-    padding: 40px 32px;
+    padding: 32px 28px;
     border-bottom: 1px solid var(--rule);
   }
 
@@ -245,16 +408,16 @@ function formatDate(dateStr: string) {
     text-transform: uppercase;
     letter-spacing: 0.16em;
     color: var(--accent);
-    margin-bottom: 14px;
+    margin-bottom: 12px;
   }
 
   .card-title {
     font-family: var(--font-serif);
-    font-size: var(--text-28);
+    font-size: var(--text-24);
     font-weight: 400;
     line-height: 1.18;
     letter-spacing: -0.005em;
-    margin-bottom: 14px;
+    margin-bottom: 10px;
   }
 
   .card-title a {
@@ -267,23 +430,27 @@ function formatDate(dateStr: string) {
 
   .card-excerpt {
     font-family: var(--font-sans);
-    font-size: var(--text-14);
-    line-height: 1.65;
-    color: var(--text-mid);
-    margin-bottom: 16px;
+    font-size: var(--text-13);
+    line-height: 1.6;
+    color: #4A3F32;
+    margin-bottom: 14px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
   .card-byline {
     font-family: var(--font-sans);
     font-size: var(--text-11);
     color: var(--text-muted);
-    padding-top: 14px;
+    padding-top: 12px;
     border-top: 1px solid var(--rule-light);
   }
 
   .articles-cta {
     text-align: center;
-    padding: 32px 0 56px;
+    padding: 24px 0 40px;
   }
 
   .cta-link {
@@ -310,6 +477,7 @@ function formatDate(dateStr: string) {
   .tracker-preview {
     padding: 0 56px;
     border-bottom: 1px solid var(--text);
+    justify-content: flex-start;
   }
 
   .col-law    { width: 32%; }
@@ -318,38 +486,7 @@ function formatDate(dateStr: string) {
 
   .tracker-cta {
     text-align: center;
-    padding: 32px 0 56px;
-  }
-
-  /* ====================================================
-     EDITORIAL QUOTE STRIP
-     ==================================================== */
-
-  .quote-strip {
-    padding: 80px 56px;
-    text-align: center;
-    border-bottom: 1px solid var(--text);
-  }
-
-  .quote-text {
-    font-family: var(--font-serif);
-    font-style: italic;
-    font-size: var(--text-32);
-    line-height: 1.35;
-    max-width: 720px;
-    margin: 0 auto;
-    letter-spacing: -0.01em;
-    font-weight: 400;
-  }
-
-  .quote-attribution {
-    font-family: var(--font-sans);
-    font-size: var(--text-11);
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.16em;
-    color: var(--accent);
-    margin-top: 24px;
+    padding: 24px 0 40px;
   }
 
   /* ====================================================
@@ -357,7 +494,7 @@ function formatDate(dateStr: string) {
      ==================================================== */
 
   .newsletter-section {
-    padding: 64px 56px;
+    padding: 56px 56px;
     text-align: center;
     border-bottom: 1px solid var(--text);
   }
@@ -428,5 +565,42 @@ function formatDate(dateStr: string) {
   .newsletter-button:hover {
     background: var(--accent);
     border-color: var(--accent);
+  }
+
+  /* ====================================================
+     MOBILE
+     ==================================================== */
+
+  @media (max-width: 768px) {
+    .masthead {
+      padding: 40px 20px;
+    }
+
+    .masthead-inner {
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    .masthead-title {
+      font-size: var(--text-48);
+    }
+
+    .this-month-block {
+      width: 100%;
+    }
+
+    .articles-section,
+    .tracker-preview {
+      padding: 0 20px;
+    }
+
+    .newsletter-section {
+      padding: 56px 20px;
+    }
+
+    .snap-section {
+      min-height: unset;
+      scroll-snap-align: none;
+    }
   }
 </style>

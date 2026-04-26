@@ -35,6 +35,13 @@ export default {
       type: 'text',
     },
     {
+      name: 'articleDisclaimer',
+      title: 'Article Disclaimer',
+      type: 'text',
+      rows: 3,
+      description: 'Appears at the bottom of every article page below the author bio.',
+    },
+    {
       name: 'movementsThisMonth',
       title: 'This Month Movements (3 items)',
       type: 'array',
