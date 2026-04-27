@@ -25,7 +25,7 @@ losing the editorial system the design is built around.
 | Framework | **Astro 5+** with islands for interactivity |
 | CMS | **Sanity Studio** (separate `studio/` workspace) |
 | Hosting | **Cloudflare Pages** |
-| Languages | **English, Spanish, Portuguese** — three-edition site |
+| Languages | **English only** |
 | Forms | Email capture goes to **Buttondown** (or a comparable transactional sender) |
 | Maps | **d3-geo** + **world-atlas TopoJSON** (already used in mocks) |
 | Type | Google Fonts: **EB Garamond**, **Inter**, **JetBrains Mono** |
@@ -296,13 +296,6 @@ your editor needs):
 // author
 { slug, name, role, bio, avatarInitials, photo? }
 
-// translation (group object)
-{ en, es, pt }   ← every translatable field is a group of these three
-```
-
-Use `@sanity/internationalization-plugin` or per-field grouping —
-either is fine, but be consistent.
-
 ---
 
 ## 6 · The editorial disclosure (use verbatim)
@@ -321,7 +314,7 @@ About page's Funding section. Do not paraphrase.
 I recommend tackling in this order — each step builds on the last:
 
 1. **Tokens + base layout.** Lift `tokens.css`. Build the global
-   layout (`<TopStrip>`, `<Nav>`, `<Footer>`). Wire i18n.
+   layout (`<TopStrip>`, `<Nav>`, `<Footer>`).
 2. **About page.** Static, no data fetching, exercises the full type
    system + manifesto patterns.
 3. **Sanity schemas + studio.** Define `law`, `article`, `author`,
@@ -370,23 +363,6 @@ These are easy to lose in translation. Don't.
 - No filler imagery — placeholder frames in the mocks are placeholders.
   Replace them with real commissioned photography or leave them as
   hairline-bordered figure cells with mono captions.
-
----
-
-## 11 · Open questions for the user
-
-When you start, confirm:
-
-1. **CMS choice.** Is Sanity definitely the CMS? If they prefer
-   Contentful, Storyblok, or a Markdown-first approach (Astro
-   Content Collections), the schema in §5 needs adapting.
-2. **Email sender.** Buttondown? Mailcoach? Substack-as-source-of-truth?
-3. **Map provider.** d3-geo + world-atlas is what the mock uses. Other
-   options: MapLibre vector tiles, Mapbox. d3-geo is recommended —
-   it's lighter and matches the editorial aesthetic.
-4. **Analytics.** None in the mocks. If they want analytics,
-   Plausible or Fathom keeps the no-tracking ethos.
-5. **Comment system.** Mocks have none. If they want one, ask.
 
 ---
 
