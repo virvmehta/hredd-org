@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>HREDD — Articles</title>
+  <meta name="viewport" content="width=1366" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles/tokens.css" />
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <style>
+    .page { max-width: 1366px; margin: 0 auto; padding: 0 var(--pad-x); }
+
+    /* shared chrome */
+    .topstrip { display: flex; justify-content: space-between; align-items: center; font-family: var(--sans); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); padding: 12px 0 10px; border-bottom: 1px solid var(--rule); }
+    .topstrip .vol { color: var(--ink-2); }
+    .topstrip .right { display: flex; gap: 22px; }
+    .topstrip .right a:hover { color: var(--accent); }
+    .nav { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 36px; padding: 22px 0; border-bottom: 2px solid var(--ink); }
+    .nav-left { display: flex; gap: 26px; flex-wrap: nowrap; white-space: nowrap; font-family: var(--sans); font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-2); }
+    .nav-left a { padding-bottom: 2px; border-bottom: 1px solid transparent; }
+    .nav-left a:hover, .nav-left a.active { color: var(--accent); border-color: var(--accent); }
+    .nav-center { text-align: center; font-family: var(--serif); font-size: 36px; line-height: 1; letter-spacing: 0.01em; white-space: nowrap; }
+    .nav-center .glyph { display: inline-block; transform: translateY(-2px); margin: 0 6px; color: var(--accent); font-style: italic; font-size: 30px; }
+    .nav-right { display: flex; gap: 26px; justify-content: flex-end; flex-wrap: nowrap; white-space: nowrap; font-family: var(--sans); font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-2); }
+    .nav-right a { padding-bottom: 2px; border-bottom: 1px solid transparent; }
+    .nav-right a:hover, .nav-right a.active { color: var(--accent); border-color: var(--accent); }
+
+    /* page header */
+    .pgh { display: grid; grid-template-columns: minmax(0, 1.8fr) 1px minmax(0, 1fr); gap: 56px 88px; padding: 56px 0 40px; border-bottom: 1px solid var(--ink); }
+    .pgh .v { background: var(--rule); width: 1px; }
+    .pgh .eyebrow { margin-bottom: 14px; }
+    .pgh h1 { font-family: var(--serif); font-weight: 400; font-size: 80px; line-height: 0.98; letter-spacing: -0.014em; margin: 0 0 22px; text-wrap: balance; }
+    .pgh h1 em { color: var(--accent); font-style: italic; }
+    .pgh .lede { font-family: var(--serif); font-size: 21px; line-height: 1.45; color: var(--ink-2); max-width: 620px; text-wrap: pretty; }
+    .pgh .meta-side { padding-top: 6px; }
+    .pgh .meta-side .label { font-family: var(--sans); font-size: 10.5px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; }
+    .pgh .meta-side .row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 12px 0; border-top: 1px solid var(--rule); }
+    .pgh .meta-side .row:last-of-type { border-bottom: 1px solid var(--rule); }
+    .pgh .meta-side .row .n { font-family: var(--serif); font-size: 28px; line-height: 1; }
+    .pgh .meta-side .row .k { font-family: var(--sans); font-size: 11.5px; color: var(--ink-2); letter-spacing: 0.04em; text-align: right; max-width: 130px; }
+
+    /* category bar */
+    .cats { display: grid; grid-template-columns: 1fr auto; align-items: center; padding: 22px 0; border-bottom: 1px solid var(--ink); }
+    .cats .group { display: flex; gap: 22px; flex-wrap: wrap; align-items: center; font-family: var(--sans); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; }
+    .cats .pill { color: var(--ink-3); cursor: pointer; padding-bottom: 2px; border-bottom: 1px solid transparent; }
+    .cats .pill.active { color: var(--accent); border-color: var(--accent); }
+    .cats .pill:hover { color: var(--accent); }
+    .cats .sort { font-family: var(--sans); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-3); }
+    .cats .sort a { color: var(--ink-2); cursor: pointer; padding: 2px 6px; }
+    .cats .sort a.active { color: var(--accent); }
+
+    /* lead row: one big article + two stacked */
+    .lead-row { display: grid; grid-template-columns: minmax(0, 1.55fr) 1px minmax(0, 1fr); gap: 56px; padding: 48px 0 40px; border-bottom: 1px solid var(--ink); }
+    .lead-row .v { background: var(--rule); width: 1px; }
+    .lead .figure { width: 100%; aspect-ratio: 16 / 10; background: repeating-linear-gradient(135deg, var(--rule-soft) 0 2px, transparent 2px 14px), var(--bg-warm); border: 1px solid var(--rule); display: flex; align-items: flex-end; padding: 14px; }
+    .lead .figure .cap { font-family: var(--mono); font-size: 11px; color: var(--ink-3); background: var(--bg); padding: 4px 8px; border: 1px solid var(--rule); }
+    .lead .eyebrow { margin-top: 22px; }
+    .lead h2 { font-family: var(--serif); font-weight: 400; font-size: 48px; line-height: 1.04; letter-spacing: -0.005em; margin: 12px 0 14px; text-wrap: balance; cursor: pointer; }
+    .lead h2:hover { color: var(--accent-ink); }
+    .lead .deck { font-family: var(--serif); font-style: italic; font-size: 21px; line-height: 1.45; color: var(--ink-2); max-width: 640px; margin-bottom: 18px; text-wrap: pretty; }
+    .byline { font-family: var(--sans); font-size: 12px; letter-spacing: 0.04em; color: var(--ink-3); display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+    .byline .author { color: var(--ink-2); }
+    .byline .sep { color: var(--rule); }
+
+    .stacked { display: flex; flex-direction: column; }
+    .stacked .item { padding: 0 0 24px; margin-bottom: 24px; border-bottom: 1px solid var(--rule); cursor: pointer; }
+    .stacked .item:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: 0; }
+    .stacked .item h3 { font-family: var(--serif); font-weight: 400; font-size: 26px; line-height: 1.18; margin: 8px 0 10px; text-wrap: balance; }
+    .stacked .item:hover h3 { color: var(--accent-ink); }
+    .stacked .item .excerpt { font-family: var(--serif); font-size: 16px; line-height: 1.5; color: var(--ink-2); margin: 0 0 12px; }
+
+    /* archive list */
+    .archive { padding: 36px 0 80px; }
+    .archive-head { display: flex; justify-content: space-between; align-items: baseline; padding-bottom: 18px; }
+    .archive-head h2 { font-family: var(--serif); font-weight: 400; font-size: 32px; margin: 0; }
+    .archive-head h2 em { color: var(--accent); }
+    .archive-head .meta { font-family: var(--sans); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-3); }
+    .archive .row { display: grid; grid-template-columns: 90px 110px minmax(0, 1fr) 200px 70px; gap: 28px; align-items: baseline; padding: 22px 0; border-top: 1px solid var(--rule); cursor: pointer; }
+    .archive .row:first-child { border-top: 1px solid var(--ink); }
+    .archive .row:last-child { border-bottom: 1px solid var(--ink); }
+    .archive .row:hover .ttl { color: var(--accent-ink); }
+    .archive .row .date { font-family: var(--mono); font-size: 12px; color: var(--ink-3); letter-spacing: 0.04em; }
+    .archive .row .cat { font-family: var(--sans); font-size: 10.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); }
+    .archive .row .ttl { font-family: var(--serif); font-size: 22px; line-height: 1.2; color: var(--ink); text-wrap: balance; }
+    .archive .row .ttl .deck { display: block; font-style: italic; font-size: 15px; color: var(--ink-2); margin-top: 4px; line-height: 1.4; }
+    .archive .row .by { font-family: var(--sans); font-size: 11.5px; letter-spacing: 0.04em; color: var(--ink-2); }
+    .archive .row .read { font-family: var(--mono); font-size: 11.5px; color: var(--ink-3); text-align: right; }
+
+    .archive .more { display: flex; justify-content: center; padding: 36px 0 0; }
+    .archive .more span { font-family: var(--sans); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); cursor: pointer; padding: 12px 18px; border: 1px solid var(--accent); }
+    .archive .more span:hover { background: var(--accent); color: var(--bg); }
+
+    /* footer */
+    footer { padding: 48px 0; font-family: var(--sans); font-size: 12px; color: var(--ink-3); display: flex; justify-content: space-between; border-top: 2px solid var(--ink); }
+    footer a:hover { color: var(--accent); }
+    footer .links { display: flex; gap: 28px; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="application/json" id="page-data">
+  {
+    "vol": "VOL I · NO V · APRIL 2026",
+    "stats": [
+      { "n": "62", "k": "pieces published" },
+      { "n": "23", "k": "field reports" },
+      { "n": "11", "k": "interviews" },
+      { "n": "05", "k": "this month" }
+    ],
+    "lead": {
+      "category": "ANALYSIS",
+      "title": "When the Supply Chain Speaks Back",
+      "deck": "Germany's Lieferkettengesetz promised accountability for workers half a world away. Three years on, the workers it was written for tell a different story.",
+      "author": "Vir Mehta",
+      "date": "18 Apr 2026",
+      "read": "22 min read",
+      "figcap": "PHOTOGRAPH · TIRUPPUR, TAMIL NADU"
+    },
+    "stacked": [
+      { "category": "FIELD REPORT", "title": "Cobalt, Cabinets, and the Limits of Self-Audit", "excerpt": "An interior designer in Lagos discovers her sourcing certification means almost nothing in Lubumbashi.", "author": "Adaeze Nwosu", "date": "11 Apr 2026", "read": "14 min" },
+      { "category": "INTERVIEW", "title": "Ratna Ramaiah on the Quiet Drafting of CSDDD", "excerpt": "The Indian trade-policy lawyer who watched Brussels build a regime that named her constituents but never consulted them.", "author": "Editors", "date": "07 Apr 2026", "read": "9 min" },
+      { "category": "COMMENTARY", "title": "Against the Universal Buyer", "excerpt": "A short polemic on why due diligence frameworks keep mistaking documents for evidence.", "author": "Lucas Pereira", "date": "01 Apr 2026", "read": "7 min" }
+    ],
+    "archive": [
+      { "date": "28 Mar 2026", "cat": "CASE STUDY", "title": "Sandstone, Subcontractors, and the Norwegian Transparency Act", "deck": "What a single quarry in Rajasthan teaches about how the Act behaves in the field.", "author": "Ishaan Roy", "read": "11 min" },
+      { "date": "21 Mar 2026", "cat": "ANALYSIS", "title": "The Empty Chair at the Buyer's Table", "deck": "A reading of three failed roundtables and what they reveal about consultation.", "author": "Marisol Cortés", "read": "13 min" },
+      { "date": "14 Mar 2026", "cat": "DISPATCH", "title": "Brazil's Forced-Labour List, Quietly Restored", "deck": "The Lista Suja returns. What it covers, and what buyer-country regulators are doing with it.", "author": "Beatriz Matos", "read": "6 min" },
+      { "date": "07 Mar 2026", "cat": "FIELD REPORT", "title": "What an Audit Misses in the Sialkot Football Belt", "deck": "Six visits, three failed certifications, and one piecework wage system that no buyer has yet acknowledged.", "author": "Asma Khan", "read": "16 min" },
+      { "date": "29 Feb 2026", "cat": "INTERVIEW", "title": "Carla Aboubakar on the Shape of African Due Diligence", "deck": "On why a continent-wide framework will not be a CSDDD tribute act.", "author": "Editors", "read": "10 min" },
+      { "date": "22 Feb 2026", "cat": "COMMENTARY", "title": "The Audit Is Not the Remedy", "deck": "How private assurance has come to substitute for both regulation and reparation.", "author": "Vir Mehta", "read": "8 min" },
+      { "date": "15 Feb 2026", "cat": "ANALYSIS", "title": "How the CSDDD Was Almost Repealed in Trilogue", "deck": "Reconstruction of the four weeks in early 2025 when the Directive nearly came undone.", "author": "Eda Yılmaz", "read": "18 min" },
+      { "date": "08 Feb 2026", "cat": "CASE STUDY", "title": "Tea, Plantations, and the Ceylon Workers' Charter", "deck": "A Sri Lankan trade union tries the German law on for size, and finds it borrowed.", "author": "Niranjan David", "read": "12 min" },
+      { "date": "01 Feb 2026", "cat": "FIELD REPORT", "title": "The Garment Workers Who Never Heard of the Law Written For Them", "deck": "Tiruppur, Dhaka, Yangon. Three rooms, one questionnaire, and a long silence.", "author": "Vir Mehta", "read": "20 min" },
+      { "date": "25 Jan 2026", "cat": "DISPATCH", "title": "Mexico's CADHU Bill Reaches the Senate", "deck": "What the proposed Mexican due-diligence statute has, and what it has quietly dropped.", "author": "Marisol Cortés", "read": "5 min" }
+    ]
+  }
+  </script>
+
+  <script type="text/babel" src="src/Articles.jsx"></script>
+</body>
+</html>

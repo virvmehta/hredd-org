@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>HREDD — Lieferkettensorgfaltspflichtengesetz</title>
+  <meta name="viewport" content="width=1366" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles/tokens.css" />
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <style>
+    .page { max-width: 1366px; margin: 0 auto; padding: 0 var(--pad-x); }
+
+    /* shared chrome */
+    .topstrip {
+      display: flex; justify-content: space-between; align-items: center;
+      font-family: var(--sans); font-size: 11px; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--ink-3);
+      padding: 12px 0 10px; border-bottom: 1px solid var(--rule);
+    }
+    .topstrip .vol { color: var(--ink-2); }
+    .topstrip .right { display: flex; gap: 22px; }
+    .topstrip .right a:hover { color: var(--accent); }
+
+    .nav {
+      display: grid; grid-template-columns: 1fr auto 1fr;
+      align-items: center; padding: 22px 0;
+      border-bottom: 2px solid var(--ink);
+    }
+    .nav-left { display: flex; gap: 26px; flex-wrap: nowrap; white-space: nowrap; font-family: var(--sans); font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-2); }
+    .nav-left a { padding-bottom: 2px; border-bottom: 1px solid transparent; }
+    .nav-left a:hover, .nav-left a.active { color: var(--accent); border-color: var(--accent); }
+    .nav-center { text-align: center; font-family: var(--serif); font-size: 36px; line-height: 1; letter-spacing: 0.01em; white-space: nowrap; }
+    .nav-center .glyph {
+      display: inline-block; transform: translateY(-2px); margin: 0 6px;
+      color: var(--accent); font-style: italic; font-size: 30px;
+    }
+    .nav-right {
+      display: flex; gap: 26px; justify-content: flex-end;
+      font-family: var(--sans); font-size: 12px; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--ink-2);
+    }
+    .nav-right a { padding-bottom: 2px; border-bottom: 1px solid transparent; }
+    .nav-right a:hover, .nav-right a.active { color: var(--accent); border-color: var(--accent); }
+
+    /* breadcrumb */
+    .crumb {
+      padding: 18px 0;
+      border-bottom: 1px solid var(--rule);
+      font-family: var(--sans);
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+    }
+    .crumb a:hover { color: var(--accent); }
+    .crumb .sep { color: var(--rule); padding: 0 10px; }
+
+    /* law masthead */
+    .law-mast {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 1px 320px;
+      gap: 56px;
+      padding: 56px 0 48px;
+      border-bottom: 1px solid var(--ink);
+    }
+    .law-mast .v { background: var(--rule); width: 1px; }
+    .law-mast .eyebrow { margin-bottom: 18px; }
+    .law-mast h1 {
+      font-family: var(--serif);
+      font-weight: 400;
+      font-size: 52px;
+      line-height: 1.04;
+      letter-spacing: -0.012em;
+      margin: 0 0 22px;
+      text-wrap: balance;
+      overflow-wrap: anywhere;
+    }
+    .law-mast h1 .native { font-style: italic; display: block; color: var(--ink-2); font-size: 0.46em; margin-top: 12px; letter-spacing: 0; overflow-wrap: normal; }
+    .law-mast .deck {
+      font-family: var(--serif);
+      font-size: 22px;
+      line-height: 1.45;
+      color: var(--ink-2);
+      max-width: 760px;
+      text-wrap: pretty;
+      font-style: italic;
+    }
+    .law-mast .meta-line {
+      display: flex; gap: 18px; align-items: center;
+      font-family: var(--sans); font-size: 12px;
+      letter-spacing: 0.06em; color: var(--ink-3);
+      margin-top: 26px;
+    }
+    .law-mast .meta-line .pip {
+      display: inline-block; width: 6px; height: 6px;
+      background: var(--accent);
+    }
+    .law-mast .meta-line .sep { color: var(--rule); }
+
+    /* facts (sidebar in masthead) */
+    .facts .label {
+      font-family: var(--sans); font-size: 10.5px;
+      letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 16px;
+    }
+    .facts dl {
+      margin: 0; padding: 0;
+      border-top: 1px solid var(--rule);
+    }
+    .facts dt {
+      font-family: var(--sans); font-size: 10.5px;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--ink-3); padding-top: 14px;
+    }
+    .facts dd {
+      font-family: var(--serif);
+      font-size: 18px; line-height: 1.3;
+      margin: 4px 0 14px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--rule);
+      color: var(--ink);
+    }
+    .facts dd .small {
+      display: block;
+      font-family: var(--sans); font-size: 11.5px;
+      color: var(--ink-3); letter-spacing: 0.04em;
+      margin-top: 4px;
+    }
+    .facts dd.status { font-family: var(--sans); font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); padding-top: 0; padding-bottom: 14px; }
+
+    /* body grid */
+    .body-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 1px 320px;
+      gap: 56px;
+      padding: 56px 0 96px;
+    }
+    .body-grid .v { background: var(--rule); width: 1px; }
+
+    .article {
+      max-width: 720px;
+    }
+    .article h2 {
+      font-family: var(--serif);
+      font-weight: 400;
+      font-size: 30px;
+      line-height: 1.15;
+      letter-spacing: -0.005em;
+      margin: 56px 0 18px;
+      text-wrap: balance;
+    }
+    .article h2:first-child { margin-top: 0; }
+    .article h2 .num {
+      font-family: var(--mono); font-size: 14px;
+      color: var(--accent); letter-spacing: 0.1em;
+      margin-right: 14px; vertical-align: middle;
+    }
+    .article p {
+      font-family: var(--serif);
+      font-size: 19px;
+      line-height: 1.55;
+      color: var(--ink);
+      margin: 0 0 18px;
+      text-align: justify;
+      hyphens: auto;
+      text-wrap: pretty;
+    }
+    .article p .lead-letter {
+      font-family: var(--serif);
+      float: left;
+      font-size: 64px;
+      line-height: 0.88;
+      padding: 6px 10px 0 0;
+      color: var(--accent);
+    }
+    .article ol.provisions {
+      list-style: none; padding: 0; margin: 0 0 18px;
+      counter-reset: prov;
+    }
+    .article ol.provisions li {
+      display: grid;
+      grid-template-columns: 56px 1fr;
+      gap: 16px;
+      padding: 18px 0;
+      border-top: 1px solid var(--rule);
+      counter-increment: prov;
+    }
+    .article ol.provisions li:last-child { border-bottom: 1px solid var(--rule); }
+    .article ol.provisions li::before {
+      content: "§ " counter(prov, decimal-leading-zero);
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--accent);
+      letter-spacing: 0.08em;
+      padding-top: 4px;
+    }
+    .article ol.provisions h4 {
+      font-family: var(--serif);
+      font-weight: 400;
+      font-size: 21px;
+      line-height: 1.25;
+      margin: 0 0 6px;
+    }
+    .article ol.provisions p {
+      font-size: 16px;
+      line-height: 1.5;
+      color: var(--ink-2);
+      margin: 0;
+      text-align: left;
+    }
+    .article blockquote {
+      margin: 32px 0;
+      padding: 0 0 0 32px;
+      border-left: 2px solid var(--accent);
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 24px;
+      line-height: 1.4;
+      color: var(--ink);
+      max-width: 600px;
+    }
+    .article blockquote cite {
+      display: block;
+      margin-top: 14px;
+      font-family: var(--sans);
+      font-style: normal;
+      font-size: 11.5px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+    }
+    .article .timeline {
+      margin: 32px 0;
+    }
+    .article .tl-row {
+      display: grid;
+      grid-template-columns: 110px 1fr;
+      gap: 24px;
+      padding: 16px 0;
+      border-top: 1px solid var(--rule);
+    }
+    .article .tl-row:last-child { border-bottom: 1px solid var(--rule); }
+    .article .tl-row .yr {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--accent);
+      letter-spacing: 0.06em;
+      padding-top: 2px;
+    }
+    .article .tl-row .what {
+      font-family: var(--serif);
+      font-size: 18px;
+      line-height: 1.4;
+      color: var(--ink);
+      margin: 0;
+      text-align: left;
+    }
+
+    /* sticky sidebar */
+    .side {
+      position: sticky;
+      top: 24px;
+      align-self: start;
+    }
+    .side .label {
+      font-family: var(--sans); font-size: 10.5px;
+      letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 14px;
+    }
+    .side .block { margin-bottom: 36px; }
+    .side .item {
+      padding: 14px 0;
+      border-top: 1px solid var(--rule);
+      cursor: pointer;
+    }
+    .side .item:last-child { border-bottom: 1px solid var(--rule); }
+    .side .item:hover .ttl { color: var(--accent-ink); }
+    .side .item .ttl {
+      font-family: var(--serif);
+      font-size: 17px;
+      line-height: 1.25;
+      color: var(--ink);
+      margin: 0 0 4px;
+    }
+    .side .item .juris {
+      font-family: var(--sans); font-size: 10.5px;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--ink-3);
+    }
+    .side .item .juris .st { color: var(--accent); margin-left: 8px; }
+
+    .side .article-item .cat {
+      font-family: var(--sans); font-size: 10px;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 4px;
+    }
+    .side .article-item .by {
+      font-family: var(--sans); font-size: 11px;
+      color: var(--ink-3); letter-spacing: 0.04em;
+    }
+
+    /* footer */
+    footer {
+      padding: 48px 0; font-family: var(--sans);
+      font-size: 12px; color: var(--ink-3);
+      display: flex; justify-content: space-between;
+      border-top: 2px solid var(--ink);
+    }
+    footer a:hover { color: var(--accent); }
+    footer .links { display: flex; gap: 28px; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="application/json" id="page-data">
+  {
+    "vol": "VOL I · NO V · APRIL 2026",
+    "law": {
+      "title": "Lieferkettensorgfaltspflichtengesetz",
+      "shortTitle": "Supply Chain Due Diligence Act",
+      "native": "Act on Corporate Due Diligence Obligations in Supply Chains",
+      "deck": "Germany's first binding statute requiring large enterprises to identify, prevent, and remediate human rights and environmental risks across their direct supply chains.",
+      "jurisdiction": "Germany",
+      "year": "2023",
+      "status": "In force",
+      "scope": "Companies with > 1,000 employees domiciled in Germany",
+      "enforcement": "Bundesamt für Wirtschaft und Ausfuhrkontrolle (BAFA)",
+      "penalty": "Up to €8 million or 2% of global turnover",
+      "covers": "Direct suppliers (Tier 1) by default; indirect suppliers on substantiated knowledge",
+      "duties": "Risk analysis, preventive measures, remedy, complaint mechanism, annual report"
+    }
+  }
+  </script>
+
+  <script type="text/babel" src="src/Law.jsx"></script>
+</body>
+</html>
