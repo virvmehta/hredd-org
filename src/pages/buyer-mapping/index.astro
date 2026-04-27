@@ -1,0 +1,346 @@
+---
+import BaseLayout from '../../layouts/Base.astro';
+import { client } from '../../lib/sanity.js';
+import { LAWS_QUERY } from '../../lib/queries.js';
+import { STATIC_LAWS } from '../../lib/staticData.js';
+
+let laws: any[] = [];
+try {
+  const fetched = await client.fetch(LAWS_QUERY);
+  laws = fetched && fetched.length > 0 ? fetched : STATIC_LAWS;
+} catch {
+  laws = STATIC_LAWS;
+}
+
+function statusLabel(status: string) {
+  if (status === 'in-force') return 'In force';
+  if (status === 'pending') return 'Pending';
+  return 'Proposed';
+}
+
+function tagClass(status: string) {
+  if (status === 'in-force') return 'tag-force';
+  if (status === 'pending') return 'tag-pending';
+  return 'tag-proposed';
+}
+
+const allLawsData = laws.map((l: any) => ({
+  name: l.name,
+  slug: l.slug,
+  jurisdiction: l.jurisdiction || '',
+  status: statusLabel(l.status),
+  tag: tagClass(l.status),
+  scope: l.scope || '',
+}));
+---
+
+<BaseLayout
+  title="Buyer Mapping — hredd.org"
+  description="Suppliers: select your buyer countries to see which HREDD laws apply to your trade relationships."
+>
+
+  <!-- SECTION 1: HEADER + BUYER PILLS -->
+  <section class="mapping-header snap-section">
+    <div class="header-inner">
+      <div class="eyebrow">Supplier tool</div>
+      <h1 class="page-title serif">Buyer mapping</h1>
+      <p class="page-deck serif">Select your buyer countries to see which HREDD laws apply to your trade relationships.</p>
+
+      <div class="pills-block">
+        <p class="pills-label eyebrow">My buyers are in</p>
+        <div class="filter-pills" id="filter-pills">
+          {['Germany', 'France', 'Netherlands', 'Norway', 'United Kingdom', 'Switzerland', 'United States', 'Canada', 'Australia', 'EU-wide'].map(country => (
+            <button class="filter-pill" data-country={country}>{country}</button>
+          ))}
+        </div>
+        <p class="pills-hint" id="pills-hint">Select one or more buyer countries above.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 2: RESULTS -->
+  <section class="results-section snap-section" id="results-section">
+    <div class="results-inner">
+      <div id="results-empty" class="results-empty">
+        <p>Select buyer countries above to see applicable laws.</p>
+      </div>
+      <div id="results-list" class="results-list" hidden></div>
+    </div>
+  </section>
+
+</BaseLayout>
+
+<script define:vars={{ allLawsData }}>
+  const pillToLawSlugs = {
+    'Germany':        ['lksg'],
+    'France':         ['loi-vigilance'],
+    'Netherlands':    ['wkba'],
+    'Norway':         ['transparency-act-norway'],
+    'United Kingdom': ['modern-slavery-act'],
+    'Switzerland':    ['swiss-responsible-business-ordinance'],
+    'United States':  ['uflpa'],
+    'Canada':         ['canada-flcca'],
+    'Australia':      ['australia-modern-slavery-act'],
+    'EU-wide': ['csddd', 'lksg', 'loi-vigilance', 'wkba', 'transparency-act-norway'],
+  };
+
+  const lawsBySlug = {};
+  for (const law of allLawsData) {
+    lawsBySlug[law.slug] = law;
+  }
+
+  const pillsContainer = document.getElementById('filter-pills');
+  const resultsEmpty = document.getElementById('results-empty');
+  const resultsList = document.getElementById('results-list');
+  const pinsHint = document.getElementById('pills-hint');
+  const activePills = new Set();
+
+  if (pillsContainer) {
+    pillsContainer.querySelectorAll('.filter-pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        const country = pill.dataset.country || '';
+        if (activePills.has(country)) {
+          activePills.delete(country);
+          pill.classList.remove('active');
+        } else {
+          activePills.add(country);
+          pill.classList.add('active');
+        }
+        updateResults();
+      });
+    });
+  }
+
+  function updateResults() {
+    if (!resultsEmpty || !resultsList) return;
+
+    if (activePills.size === 0) {
+      resultsEmpty.hidden = false;
+      resultsList.hidden = true;
+      resultsList.innerHTML = '';
+      if (pinsHint) pinsHint.textContent = 'Select one or more buyer countries above.';
+      return;
+    }
+
+    const slugSet = new Set();
+    for (const pill of activePills) {
+      for (const slug of (pillToLawSlugs[pill] || [])) {
+        slugSet.add(slug);
+      }
+    }
+
+    const laws = Array.from(slugSet).map(slug => lawsBySlug[slug]).filter(Boolean);
+    const count = laws.length;
+
+    if (pinsHint) {
+      const names = Array.from(activePills).join(', ');
+      pinsHint.textContent = `Buyers in ${names}: ${count} ${count === 1 ? 'law applies' : 'laws apply'}.`;
+    }
+
+    if (count === 0) {
+      resultsEmpty.hidden = false;
+      resultsList.hidden = true;
+      resultsList.innerHTML = '';
+      return;
+    }
+
+    resultsEmpty.hidden = true;
+    resultsList.hidden = false;
+
+    resultsList.innerHTML = laws.map(law => `
+      <div class="law-card">
+        <div class="law-card-main">
+          <p class="law-card-jurisdiction">${law.jurisdiction}</p>
+          <a href="/laws/${law.slug}" class="law-card-name">${law.name}</a>
+          ${law.scope ? `<p class="law-card-scope">${law.scope}</p>` : ''}
+        </div>
+        <div class="law-card-meta">
+          <span class="tag ${law.tag}">${law.status}</span>
+          <a href="/laws/${law.slug}" class="law-card-readmore">Read more &rarr;</a>
+        </div>
+      </div>
+    `).join('');
+
+    setTimeout(() => {
+      const el = document.getElementById('results-section');
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+  }
+</script>
+
+<style>
+  :global(html) {
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+  }
+
+  @media (max-width: 768px) {
+    :global(html) { scroll-snap-type: y proximity; }
+  }
+
+  .snap-section {
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  /* HEADER */
+  .mapping-header {
+    padding: 56px var(--pad-x) 48px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .header-inner { max-width: 760px; }
+
+  .mapping-header .eyebrow { margin-bottom: 20px; display: block; }
+
+  .page-title {
+    font-size: 56px;
+    font-weight: 400;
+    line-height: 1.0;
+    letter-spacing: -0.02em;
+    margin: 0 0 20px;
+  }
+
+  .page-deck {
+    font-style: italic;
+    font-size: 19px;
+    color: var(--ink-2);
+    max-width: 560px;
+    line-height: 1.5;
+    margin-bottom: 40px;
+  }
+
+  /* PILLS */
+  .pills-block {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .pills-label { margin-bottom: 0; }
+
+  .filter-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .filter-pill {
+    font-family: var(--sans);
+    font-size: 13px;
+    padding: 8px 16px;
+    background: transparent;
+    border: 1px solid var(--rule);
+    color: var(--ink-2);
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s, background 0.15s;
+  }
+
+  .filter-pill:hover { border-color: var(--accent); color: var(--ink); }
+
+  .filter-pill.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--bg);
+  }
+
+  .pills-hint {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 14px;
+    color: var(--ink-3);
+  }
+
+  /* RESULTS */
+  .results-section {
+    padding: 56px var(--pad-x);
+    border-bottom: 1px solid var(--rule);
+    justify-content: flex-start;
+  }
+
+  .results-inner { max-width: 760px; }
+
+  .results-empty {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 17px;
+    color: var(--ink-3);
+    padding: 48px 0;
+  }
+
+  .results-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  :global(.law-card) {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 24px 0;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+
+  :global(.law-card:last-child) { border-bottom: none; }
+
+  :global(.law-card-main) {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  :global(.law-card-jurisdiction) {
+    font-family: var(--sans);
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-3);
+  }
+
+  :global(.law-card-name) {
+    font-family: var(--serif);
+    font-size: 20px;
+    color: var(--ink);
+    line-height: 1.2;
+  }
+
+  :global(.law-card-name:hover) { color: var(--accent); }
+
+  :global(.law-card-scope) {
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--ink-2);
+    line-height: 1.5;
+  }
+
+  :global(.law-card-meta) {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  :global(.law-card-readmore) {
+    font-family: var(--sans);
+    font-size: 12px;
+    color: var(--accent);
+    white-space: nowrap;
+  }
+
+  :global(.law-card-readmore:hover) { opacity: 0.7; }
+
+  @media (max-width: 768px) {
+    .snap-section { min-height: unset; scroll-snap-align: none; }
+    .mapping-header, .results-section { padding-left: var(--pad-x-narrow); padding-right: var(--pad-x-narrow); }
+    .page-title { font-size: 38px; }
+  }
+</style>

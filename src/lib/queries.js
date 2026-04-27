@@ -1,93 +1,61 @@
-export const getAllArticlesQuery = `*[_type == "article"] | order(publishedAt desc) {
-  title,
+export const LAWS_QUERY = `*[_type == "law"] | order(year desc) {
+  _id,
+  name,
+  nativeName,
   "slug": slug.current,
-  category,
-  publishedAt,
-  readTime,
-  excerpt,
-  deck,
-  authorName
+  jurisdiction,
+  iso,
+  year,
+  inForce,
+  status,
+  scope
 }`;
 
-export const getArticleBySlugQuery = `*[_type == "article" && slug.current == $slug][0] {
+export const LAW_BY_SLUG_QUERY = `*[_type == "law" && slug.current == $slug][0] {
+  _id,
+  name,
+  nativeName,
+  "slug": slug.current,
+  jurisdiction,
+  iso,
+  year,
+  inForce,
+  status,
+  scope,
+  provisions,
+  timeline,
+  "relatedLaws": relatedLaws[]-> {
+    name,
+    "slug": slug.current,
+    jurisdiction,
+    year,
+    status
+  }
+}`;
+
+export const ARTICLES_QUERY = `*[_type == "article"] | order(publishedAt desc) {
+  _id,
   title,
   "slug": slug.current,
-  category,
-  publishedAt,
-  readTime,
-  excerpt,
   deck,
-  authorName,
+  category,
+  "author": authorName,
+  publishedAt,
+  readTime
+}`;
+
+export const ARTICLE_BY_SLUG_QUERY = `*[_type == "article" && slug.current == $slug][0] {
+  _id,
+  title,
+  "slug": slug.current,
+  deck,
+  category,
+  "author": authorName,
   authorRole,
   authorBio,
-  body,
-  "referencedLaws": referencedLaws[]->{name, shortName, "slug": slug.current},
-  "relatedArticles": relatedArticles[]->{title, "slug": slug.current, category, authorName, readTime, excerpt}
+  publishedAt,
+  readTime,
+  body
 }`;
 
-export const getAllLawSlugsQuery = `*[_type == "trackerLaw"] | order(order asc) {
-  name,
-  shortName,
-  "slug": slug.current,
-  jurisdiction,
-  region,
-  status,
-  statusType,
-  lastUpdated,
-  tableUpdateText,
-  countryCode,
-  order
-}`;
-
-export const getLawBySlugQuery = `*[_type == "trackerLaw" && slug.current == $slug][0] {
-  name,
-  shortName,
-  "slug": slug.current,
-  jurisdiction,
-  region,
-  status,
-  statusType,
-  lastUpdated,
-  tableUpdateText,
-  enactedDate,
-  firstComplianceDeadline,
-  companiesInScope,
-  maxPenalty,
-  civilLiability,
-  enforcementBody,
-  sectorsAffected,
-  supplierCountries,
-  countryCode,
-  summary,
-  obligations,
-  timeline,
-  changelog,
-  sources,
-  "relatedArticles": relatedArticles[]->{title, "slug": slug.current, category, authorName, readTime, excerpt},
-  order
-}`;
-
-export const getSiteSettingsQuery = `*[_type == "siteSettings"][0] {
-  currentVolume,
-  currentIssue,
-  currentMonth,
-  trackerLastUpdated,
-  trackerNextUpdate,
-  editorialQuote,
-  articleDisclaimer,
-  movementsThisMonth
-}`;
-
-export const getAllLawRegionsQuery = `*[_type == "trackerLaw"] | order(order asc) {
-  name,
-  shortName,
-  "slug": slug.current,
-  jurisdiction,
-  region,
-  status,
-  statusType,
-  lastUpdated,
-  tableUpdateText,
-  countryCode,
-  order
-}`;
+export const SITE_SETTINGS_QUERY = `*[_id == "siteSettings"][0]`;

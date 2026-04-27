@@ -26,8 +26,8 @@ export default defineConfig({
               .title('Articles')
               .child(S.documentTypeList('article').title('Articles')),
             S.listItem()
-              .title('Tracker Laws')
-              .child(S.documentTypeList('trackerLaw').title('Tracker Laws')),
+              .title('Laws')
+              .child(S.documentTypeList('law').title('Laws')),
           ]),
     }),
     visionTool(),

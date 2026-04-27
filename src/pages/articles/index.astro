@@ -1,12 +1,12 @@
 ---
 import BaseLayout from '../../layouts/Base.astro';
-import { sanityClient } from '../../lib/sanity.js';
-import { getAllArticlesQuery } from '../../lib/queries.js';
+import { client } from '../../lib/sanity.js';
+import { ARTICLES_QUERY } from '../../lib/queries.js';
 import { STATIC_ARTICLES } from '../../lib/staticData.js';
 
 let articles: any[] = [];
 try {
-  const fetched = await sanityClient.fetch(getAllArticlesQuery);
+  const fetched = await client.fetch(ARTICLES_QUERY);
   articles = fetched && fetched.length > 0 ? fetched : STATIC_ARTICLES;
 } catch {
   articles = STATIC_ARTICLES;
@@ -15,7 +15,7 @@ try {
 const categories = ['All', 'From the Field', 'Legal Analysis', 'Implementation', 'Case Studies'];
 ---
 
-<BaseLayout title="Articles — hredd.org" activePage="articles">
+<BaseLayout title="Articles — hredd.org">
 
   <!-- PAGE HEADER -->
   <section class="page-header">
@@ -49,7 +49,7 @@ const categories = ['All', 'From the Field', 'Legal Analysis', 'Implementation',
               <a href={`/articles/${slug}`}>{article.title}</a>
             </h2>
             <p class="card-excerpt">{article.excerpt}</p>
-            <p class="card-byline">{article.authorName} &middot; {article.readTime} min read</p>
+            <p class="card-byline">{article.author} &middot; {article.readTime} min read</p>
           </article>
         );
       })}

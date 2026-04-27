@@ -1,0 +1,7 @@
+---
+const { color = 'var(--rule)' } = Astro.props;
+---
+<div class="v" style={`background:${color}`}></div>
+<style>
+.v { width: 1px; align-self: stretch; }
+</style>

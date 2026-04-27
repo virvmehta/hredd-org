@@ -1,13 +1,13 @@
 ---
 import BaseLayout from '../../layouts/Base.astro';
-import { sanityClient, renderPortableText } from '../../lib/sanity.js';
-import { getArticleBySlugQuery, getAllArticlesQuery, getSiteSettingsQuery } from '../../lib/queries.js';
-import { STATIC_ARTICLES, STATIC_SITE_SETTINGS } from '../../lib/staticData.js';
+import { client, renderPortableText } from '../../lib/sanity.js';
+import { ARTICLE_BY_SLUG_QUERY, ARTICLES_QUERY } from '../../lib/queries.js';
+import { STATIC_ARTICLES } from '../../lib/staticData.js';
 
 export async function getStaticPaths() {
   let articles: any[] = [];
   try {
-    const fetched = await sanityClient.fetch(getAllArticlesQuery);
+    const fetched = await client.fetch(ARTICLES_QUERY);
     articles = fetched && fetched.length > 0 ? fetched : STATIC_ARTICLES;
   } catch {
     articles = STATIC_ARTICLES;
@@ -20,15 +20,9 @@ export async function getStaticPaths() {
 
 const { slug } = Astro.params;
 let article: any = null;
-let settings: any = STATIC_SITE_SETTINGS;
 
 try {
-  const [fetchedArticle, fetchedSettings] = await Promise.all([
-    sanityClient.fetch(getArticleBySlugQuery, { slug }),
-    sanityClient.fetch(getSiteSettingsQuery),
-  ]);
-  article = fetchedArticle;
-  if (fetchedSettings) settings = fetchedSettings;
+  article = await client.fetch(ARTICLE_BY_SLUG_QUERY, { slug });
 } catch { /* fall through */ }
 
 if (!article) {
@@ -43,7 +37,7 @@ if (!article) return Astro.redirect('/articles');
 // The deck shows on the article page; the excerpt shows on cards.
 // If deck is not set, fall back to excerpt on the article page.
 const articleDeck = article.deck || article.excerpt || '';
-const articleDisclaimer = settings.articleDisclaimer || 'The views expressed are the author\'s own. hredd.org is an independent platform.';
+const articleDisclaimer = 'The views expressed are the author\'s own. hredd.org is an independent platform.';
 
 function formatDate(dateStr: string) {
   if (!dateStr) return '';
@@ -105,7 +99,6 @@ const ogDescription = article.deck || article.excerpt || '';
 <BaseLayout
   title={`${article.title} — hredd.org`}
   description={ogDescription}
-  activePage="articles"
   ogType="article"
 >
 
@@ -117,7 +110,7 @@ const ogDescription = article.deck || article.excerpt || '';
 
     <div class="article-meta-row">
       <div class="author-meta">
-        <span class="author-name">{article.authorName}</span>
+        <span class="author-name">{article.author}</span>
         {article.authorRole && <span class="author-role">{article.authorRole}</span>}
       </div>
       <div class="meta-divider"></div>
@@ -140,9 +133,9 @@ const ogDescription = article.deck || article.excerpt || '';
 
     <!-- AUTHOR BLOCK -->
     <div class="author-block">
-      <div class="author-initial">{authorInitial(article.authorName)}</div>
+      <div class="author-initial">{authorInitial(article.author)}</div>
       <div class="author-info">
-        <p class="author-full-name">{article.authorName}</p>
+        <p class="author-full-name">{article.author}</p>
         {article.authorRole && <p class="author-role-full">{article.authorRole}</p>}
         {article.authorBio && <p class="author-bio">{article.authorBio}</p>}
         {articleDisclaimer && <p class="author-disclaimer">{articleDisclaimer}</p>}
@@ -158,7 +151,7 @@ const ogDescription = article.deck || article.excerpt || '';
             const lSlug = typeof law === 'string' ? law : (law.slug?.current || law.slug);
             const lName = typeof law === 'string' ? law : (law.shortName || law.name || law);
             return (
-              <a href={`/tracker/${lSlug}`} class="law-pill">{lName}</a>
+              <a href={`/laws/${lSlug}`} class="law-pill">{lName}</a>
             );
           })}
         </div>
@@ -179,7 +172,7 @@ const ogDescription = article.deck || article.excerpt || '';
                   <a href={`/articles/${rSlug}`}>{rel.title}</a>
                 </h3>
                 {rel.excerpt && <p class="related-card-excerpt">{rel.excerpt}</p>}
-                <p class="related-card-byline">{rel.authorName} &middot; {rel.readTime} min read</p>
+                <p class="related-card-byline">{rel.author} &middot; {rel.readTime} min read</p>
               </article>
             );
           })}

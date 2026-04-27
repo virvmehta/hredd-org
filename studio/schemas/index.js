@@ -1,5 +1,5 @@
 import article from './article.js';
-import trackerLaw from './trackerLaw.js';
+import law from './law.js';
 import siteSettings from './siteSettings.js';
 
-export const schemaTypes = [article, trackerLaw, siteSettings];
+export const schemaTypes = [article, law, siteSettings];

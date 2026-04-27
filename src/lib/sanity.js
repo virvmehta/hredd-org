@@ -1,6 +1,6 @@
 import { createClient } from '@sanity/client';
 
-export const sanityClient = createClient({
+export const client = createClient({
   projectId: import.meta.env.PUBLIC_SANITY_PROJECT_ID,
   dataset: import.meta.env.PUBLIC_SANITY_DATASET || 'production',
   useCdn: true,
@@ -10,24 +10,26 @@ export const sanityClient = createClient({
 export function renderPortableText(blocks) {
   if (!blocks || !Array.isArray(blocks)) return '';
   return blocks.map(block => {
-    if (block._type === 'block') {
+    if (block._type === 'block' || block.type === 'block') {
       const children = block.children || [];
       const text = children.map(child => {
         let t = child.text || '';
-        if (child.marks && child.marks.includes('em')) t = `<em>${t}</em>`;
-        if (child.marks && child.marks.includes('strong')) t = `<strong>${t}</strong>`;
+        if (child.marks?.includes('em')) t = `<em>${t}</em>`;
+        if (child.marks?.includes('strong')) t = `<strong>${t}</strong>`;
         return t;
       }).join('');
       const style = block.style || 'normal';
       if (style === 'h2') return `<h2 class="article-h2">${text}</h2>`;
-      if (style === 'pullQuote') return `<div class="pull-quote"><blockquote><p>${text}</p></blockquote></div>`;
+      if (style === 'pullQuote') return `<blockquote class="pull-quote"><p>${text}</p></blockquote>`;
       return `<p class="article-p">${text}</p>`;
     }
+    if (block.type === 'paragraph') return `<p class="article-p">${block.text || ''}</p>`;
+    if (block.type === 'h2') return `<h2 class="article-h2">${block.text || ''}</h2>`;
     if (block._type === 'callout') {
       return `<div class="callout-block"><span class="callout-label">${block.label || ''}</span><p>${block.body || ''}</p></div>`;
     }
     if (block._type === 'sectionBreak') {
-      return `<div class="section-break"><div class="section-break-line"></div><span>· · ·</span><div class="section-break-line"></div></div>`;
+      return `<div class="section-break"><span>· · ·</span></div>`;
     }
     if (block._type === 'dataBlock') {
       return `<div class="data-block">

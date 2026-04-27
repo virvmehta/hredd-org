@@ -1,6 +1,3 @@
-// After making changes to this schema, redeploy the studio:
-// cd studio && npx sanity deploy
-
 export default {
   name: 'article',
   title: 'Article',
@@ -20,13 +17,38 @@ export default {
       validation: Rule => Rule.required(),
     },
     {
+      name: 'deck',
+      title: 'Deck',
+      type: 'text',
+      rows: 2,
+      description: 'One sentence shown below the title. No em dashes.',
+    },
+    {
       name: 'category',
       title: 'Category',
       type: 'string',
       options: {
-        list: ['From the Field', 'Legal Analysis', 'Implementation', 'Case Studies'],
+        list: ['Analysis', 'Legal Analysis', 'Implementation', 'From the Field', 'Case Studies', 'Tracker', 'Opinion', 'Interview'],
       },
       validation: Rule => Rule.required(),
+    },
+    {
+      name: 'authorName',
+      title: 'Author Name',
+      type: 'string',
+    },
+    {
+      name: 'authorRole',
+      title: 'Author Role',
+      type: 'string',
+      description: 'One line, e.g. "Research Fellow, Institute for Responsible Business"',
+    },
+    {
+      name: 'authorBio',
+      title: 'Author Bio',
+      type: 'text',
+      rows: 4,
+      description: 'One paragraph. Appears at the bottom of the article page.',
     },
     {
       name: 'publishedAt',
@@ -38,36 +60,6 @@ export default {
       name: 'readTime',
       title: 'Read Time (minutes)',
       type: 'number',
-    },
-    {
-      name: 'excerpt',
-      title: 'Excerpt',
-      type: 'text',
-      rows: 3,
-      description: 'Shown in article cards. 1-2 sentences.',
-    },
-    {
-      name: 'deck',
-      title: 'Article Deck',
-      type: 'text',
-      rows: 2,
-      description: 'Shown below title on article page. One sentence.',
-    },
-    {
-      name: 'authorName',
-      title: 'Author Name',
-      type: 'string',
-    },
-    {
-      name: 'authorRole',
-      title: 'Author Role (one line)',
-      type: 'string',
-    },
-    {
-      name: 'authorBio',
-      title: 'Author Bio (full paragraph)',
-      type: 'text',
-      rows: 4,
     },
     {
       name: 'body',
@@ -105,7 +97,7 @@ export default {
             {
               name: 'placeholder',
               type: 'string',
-              title: 'placeholder',
+              title: 'Placeholder',
               initialValue: 'section-break',
               hidden: true,
             },
@@ -130,7 +122,7 @@ export default {
       name: 'referencedLaws',
       title: 'Laws Referenced',
       type: 'array',
-      of: [{ type: 'reference', to: [{ type: 'trackerLaw' }] }],
+      of: [{ type: 'reference', to: [{ type: 'law' }] }],
     },
     {
       name: 'relatedArticles',
@@ -139,4 +131,10 @@ export default {
       of: [{ type: 'reference', to: [{ type: 'article' }] }],
     },
   ],
+  preview: {
+    select: {
+      title: 'title',
+      subtitle: 'publishedAt',
+    },
+  },
 };

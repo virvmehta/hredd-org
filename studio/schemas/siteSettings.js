@@ -5,56 +5,28 @@ export default {
   __experimental_actions: ['update', 'publish'],
   fields: [
     {
-      name: 'currentVolume',
-      title: 'Current Volume',
+      name: 'vol',
+      title: 'Volume Label',
+      type: 'string',
+      description: 'e.g. "VOL I"',
+      initialValue: 'VOL I',
+    },
+    {
+      name: 'issue',
+      title: 'Issue Number',
       type: 'number',
+      description: 'Displayed as Roman numerals in the TopStrip.',
     },
     {
-      name: 'currentIssue',
-      title: 'Current Issue',
-      type: 'number',
+      name: 'issueDate',
+      title: 'Issue Date',
+      type: 'date',
+      description: 'The date of the current issue. Used to compute the month label in TopStrip.',
     },
     {
-      name: 'currentMonth',
-      title: 'Current Month (e.g. June 2026)',
-      type: 'string',
-    },
-    {
-      name: 'trackerLastUpdated',
-      title: 'Tracker Last Updated',
-      type: 'string',
-    },
-    {
-      name: 'trackerNextUpdate',
-      title: 'Tracker Next Update',
-      type: 'string',
-    },
-    {
-      name: 'editorialQuote',
-      title: 'Editorial Quote (homepage strip)',
-      type: 'text',
-    },
-    {
-      name: 'articleDisclaimer',
-      title: 'Article Disclaimer',
-      type: 'text',
-      rows: 3,
-      description: 'Appears at the bottom of every article page below the author bio.',
-    },
-    {
-      name: 'movementsThisMonth',
-      title: 'This Month Movements (3 items)',
-      type: 'array',
-      of: [
-        {
-          type: 'object',
-          fields: [
-            { name: 'lawName', type: 'string', title: 'Law Name' },
-            { name: 'jurisdiction', type: 'string', title: 'Jurisdiction' },
-            { name: 'summary', type: 'text', title: 'Summary' },
-          ],
-        },
-      ],
+      name: 'nextIssueDate',
+      title: 'Next Issue Date',
+      type: 'date',
     },
   ],
 };
