@@ -1,6 +1,6 @@
-﻿---
-import Base from "../../layouts/Base.astro";
-import { getAllArticles, getSiteSettings, renderBody, formatDate } from "../../lib/sanity.js";
+---
+import Base from '../../layouts/Base.astro';
+import { getAllArticles, getSiteSettings, renderBody, formatDate } from '../../lib/sanity.js';
 
 export async function getStaticPaths() {
   const articles = await getAllArticles();
@@ -10,67 +10,77 @@ export async function getStaticPaths() {
 const { article } = Astro.props;
 const settings = await getSiteSettings();
 const bodyHtml = renderBody(article.body);
-const disclaimer = article.disclosureOverride || settings.articleDisclaimer;
+const disclosure = article.disclosureOverride || settings?.articleDisclaimer ||
+  'hredd.org is an independent publication with no affiliation with any organisation, public or private. The views contained herein are personal. hredd.org is not funded by any organisation.';
+const relatedLaws = article.relatedLaws || [];
+const relatedArticles = article.relatedArticles || [];
 ---
-<Base title={`${article.title} | hredd.org`} description={article.excerpt || article.deck || article.title} activePage="articles">
-  <article>
-    <section class="section" style="padding-bottom:clamp(30px,4vw,48px)">
-      <div class="wrap" style="max-width:900px">
-        <span class="chip reveal">{article.category}</span>
-        <h1 class="display reveal" data-delay="1" style="font-size:clamp(36px,5vw,68px); margin-top:24px">{article.title}</h1>
-        {article.deck && (<p class="standfirst reveal" data-delay="2" style="margin-top:24px">{article.deck}</p>)}
-        <p class="byline reveal" data-delay="3">
-          <b>{article.authorName}</b>
-          {article.authorLocation && <Fragment> &middot; {article.authorLocation}</Fragment>}
-          &middot; {formatDate(article.publishedAt)}
-          {article.readTime && <Fragment> &middot; {article.readTime}</Fragment>}
-        </p>
+<Base
+  title={`${article.title} | hredd.org`}
+  description={article.excerpt || article.deck || article.title}
+  active="articles"
+>
+
+<section class="section" style="padding-bottom:clamp(30px,4vw,48px)">
+  <div class="wrap" style="max-width:900px">
+    <nav class="crumb reveal"><a href="/">hredd·org</a><span>/</span><a href="/articles/">Articles</a><span>/</span><span>{article.category || 'Analysis'}</span></nav>
+    <h1 class="display reveal" data-delay="1" style="font-size:clamp(36px,5vw,68px); margin-top:28px">{article.title}</h1>
+    {article.deck && <p class="standfirst reveal" data-delay="2" style="margin-top:24px">{article.deck}</p>}
+    <p class="byline reveal" data-delay="3">
+      <b>{article.authorName}</b>
+      {article.authorLocation ? ` · ${article.authorLocation}` : ''} · {formatDate(article.publishedAt)}
+      {article.readTime ? ` · ${article.readTime}` : ''}
+    </p>
+  </div>
+</section>
+
+<hr class="hairline" />
+
+<section class="section">
+  <div class="wrap">
+    <div class="prose" set:html={bodyHtml}></div>
+    <div class="disclosure" style="margin-top:clamp(40px,5vw,64px)">{disclosure}</div>
+  </div>
+</section>
+
+{relatedLaws.length > 0 && (
+  <section class="section" style="padding-top:0">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div><p class="kicker">Referenced</p><h2 class="h2">Laws in this piece</h2></div>
       </div>
-    </section>
-    <hr class="hairline" />
-    <section class="section">
-      <div class="wrap">
-        <div class="prose"><Fragment set:html={bodyHtml} /></div>
-        <div class="author-panel panel">
-          <h4>The author</h4>
-          <p style="margin:0; font:400 18px/1.6 var(--serif);">{article.authorName}</p>
-          {article.authorBio && (<p style="margin:10px 0 0; color:var(--ink-dim); font-size:15px;">{article.authorBio}</p>)}
-        </div>
-        {disclaimer && <p class="disclaimer">{disclaimer}</p>}
+      <div class="law-grid reveal" data-delay="1">
+        {relatedLaws.map((l) => (
+          <article class="law-card" data-g={l.statusType}>
+            <div class="law-top"><span class="jur">{l.jurisdiction}</span>
+              <span class="chip" data-g={l.statusType}>{l.status}</span></div>
+            <h3><a href={`/laws/${l.slug}/`}>{l.name}</a></h3>
+            {l.oneLineSummary && <p>{l.oneLineSummary}</p>}
+            <a class="textlink" href={`/laws/${l.slug}/`}>Read <i>→</i></a>
+          </article>
+        ))}
       </div>
-    </section>
-    {article.relatedLaws?.length > 0 && (
-      <section class="section" style="padding-top:0">
-        <div class="wrap">
-          <div class="section-head reveal"><div><p class="kicker">Laws referenced</p><h2 class="h2">Tracker entries</h2></div></div>
-          <div class="law-grid reveal" data-delay="1">
-            {article.relatedLaws.map((l) => (
-              <article class="law-card" data-g={l.statusType}>
-                <div class="law-top"><span class="jur">{l.jurisdiction}</span><span class="chip" data-g={l.statusType}>{l.status}</span></div>
-                <h3><a href={`/laws/${l.slug}/`}>{l.name}</a></h3>
-                <p>{l.oneLineSummary}</p>
-                <a class="textlink" href={`/laws/${l.slug}/`}>View tracker entry <i>&rarr;</i></a>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-    )}
-    {article.relatedArticles?.length > 0 && (
-      <section class="section" style="padding-top:0">
-        <div class="wrap">
-          <div class="section-head reveal"><div><p class="kicker">Related reading</p><h2 class="h2">More from the field</h2></div></div>
-          <div class="law-rows reveal" data-delay="1">
-            {article.relatedArticles.map((r) => (
-              <a class="law-row" href={`/articles/${r.slug}/`}>
-                <div><h3>{r.title}</h3></div>
-                <span class="jur">{formatDate(r.publishedAt)}{r.readTime && ` \u00B7 ${r.readTime}`}</span>
-                <span class="chip">{r.category}</span>
-              </a>
-            ))}
-          </div>
-        </div>
-      </section>
-    )}
-  </article>
+    </div>
+  </section>
+)}
+
+{relatedArticles.length > 0 && (
+  <section class="section" style="padding-top:0">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div><p class="kicker">Continue reading</p><h2 class="h2">Related pieces</h2></div>
+      </div>
+      <div class="law-rows reveal" data-delay="1">
+        {relatedArticles.map((a) => (
+          <a class="law-row" href={`/articles/${a.slug}/`}>
+            <div><h3>{a.title}</h3></div>
+            <span class="jur">{formatDate(a.publishedAt)}{a.readTime ? ` · ${a.readTime}` : ''}</span>
+            <span class="chip">{a.category || 'Analysis'}</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+)}
+
 </Base>

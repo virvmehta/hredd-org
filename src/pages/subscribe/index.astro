@@ -1,27 +1,39 @@
-﻿---
-import Base from "../../layouts/Base.astro";
-import { getSiteSettings } from "../../lib/sanity.js";
+---
+import Base from '../../layouts/Base.astro';
+import { getSiteSettings } from '../../lib/sanity.js';
 
 const settings = await getSiteSettings();
+const blurb = settings?.newsletterBlurb ||
+  'What moved, what it means for your trade relationships, and what to prepare before your buyers ask. Twelve issues a year. No noise.';
 ---
 <Base
   title="Subscribe | hredd.org"
-  description="One email a month covering every tracker movement and every new analysis."
-  activePage="subscribe"
+  description="Subscribe to the hredd.org monthly digest: every HREDD movement, from the supplier side of the chain."
+  active="subscribe"
 >
-  <section class="section sub-band" style="min-height:56vh; display:grid; align-items:center">
-    <div class="wrap">
-      <p class="kicker reveal" style="justify-content:center">The monthly digest</p>
-      <h1 class="display reveal" data-delay="1" style="font-size:clamp(40px,5.6vw,80px)">One briefing.<br /><em>Every movement.</em></h1>
-      <p class="standfirst reveal" data-delay="2" style="margin:26px auto 0">
-        What moved, what it means for your trade relationships, and what to
-        prepare before your buyers ask. Twelve issues a year. No noise.
-      </p>
-      <form class="sub-form reveal" data-delay="3" data-mailto={settings.contactEmail}>
-        <input type="email" placeholder="you@example.org" required aria-label="Email address" />
-        <button class="btn solid" type="submit"><span>Subscribe</span></button>
-      </form>
-      <p class="form-note reveal" data-delay="3">Monthly &middot; Free &middot; Unsubscribe anytime</p>
-    </div>
-  </section>
+
+<section class="section sub-band" style="min-height:56vh; display:grid; align-items:center">
+  <div class="wrap">
+    <p class="kicker reveal" style="justify-content:center">The monthly digest</p>
+    <h1 class="display reveal" data-delay="1" style="font-size:clamp(40px,5.6vw,80px)">One briefing.<br /><em>Every movement.</em></h1>
+    <p class="standfirst reveal" data-delay="2" style="margin:26px auto 0">{blurb}</p>
+    <form class="sub-form reveal" data-delay="3" data-subscribe>
+      <input type="email" name="email" placeholder="you@example.org" required aria-label="Email address" />
+      <button class="btn solid" type="submit"><span>Subscribe</span></button>
+    </form>
+    <p class="form-note reveal" data-delay="3">Monthly · Free · Unsubscribe anytime · We use your email only to send the letter</p>
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll('form[data-subscribe]').forEach((f) => {
+    f.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      const note = f.parentElement?.querySelector('.form-note');
+      if (note) note.textContent = 'Thank you. You are on the list for the next issue.';
+      f.querySelector('input')?.setAttribute('disabled', 'true');
+    });
+  });
+</script>
+
 </Base>

@@ -1,6 +1,6 @@
-﻿---
-import Base from "../../layouts/Base.astro";
-import { getAllArticles, formatDate } from "../../lib/sanity.js";
+---
+import Base from '../../layouts/Base.astro';
+import { getAllArticles, formatDate } from '../../lib/sanity.js';
 
 const articles = await getAllArticles();
 const categories = [...new Set(articles.map((a) => a.category).filter(Boolean))];
@@ -8,59 +8,55 @@ const categories = [...new Set(articles.map((a) => a.category).filter(Boolean))]
 <Base
   title="Articles | hredd.org"
   description="Analysis, commentary and field reporting on HREDD legislation from the supplier side of global supply chains."
-  activePage="articles"
+  active="articles"
 >
-  <section class="section" style="padding-bottom:clamp(36px,4vw,56px)">
-    <div class="wrap">
-      <p class="kicker reveal">Articles</p>
-      <h1 class="display reveal" data-delay="1" style="font-size:clamp(40px,5.6vw,80px)">From the supplier side<br />of the <em>chain</em></h1>
-      <p class="standfirst reveal" data-delay="2" style="margin-top:26px">
-        Analysis, commentary and field reporting, written from the supplier
-        side of the chain rather than the boardroom side.
-      </p>
-    </div>
-  </section>
 
-  <section class="section" style="padding-top:0">
-    <div class="wrap">
-      <div class="tabs reveal" id="cat-tabs" style="margin-bottom:clamp(30px,4vw,48px)">
-        <button class="tab on" data-cat="all">All</button>
-        {categories.map((c) => (
-          <button class="tab" data-cat={c}>{c}</button>
-        ))}
-      </div>
-      <div class="law-rows reveal" data-delay="1" id="article-rows">
-        {articles.map((a) => (
-          <a class="law-row" href={`/articles/${a.slug}/`} data-cat={a.category}>
-            <div>
-              <h3>{a.title}</h3>
-              <p class="sub">{a.excerpt}</p>
-            </div>
-            <span class="jur">{a.authorName} &middot; {formatDate(a.publishedAt)}</span>
-            <span class="chip">{a.category}</span>
-          </a>
-        ))}
-      </div>
-      <p class="mono faint reveal" style="margin-top:32px">
-        More monthly: <a class="gold" href="/subscribe/">subscribe to the digest</a> to catch each one.
-      </p>
-    </div>
-  </section>
+<section class="section" style="padding-bottom:clamp(36px,4vw,56px)">
+  <div class="wrap">
+    <p class="kicker reveal">Articles</p>
+    <h1 class="display reveal" data-delay="1" style="font-size:clamp(40px,5.6vw,80px)">From the supplier side<br />of the <em>chain</em></h1>
+    <p class="standfirst reveal" data-delay="2" style="margin-top:26px">Analysis, commentary and field reporting,
+      written from the supplier side of the chain rather than the boardroom side.</p>
+  </div>
+</section>
 
-  <script is:inline>
-  (function () {
-    var tabs = document.querySelectorAll("#cat-tabs .tab");
-    var rows = document.querySelectorAll("#article-rows .law-row");
-    tabs.forEach(function (tab) {
-      tab.addEventListener("click", function () {
-        tabs.forEach(function (t) { t.classList.remove("on"); });
-        tab.classList.add("on");
-        var c = tab.getAttribute("data-cat");
-        rows.forEach(function (r) {
-          r.style.display = c === "all" || r.getAttribute("data-cat") === c ? "" : "none";
-        });
-      });
+<section class="section" style="padding-top:0">
+  <div class="wrap">
+    <div class="tabs reveal" id="cat-tabs" style="margin-bottom:clamp(30px,4vw,48px)">
+      <button class="tab on" data-c="all">All</button>
+      {categories.map((c) => (
+        <button class="tab" data-c={c}>{c}</button>
+      ))}
+    </div>
+    <div class="law-rows reveal" data-delay="1" id="article-rows">
+      {articles.map((a) => (
+        <a class="law-row" href={`/articles/${a.slug}/`} data-c={a.category || ''}>
+          <div>
+            <h3>{a.title}</h3>
+            {a.excerpt && <p class="sub">{a.excerpt}</p>}
+          </div>
+          <span class="jur">{a.authorName} · {formatDate(a.publishedAt)}{a.readTime ? ` · ${a.readTime}` : ''}</span>
+          <span class="chip">{a.category || 'Analysis'}</span>
+        </a>
+      ))}
+    </div>
+    <p class="mono faint reveal" style="margin-top:32px">More monthly · <a class="gold" href="/subscribe/">subscribe to the digest</a> to catch each one</p>
+  </div>
+</section>
+
+<script>
+  const tabs = document.getElementById('cat-tabs');
+  const rows = document.getElementById('article-rows');
+  tabs?.addEventListener('click', (e) => {
+    const b = e.target instanceof Element && e.target.closest('.tab');
+    if (!b) return;
+    tabs.querySelectorAll('.tab').forEach((t) => t.classList.remove('on'));
+    b.classList.add('on');
+    const c = b.getAttribute('data-c');
+    Array.from(rows?.children || []).forEach((r) => {
+      r.classList.toggle('hide', c !== 'all' && r.getAttribute('data-c') !== c);
     });
-  })();
-  </script>
+  });
+</script>
+
 </Base>

@@ -1,28 +1,23 @@
 ---
-/**
- * Legacy route. Law detail pages moved from /tracker/[slug] to
- * /laws/[slug] in the April 2026 rebuild; this page preserves old
- * links with a static meta refresh redirect per law.
- */
 import { getAllLaws } from '../../lib/sanity.js';
 
 export async function getStaticPaths() {
   const laws = await getAllLaws();
-  return laws.map((law) => ({ params: { slug: law.slug }, props: { slug: law.slug } }));
+  return laws.map((law) => ({ params: { slug: law.slug } }));
 }
 
-const { slug } = Astro.props;
+const { slug } = Astro.params;
 const target = `/laws/${slug}/`;
 ---
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>Redirecting</title>
-    <meta http-equiv="refresh" content={`0; url=${target}`} />
-    <link rel="canonical" href={target} />
-  </head>
-  <body>
-    <p>This page has moved. Continue to <a href={target}>the law entry</a>.</p>
-  </body>
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8" />
+<title>Redirecting</title>
+<meta http-equiv="refresh" content={`0; url=${target}`} />
+<link rel="canonical" href={target} />
+</head>
+<body>
+<p>This entry has moved. <a href={target}>Continue to the law page</a>.</p>
+</body>
 </html>

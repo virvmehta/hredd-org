@@ -1,95 +1,139 @@
 ---
 import '../styles/global.css';
-import { getAllArticles } from '../lib/sanity.js';
+import { getAllArticles, getSiteSettings } from '../lib/sanity.js';
 import { computeVolIssue } from '../lib/volIssue.js';
 
-const { title = 'hredd.org', description = 'Tracking global HREDD legislation and its implications for those most affected and least consulted.', activePage = '' } = Astro.props;
+const {
+  title = 'hredd.org | Human rights and environmental due diligence, tracked from the Global South',
+  description = 'Tracking global HREDD legislation and its implications for those most affected and least consulted.',
+  active = ''
+} = Astro.props;
 
 const articles = await getAllArticles();
+const settings = await getSiteSettings();
 const volIssue = computeVolIssue(articles);
-
-const navLinks = [
-  { href: '/tracker/', label: 'Tracker', key: 'tracker' },
-  { href: '/buyer-mapping/', label: 'Buyer Mapping', key: 'buyer-mapping' },
-  { href: '/articles/', label: 'Articles', key: 'articles' },
-  { href: '/about/', label: 'About', key: 'about' },
-  { href: '/subscribe/', label: 'Subscribe', key: 'subscribe' }
-];
-
-const leftLinks = navLinks.slice(0, 2);
-const rightLinks = navLinks.slice(2);
-const year = new Date().getFullYear();
+const tagline = settings?.tagline || 'Tracking global HREDD legislation and its implications for those most affected and least consulted. Established 2026.';
 ---
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{title}</title>
-    <meta name="description" content={description} />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500&display=swap"
-      rel="stylesheet"
-    />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
-    <meta property="og:type" content="website" />
-  </head>
-  <body>
-    <header class="page-pad">
-      <div class="top-strip">
-        <span>{volIssue}</span>
-        <span class="strip-links">
-          <a href="/articles/">Archive</a>
-          <a href="/about/#contact">Contact</a>
-          <a href="/subscribe/">RSS</a>
-        </span>
-      </div>
-      <nav class="site-nav" aria-label="Primary">
-        <div class="nav-left">
-          <a href="/" class={activePage === 'home' ? 'active' : ''}>Home</a>
-          {leftLinks.map((l) => (
-            <a href={l.href} class={activePage === l.key ? 'active' : ''}>{l.label}</a>
-          ))}
-        </div>
-        <div class="nav-lockup">
-          <a href="/" class="wordmark" aria-label="hredd.org home">hredd<span class="dot">&middot;</span>org</a>
-          <div class="nav-tagline">A Global South perspective</div>
-        </div>
-        <div class="nav-right">
-          {rightLinks.map((l) => (
-            <a href={l.href} class={activePage === l.key ? 'active' : ''}>{l.label}</a>
-          ))}
-        </div>
-      </nav>
-    </header>
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>{title}</title>
+<meta name="description" content={description} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:type" content="website" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Archivo:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+</head>
+<body>
 
-    <main>
-      <slot />
-    </main>
-
-    <footer class="site-footer page-pad">
-      <div>
-        <div class="foot-wordmark">hredd<span class="dot">&middot;</span>org</div>
-        <p style="margin-top:10px; max-width:340px;">
-          Tracking global HREDD legislation and its implications for those most
-          affected and least consulted. Established 2026.
-        </p>
+<header class="masthead">
+  <div class="mast-top">
+    <div class="wrap">
+      <span class="mono faint">{volIssue}</span>
+      <div class="mast-top-links mono">
+        <a href="/articles/">Archive</a><a href="/about/#contact">Contact</a><a href="/subscribe/">Subscribe</a>
       </div>
-      <nav aria-label="Footer">
-        <a href="/tracker/">Tracker</a>
-        <a href="/buyer-mapping/">Buyer Mapping</a>
-        <a href="/articles/">Articles</a>
-        <a href="/about/">About</a>
-        <a href="/subscribe/">Subscribe</a>
+    </div>
+  </div>
+  <div class="mast-main">
+    <div class="wrap">
+      <nav class="mast-nav left">
+        <a href="/tracker/" aria-current={active === 'tracker' ? 'page' : undefined}>Tracker</a>
+        <a href="/buyer-mapping/" aria-current={active === 'buyer-mapping' ? 'page' : undefined}>Buyer Mapping</a>
       </nav>
+      <a class="wordmark" href="/">hredd<span>·</span>org</a>
+      <nav class="mast-nav right">
+        <a href="/articles/" aria-current={active === 'articles' ? 'page' : undefined}>Articles</a>
+        <a href="/about/" aria-current={active === 'about' ? 'page' : undefined}>About</a>
+        <a href="/subscribe/" aria-current={active === 'subscribe' ? 'page' : undefined}>Subscribe</a>
+      </nav>
+      <button class="nav-toggle" aria-label="Menu">☰</button>
+    </div>
+  </div>
+  <nav class="mobile-menu">
+    <a href="/tracker/">Tracker</a><a href="/buyer-mapping/">Buyer Mapping</a>
+    <a href="/articles/">Articles</a><a href="/about/">About</a><a href="/subscribe/">Subscribe</a>
+  </nav>
+</header>
+
+<slot />
+
+<footer class="site-foot">
+  <div class="wrap">
+    <div class="foot-grid">
       <div>
-        <p>&copy; {year} hredd.org &middot; Independent &middot; Monthly</p>
-        <p style="margin-top:6px;">Published from Noida, India.</p>
+        <a class="wordmark" href="/">hredd<span>·</span>org</a>
+        <p class="foot-tag">{tagline}</p>
       </div>
-    </footer>
-  </body>
+      <div class="foot-col">
+        <h4>Sections</h4>
+        <a href="/tracker/">Tracker</a><a href="/buyer-mapping/">Buyer Mapping</a><a href="/articles/">Articles</a>
+      </div>
+      <div class="foot-col">
+        <h4>hredd.org</h4>
+        <a href="/about/">About</a><a href="/subscribe/">Subscribe</a><a href="/about/#contact">Contact</a>
+      </div>
+    </div>
+    <div class="foot-base">
+      <span>© {new Date().getFullYear()} hredd.org · Independent · Monthly</span>
+      <span>Published from Noida, India</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // scroll progress hairline
+  const bar = document.createElement('div');
+  bar.className = 'progress';
+  document.body.appendChild(bar);
+  addEventListener('scroll', () => {
+    const h = document.documentElement;
+    bar.style.width = (h.scrollTop / (h.scrollHeight - h.clientHeight || 1)) * 100 + '%';
+  }, { passive: true });
+
+  // mobile nav
+  const toggle = document.querySelector('.nav-toggle');
+  const menu = document.querySelector('.mobile-menu');
+  if (toggle && menu) toggle.addEventListener('click', () => {
+    menu.classList.toggle('open');
+    toggle.textContent = menu.classList.contains('open') ? '✕' : '☰';
+  });
+
+  // reveal on scroll
+  const io = new IntersectionObserver((es) => {
+    for (const e of es) {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    }
+  }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+  document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+
+  // count-up numbers
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const cio = new IntersectionObserver((es) => {
+    for (const e of es) {
+      if (!e.isIntersecting) continue;
+      cio.unobserve(e.target);
+      const el = e.target;
+      const end = +(el.dataset.count || 0);
+      if (reduced) { el.textContent = String(end); continue; }
+      let t0 = null;
+      const step = (t) => {
+        if (!t0) t0 = t;
+        const p = Math.min((t - t0) / 1400, 1);
+        el.textContent = String(Math.round(end * (1 - Math.pow(1 - p, 3))));
+        if (p < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    }
+  }, { threshold: 0.5 });
+  document.querySelectorAll('[data-count]').forEach((el) => {
+    el.textContent = '0'; cio.observe(el);
+  });
+</script>
+</body>
 </html>

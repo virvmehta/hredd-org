@@ -1,135 +1,191 @@
 ---
 import Base from '../../layouts/Base.astro';
-import { getAllLaws, renderBody, formatDate } from '../../lib/sanity.js';
+import { getAllLaws, getAllArticles, getSiteSettings, renderBody, formatDate, formatMonthYear } from '../../lib/sanity.js';
 
 export async function getStaticPaths() {
   const laws = await getAllLaws();
-  return laws.map((law, i) => ({
-    params: { slug: law.slug },
-    props: {
-      law,
-      prev: laws[(i - 1 + laws.length) % laws.length],
-      next: laws[(i + 1) % laws.length]
-    }
-  }));
+  return laws.map((law) => ({ params: { slug: law.slug }, props: { law } }));
 }
 
-const { law, prev, next } = Astro.props;
+const { law } = Astro.props;
+const laws = await getAllLaws();
+const articles = await getAllArticles();
+
+const related = laws.filter((l) => l.slug !== law.slug && l.jurisdiction === law.jurisdiction).slice(0, 3);
+const relatedArticles = articles
+  .filter((a) => (a.relatedLaws || []).some((r) => r.slug === law.slug))
+  .slice(0, 3);
+
+const facts = [
+  { label: 'Status', value: law.status },
+  { label: 'Enacted', value: law.enactedDate },
+  { label: 'First compliance deadline', value: law.firstComplianceDeadline },
+  { label: 'Companies in scope', value: law.companiesInScope },
+  { label: 'Maximum penalty', value: law.maxPenalty },
+  { label: 'Civil liability', value: law.civilLiability },
+  { label: 'Enforcement body', value: law.enforcementBody }
+].filter((f) => f.value);
+
 const summaryHtml = renderBody(law.summary);
+const updatedLabel = law.lastUpdated ? formatMonthYear(law.lastUpdated) : '';
 ---
 <Base
-  title={`${law.shortName || law.name} | The tracker | hredd.org`}
-  description={law.oneLineSummary}
-  activePage="tracker"
+  title={`${law.name} | hredd.org`}
+  description={law.oneLineSummary || `Tracker entry for the ${law.name}.`}
+  active="tracker"
 >
-  <article>
-    <header class="law-hero page-pad">
-      <div class="law-eyebrow">
-        <a class="label label-accent" href="/tracker/">&larr; The tracker</a>
-        <span class={`status-badge status-${law.statusType}`}>{law.status}</span>
-        <span class="label">{law.jurisdiction}</span>
-      </div>
-      <h1>{law.name}</h1>
-      <p style="margin-top: 18px; font-size: var(--text-16); color: var(--text-mid); max-width: 720px;">
-        {law.oneLineSummary}
-      </p>
-    </header>
 
-    <div class="law-body-grid page-pad">
-      <div class="law-main">
-        <h2>Summary</h2>
-        <Fragment set:html={summaryHtml} />
-
-        {law.obligations?.length > 0 && (
-          <>
-            <h2>Key obligations</h2>
-            <div>
-              {law.obligations.map((ob) => (
-                <div class="obligation">
-                  <div class="ob-title">{ob.title}</div>
-                  <div class="ob-detail">{ob.detail}</div>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
-
-        {law.timeline?.length > 0 && (
-          <>
-            <h2>Timeline</h2>
-            <div>
-              {law.timeline.map((t) => (
-                <div class="timeline-item">
-                  <span class="tl-date">{t.date}</span>
-                  <span class="tl-event">{t.event}</span>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
-
-        {law.changelog?.length > 0 && (
-          <>
-            <h2>Tracker changelog</h2>
-            <details class="changelog">
-              <summary>What changed on this entry</summary>
-              {law.changelog.map((c) => (
-                <div class="changelog-entry">
-                  <strong>{c.date}.</strong> {c.text}
-                </div>
-              ))}
-            </details>
-          </>
-        )}
-
-        {law.sources?.length > 0 && (
-          <>
-            <h2>Sources</h2>
-            <ul class="sources">
-              {law.sources.map((s) => (
-                <li><a href={s.url} rel="noopener">{s.title}</a></li>
-              ))}
-            </ul>
-          </>
-        )}
-      </div>
-
-      <aside class="law-sidebar">
-        <h3>Quick facts</h3>
-        <div class="fact"><div class="f-lab">Status</div><div class="f-val">{law.status}</div></div>
-        <div class="fact"><div class="f-lab">Enacted</div><div class="f-val">{law.enactedDate}</div></div>
-        <div class="fact"><div class="f-lab">First compliance deadline</div><div class="f-val">{law.firstComplianceDeadline}</div></div>
-        <div class="fact"><div class="f-lab">Companies in scope</div><div class="f-val">{law.companiesInScope}</div></div>
-        <div class="fact"><div class="f-lab">Maximum penalty</div><div class="f-val">{law.maxPenalty}</div></div>
-        <div class="fact"><div class="f-lab">Civil liability</div><div class="f-val">{law.civilLiability}</div></div>
-        <div class="fact"><div class="f-lab">Enforcement body</div><div class="f-val">{law.enforcementBody}</div></div>
-        <div class="fact"><div class="f-lab">Entry last updated</div><div class="f-val">{formatDate(law.lastUpdated)}</div></div>
-
-        {law.sectorsAffected?.length > 0 && (
-          <div class="fact">
-            <div class="f-lab">Sectors most affected</div>
-            <div class="tag-list">{law.sectorsAffected.map((s) => <span>{s}</span>)}</div>
-          </div>
-        )}
-
-        {law.supplierCountries?.length > 0 && (
-          <div class="fact">
-            <div class="f-lab">Supplier countries affected</div>
-            <div class="tag-list">{law.supplierCountries.map((s) => <span>{s}</span>)}</div>
-          </div>
-        )}
-      </aside>
+<section class="law-head">
+  <div class="wrap">
+    <p class="kicker reveal"><a href="/tracker/">The tracker</a>&nbsp;·&nbsp;{law.jurisdiction}</p>
+    <h1 class="display reveal" data-delay="1" style="font-size:clamp(34px,4.6vw,64px); max-width:20ch">{law.name}</h1>
+    <div class="law-meta reveal" data-delay="2">
+      <span class="chip" data-g={law.statusType}>{law.status}</span>
+      <span class="mono faint">{law.jurisdiction}</span>
+      {updatedLabel && <span class="mono faint">Entry updated {updatedLabel}</span>}
     </div>
+    {law.oneLineSummary && <p class="standfirst reveal" data-delay="3" style="margin-top:26px">{law.oneLineSummary}</p>}
+  </div>
+</section>
 
-    <nav class="prevnext page-pad" aria-label="Previous and next laws">
-      <a href={`/laws/${prev.slug}/`}>
-        <div class="pn-lab">&larr; Previous</div>
-        <div class="pn-name">{prev.name}</div>
-      </a>
-      <a href={`/laws/${next.slug}/`} style="text-align: right;">
-        <div class="pn-lab">Next &rarr;</div>
-        <div class="pn-name">{next.name}</div>
-      </a>
-    </nav>
-  </article>
+{facts.length > 0 && (
+  <section class="section" style="padding-bottom:0">
+    <div class="wrap">
+      <div class="facts reveal">
+        {facts.map((f) => (
+          <div class="fact"><span>{f.label}</span><b>{f.value}</b></div>
+        ))}
+      </div>
+    </div>
+  </section>
+)}
+
+{law.tableUpdateText && (
+  <section class="section" style="padding-bottom:0">
+    <div class="wrap">
+      <div class="panel reveal">
+        <h4>Latest movement</h4>
+        <p style="margin:0; font-size:18px; line-height:1.65">{law.tableUpdateText}</p>
+      </div>
+    </div>
+  </section>
+)}
+
+{summaryHtml && (
+  <section class="section" style="padding-bottom:0">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div><p class="kicker">In plain language</p><h2 class="h2">What this law does</h2></div>
+      </div>
+      <div class="prose" style="margin:0" set:html={summaryHtml}></div>
+    </div>
+  </section>
+)}
+
+{law.obligations && law.obligations.length > 0 && (
+  <section class="section" style="padding-bottom:0">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div><p class="kicker">Obligations</p><h2 class="h2">What it asks of companies</h2></div>
+      </div>
+      <ol class="oblist reveal" data-delay="1">
+        {law.obligations.map((o) => (
+          <li><div><h3>{o.title}</h3><p>{o.detail}</p></div></li>
+        ))}
+      </ol>
+    </div>
+  </section>
+)}
+
+{law.timeline && law.timeline.length > 0 && (
+  <section class="section" style="padding-bottom:0">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div><p class="kicker">Timeline</p><h2 class="h2">How it got here</h2></div>
+      </div>
+      <div class="timeline">
+        {law.timeline.map((t, i) => (
+          <div class="tl-item reveal" data-delay={Math.min(i, 3)}>
+            <span class="date">{t.date}</span>
+            <p style="margin-top:8px">{t.event}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+)}
+
+{law.changelog && law.changelog.length > 0 && (
+  <section class="section" style="padding-bottom:0">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div><p class="kicker">Changelog</p><h2 class="h2">Entry history</h2></div>
+      </div>
+      <div class="timeline">
+        {law.changelog.map((c, i) => (
+          <div class="tl-item reveal" data-delay={Math.min(i, 3)}>
+            <span class="date">{c.date}</span>
+            <p style="margin-top:8px">{c.text}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+)}
+
+{law.sources && law.sources.length > 0 && (
+  <section class="section" style="padding-bottom:0">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div><p class="kicker">Sources</p><h2 class="h2">Primary documents</h2></div>
+      </div>
+      <ul class="sources reveal" data-delay="1">
+        {law.sources.map((s) => (
+          <li><a href={s.url} rel="noopener" target="_blank">{s.title}</a></li>
+        ))}
+      </ul>
+    </div>
+  </section>
+)}
+
+{relatedArticles.length > 0 && (
+  <section class="section" style="padding-bottom:0">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div><p class="kicker">Coverage</p><h2 class="h2">We wrote about this</h2></div>
+      </div>
+      <div class="law-rows reveal" data-delay="1">
+        {relatedArticles.map((a) => (
+          <a class="law-row" href={`/articles/${a.slug}/`}>
+            <div><h3>{a.title}</h3></div>
+            <span class="jur">{formatDate(a.publishedAt)}</span>
+            <span class="chip">{a.category || 'Analysis'}</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+)}
+
+{related.length > 0 && (
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div><p class="kicker">Same jurisdiction</p><h2 class="h2">Related regimes</h2></div>
+      </div>
+      <div class="law-grid reveal" data-delay="1">
+        {related.map((r) => (
+          <article class="law-card" data-g={r.statusType}>
+            <div class="law-top"><span class="jur">{r.jurisdiction}</span>
+              <span class="chip" data-g={r.statusType}>{r.status}</span></div>
+            <h3><a href={`/laws/${r.slug}/`}>{r.name}</a></h3>
+            <p>{r.tableUpdateText}</p>
+            <a class="textlink" href={`/laws/${r.slug}/`}>Read <i>→</i></a>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+)}
+
 </Base>
