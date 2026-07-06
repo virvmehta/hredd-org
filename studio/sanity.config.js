@@ -1,10 +1,10 @@
 import { defineConfig } from 'sanity';
 import { structureTool } from 'sanity/structure';
 import { visionTool } from '@sanity/vision';
-import { schemaTypes } from './schemas/index.js';
+import { schemaTypes } from './schemas';
 
 export default defineConfig({
-  name: 'hredd-org',
+  name: 'default',
   title: 'hredd.org',
   projectId: 'jw8lakl8',
   dataset: 'production',
@@ -16,23 +16,15 @@ export default defineConfig({
           .items([
             S.listItem()
               .title('Site Settings')
-              .child(
-                S.document()
-                  .schemaType('siteSettings')
-                  .documentId('siteSettings')
-              ),
+              .id('siteSettings')
+              .child(S.document().schemaType('siteSettings').documentId('siteSettings')),
             S.divider(),
-            S.listItem()
-              .title('Articles')
-              .child(S.documentTypeList('article').title('Articles')),
-            S.listItem()
-              .title('Laws')
-              .child(S.documentTypeList('law').title('Laws')),
-          ]),
+            S.documentTypeListItem('article').title('Articles'),
+            S.documentTypeListItem('trackerLaw').title('Tracker Laws'),
+            S.divider()
+          ])
     }),
-    visionTool(),
+    visionTool()
   ],
-  schema: {
-    types: schemaTypes,
-  },
+  schema: { types: schemaTypes }
 });

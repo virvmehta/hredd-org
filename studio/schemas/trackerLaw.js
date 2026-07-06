@@ -1,31 +1,21 @@
+// REMINDER: after any change to this schema, redeploy the studio with
+// `npx sanity deploy` from the studio folder.
+
 export default {
   name: 'trackerLaw',
   title: 'Tracker Law',
   type: 'document',
   fields: [
-    {
-      name: 'name',
-      title: 'Full Law Name',
-      type: 'string',
-      validation: Rule => Rule.required(),
-    },
-    {
-      name: 'shortName',
-      title: 'Short Name / Abbreviation',
-      type: 'string',
-    },
+    { name: 'name', title: 'Full law name', type: 'string', validation: (Rule) => Rule.required() },
+    { name: 'shortName', title: 'Short name / abbreviation', type: 'string' },
     {
       name: 'slug',
       title: 'Slug',
       type: 'slug',
       options: { source: 'name' },
-      validation: Rule => Rule.required(),
+      validation: (Rule) => Rule.required()
     },
-    {
-      name: 'jurisdiction',
-      title: 'Jurisdiction',
-      type: 'string',
-    },
+    { name: 'jurisdiction', title: 'Jurisdiction', type: 'string' },
     {
       name: 'region',
       title: 'Region',
@@ -36,9 +26,9 @@ export default {
           'European Member States and UK',
           'North America',
           'Asia-Pacific',
-          'Global South',
-        ],
-      },
+          'Global South'
+        ]
+      }
     },
     {
       name: 'status',
@@ -46,179 +36,129 @@ export default {
       type: 'string',
       options: {
         list: [
-          'In force',
-          'Pending',
-          'Proposed',
-          'Delayed',
-          'Voluntary',
-          'In committee',
-          'Expanding',
-          'Implementing',
-          'Reform proposed',
-          'Under review',
-          'Updates pending',
-          'In Congress',
-        ],
-      },
+          'In force', 'Pending', 'Proposed', 'Delayed', 'Voluntary',
+          'In committee', 'Expanding', 'Implementing', 'Reform proposed',
+          'Under review', 'Updates pending', 'In Congress'
+        ]
+      }
     },
     {
       name: 'statusType',
-      title: 'Status Type (for tag colour)',
+      title: 'Status type (controls the tag colour)',
       type: 'string',
-      options: {
-        list: ['force', 'pending', 'proposed', 'delayed'],
-      },
+      options: { list: ['force', 'pending', 'proposed', 'delayed'] }
     },
-    {
-      name: 'lastUpdated',
-      title: 'Last Updated',
-      type: 'date',
-    },
+    { name: 'lastUpdated', title: 'Entry last updated', type: 'date' },
     {
       name: 'tableUpdateText',
-      title: 'One-line update (for tracker table)',
+      title: 'One-line update (for the tracker table)',
       type: 'string',
-      description: 'Max 20 words. Shown in the tracker table row.',
+      description: 'Maximum 20 words. Shown in the tracker table row and the monthly movements list.'
     },
-    {
-      name: 'enactedDate',
-      title: 'Enacted Date',
-      type: 'string',
-    },
-    {
-      name: 'firstComplianceDeadline',
-      title: 'First Compliance Deadline',
-      type: 'string',
-    },
-    {
-      name: 'companiesInScope',
-      title: 'Companies in Scope',
-      type: 'string',
-    },
-    {
-      name: 'maxPenalty',
-      title: 'Maximum Penalty',
-      type: 'string',
-    },
-    {
-      name: 'civilLiability',
-      title: 'Civil Liability',
-      type: 'string',
-    },
-    {
-      name: 'enforcementBody',
-      title: 'Enforcement Body',
-      type: 'string',
-    },
+    { name: 'enactedDate', title: 'Enacted date', type: 'string' },
+    { name: 'firstComplianceDeadline', title: 'First compliance deadline', type: 'string' },
+    { name: 'companiesInScope', title: 'Companies in scope', type: 'string' },
+    { name: 'maxPenalty', title: 'Maximum penalty', type: 'string' },
+    { name: 'civilLiability', title: 'Civil liability', type: 'string' },
+    { name: 'enforcementBody', title: 'Enforcement body', type: 'string' },
     {
       name: 'sectorsAffected',
-      title: 'Sectors Most Affected',
+      title: 'Sectors most affected',
       type: 'array',
-      of: [{ type: 'string' }],
+      of: [{ type: 'string' }]
     },
     {
       name: 'supplierCountries',
-      title: 'Supplier Countries Affected',
+      title: 'Supplier countries affected',
+      type: 'array',
+      of: [{ type: 'string' }]
+    },
+    {
+      name: 'countryCodes',
+      title: 'Country codes (ISO 3166-1 alpha-3)',
       type: 'array',
       of: [{ type: 'string' }],
+      description:
+        'Countries where this law applies, used to shade the world map. EU-wide laws should list all member state codes. Example: DEU for Germany.'
+    },
+    {
+      name: 'oneLineSummary',
+      title: 'One-line summary',
+      type: 'text',
+      rows: 2,
+      description: 'Shown on law cards, the map panel and article references.'
     },
     {
       name: 'summary',
-      title: 'Plain-language Summary',
+      title: 'Plain-language summary',
       type: 'array',
       of: [{ type: 'block' }],
-      description: '3-4 paragraphs written for a Global South supply chain practitioner.',
+      description: '3 to 4 paragraphs written for a Global South supply chain practitioner.'
     },
     {
       name: 'obligations',
-      title: 'Key Obligations',
+      title: 'Key obligations',
       type: 'array',
       of: [
         {
           type: 'object',
           fields: [
-            { name: 'title', type: 'string', title: 'Obligation Title' },
-            { name: 'detail', type: 'text', title: 'Obligation Detail' },
-          ],
-        },
-      ],
+            { name: 'title', type: 'string', title: 'Obligation' },
+            { name: 'detail', type: 'text', rows: 2, title: 'Detail' }
+          ]
+        }
+      ]
     },
     {
       name: 'timeline',
-      title: 'Implementation Timeline',
+      title: 'Timeline',
       type: 'array',
       of: [
         {
           type: 'object',
           fields: [
             { name: 'date', type: 'string', title: 'Date' },
-            { name: 'event', type: 'string', title: 'Event Name' },
-            { name: 'detail', type: 'text', title: 'Detail' },
-            {
-              name: 'isFuture',
-              type: 'boolean',
-              title: 'Is this a future milestone?',
-              initialValue: false,
-            },
-          ],
-        },
-      ],
+            { name: 'event', type: 'text', rows: 2, title: 'Event' }
+          ]
+        }
+      ]
     },
     {
       name: 'changelog',
-      title: 'Change Log',
+      title: 'Tracker changelog',
       type: 'array',
       of: [
         {
           type: 'object',
           fields: [
-            { name: 'date', type: 'date', title: 'Date' },
-            { name: 'summary', type: 'string', title: 'One-line Summary' },
-            { name: 'detail', type: 'text', title: 'Full Detail (2-4 paragraphs)' },
-          ],
-        },
-      ],
+            { name: 'date', type: 'string', title: 'Date' },
+            { name: 'text', type: 'text', rows: 2, title: 'What changed' }
+          ]
+        }
+      ]
     },
     {
       name: 'sources',
-      title: 'Official Sources',
+      title: 'Sources',
       type: 'array',
       of: [
         {
           type: 'object',
           fields: [
-            {
-              name: 'type',
-              type: 'string',
-              title: 'Source Type',
-              options: {
-                list: ['Official text', 'Guidance', 'Analysis', 'Explainer', 'News'],
-              },
-            },
-            { name: 'title', type: 'string', title: 'Title' },
-            { name: 'url', type: 'url', title: 'URL' },
-            { name: 'organisation', type: 'string', title: 'Organisation' },
-          ],
-        },
-      ],
-    },
-    {
-      name: 'relatedArticles',
-      title: 'Related Articles',
-      type: 'array',
-      of: [{ type: 'reference', to: [{ type: 'article' }] }],
-    },
-    {
-      name: 'countryCode',
-      title: 'Country Code (ISO 3166-1 alpha-3)',
-      type: 'string',
-      description: 'e.g. DEU, FRA, GBR. Used to highlight this law on the world map.',
+            { name: 'title', type: 'string', title: 'Source title' },
+            { name: 'url', type: 'url', title: 'URL' }
+          ]
+        }
+      ]
     },
     {
       name: 'order',
-      title: 'Display Order',
+      title: 'Sort order',
       type: 'number',
-      description: 'Controls order within region grouping on tracker page.',
-    },
+      description: 'Lower numbers appear first in the tracker table.'
+    }
   ],
+  preview: {
+    select: { title: 'name', subtitle: 'jurisdiction' }
+  }
 };

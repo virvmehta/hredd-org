@@ -1,3 +1,19 @@
 ---
-return Astro.redirect('/buyer-mapping/', 301);
+/**
+ * Legacy route preserved from the first build. Buyer compliance
+ * mapping now lives at /buyer-mapping/ and this page redirects there.
+ */
+const target = '/buyer-mapping/';
 ---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Redirecting</title>
+    <meta http-equiv="refresh" content={`0; url=${target}`} />
+    <link rel="canonical" href={target} />
+  </head>
+  <body>
+    <p>This page has moved. Continue to <a href={target}>buyer compliance mapping</a>.</p>
+  </body>
+</html>

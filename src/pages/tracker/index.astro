@@ -1,553 +1,191 @@
 ---
-import BaseLayout from '../../layouts/Base.astro';
-import { client } from '../../lib/sanity.js';
-import { LAWS_QUERY } from '../../lib/queries.js';
-import { STATIC_LAWS } from '../../lib/staticData.js';
-import { feature } from 'topojson-client';
-import { geoEqualEarth, geoPath } from 'd3-geo';
-import worldData from 'world-atlas/countries-110m.json';
+import Base from '../../layouts/Base.astro';
+import { getAllLaws, formatMonthYear } from '../../lib/sanity.js';
+import { buildWorldMap, buildCountryLawIndex } from '../../lib/mapData.js';
 
-let laws: any[] = [];
+const laws = await getAllLaws();
+const map = buildWorldMap(laws);
+const countryIndex = buildCountryLawIndex(laws);
 
-try {
-  const fetchedLaws = await client.fetch(LAWS_QUERY);
-  laws = fetchedLaws && fetchedLaws.length > 0 ? fetchedLaws : STATIC_LAWS;
-} catch {
-  laws = STATIC_LAWS;
-}
+const inForce = laws.filter((l) => l.statusType === 'force').length;
+const pending = laws.filter((l) => l.statusType === 'pending').length;
+const proposed = laws.filter((l) => l.statusType === 'proposed').length;
+const delayed = laws.filter((l) => l.statusType === 'delayed').length;
 
-const inForceCount = laws.filter((l: any) => l.status === 'in-force').length;
-const pendingCount = laws.filter((l: any) => l.status === 'pending').length;
-const proposedCount = laws.filter((l: any) => l.status === 'proposed').length;
+const mostRecent = laws.reduce((latest, l) => {
+  const d = new Date(l.lastUpdated || 0);
+  return d > latest ? d : latest;
+}, new Date(0));
+const nextUpdate = new Date(mostRecent.getFullYear(), mostRecent.getMonth() + 1, 1);
 
-function statusLabel(status: string) {
-  if (status === 'in-force') return 'In force';
-  if (status === 'pending') return 'Pending';
-  return 'Proposed';
-}
+const movements = [...laws]
+  .sort((a, b) => new Date(b.lastUpdated || 0) - new Date(a.lastUpdated || 0))
+  .slice(0, 6);
 
-function tagClass(status: string) {
-  if (status === 'in-force') return 'tag-force';
-  if (status === 'pending') return 'tag-pending';
-  return 'tag-proposed';
-}
-
-function formatInForce(s: string) {
-  if (!s) return '';
-  try {
-    return new Date(s + 'T12:00:00Z').toLocaleDateString('en-GB', { month: 'short', year: 'numeric', timeZone: 'UTC' });
-  } catch { return s; }
-}
-
-// World map: ISO numeric → ISO_A3 code
-const isoNumericToKey: Record<number, string> = {
-  276: 'DEU',
-  250: 'FRA',
-  528: 'NLD',
-  578: 'NOR',
-  826: 'GBR',
-  756: 'CHE',
-  840: 'USA',
-  124: 'CAN',
-  36:  'AUS',
-};
-
-const lawCountryIds = new Set(Object.keys(isoNumericToKey).map(Number));
-
-const countriesGeo = feature(worldData as any, (worldData as any).objects.countries);
-const projection = geoEqualEarth().fitExtent([[2, 2], [958, 478]], countriesGeo as any);
-const pathGen = geoPath().projection(projection);
-
-const countryPaths = (countriesGeo as any).features.map((feat: any) => {
-  const id = typeof feat.id === 'string' ? parseInt(feat.id, 10) : feat.id;
-  const hasLaws = lawCountryIds.has(id);
-  const key = isoNumericToKey[id] || null;
-  const d = pathGen(feat) || '';
-  return { id, hasLaws, key, d };
-}).filter((c: any) => c.d);
-
-// Build lawsByIso for the client-side map panel
-const lawsByIso: Record<string, Array<{ name: string; status: string; tag: string; slug: string; scope: string }>> = {};
-for (const law of laws) {
-  if (!law.iso) continue;
-  if (!lawsByIso[law.iso]) lawsByIso[law.iso] = [];
-  lawsByIso[law.iso].push({
-    name: law.name,
-    status: statusLabel(law.status),
-    tag: tagClass(law.status),
-    slug: law.slug,
-    scope: law.scope || '',
-  });
-}
-
-const countryDisplayNames: Record<string, string> = {
-  DEU: 'Germany',
-  FRA: 'France',
-  NLD: 'Netherlands',
-  NOR: 'Norway',
-  GBR: 'United Kingdom',
-  CHE: 'Switzerland',
-  USA: 'United States',
-  CAN: 'Canada',
-  AUS: 'Australia',
-};
+const tabs = [
+  { key: 'all', label: `All (${laws.length})` },
+  { key: 'force', label: `In force (${inForce})` },
+  { key: 'pending', label: `Pending (${pending})` },
+  { key: 'proposed', label: `Proposed (${proposed})` },
+  { key: 'delayed', label: `Delayed (${delayed})` }
+];
 ---
-
-<BaseLayout
-  title="The Tracker — hredd.org"
-  description="A working ledger of HREDD statutes tracked monthly across jurisdictions."
+<Base
+  title="The tracker | hredd.org"
+  description="A modular tracker of mandatory human rights and environmental due diligence laws worldwide, maintained monthly from a Global South perspective."
+  activePage="tracker"
 >
-
-  <!-- SECTION 1: PAGE HEADER -->
-  <section class="page-header snap-section" id="tracker-header">
-    <div class="eyebrow">The Tracker · Updated April 2026</div>
-    <h1 class="page-title serif">The <em>tracker</em></h1>
-    <p class="page-deck serif">A working ledger of HREDD statutes on the books.</p>
-    <p class="page-meta">
-      <span class="meta-item">{laws.length} statutes</span>
-      <span class="meta-dot">·</span>
-      <span class="meta-item">{inForceCount} in force</span>
-      <span class="meta-dot">·</span>
-      <span class="meta-item">{pendingCount} pending</span>
-      <span class="meta-dot">·</span>
-      <span class="meta-item">{proposedCount} proposed</span>
+  <section class="page-title-block page-pad">
+    <h1>The tracker</h1>
+    <p class="subtitle">
+      Every mandatory HREDD regime that reaches Global South supply chains,
+      tracked monthly with a changelog on every entry.
     </p>
   </section>
 
-  <!-- SECTION 2: WORLD MAP -->
-  <section class="map-section page snap-section" id="map">
-    <p class="map-instruction">Highlighted countries have HREDD legislation. Click to explore.</p>
-
-    <div class="map-container">
-      <svg
-        id="world-map"
-        viewBox="0 0 960 480"
-        xmlns="http://www.w3.org/2000/svg"
-        aria-label="Interactive world map showing countries with HREDD legislation"
-      >
-        <rect width="960" height="480" fill="#C8C0AE" />
-        {countryPaths.map((c: any) => (
-          <path
-            d={c.d}
-            class={c.hasLaws ? 'country has-laws' : 'country'}
-            data-country={c.key}
-            data-country-id={String(c.id)}
-            tabindex={c.hasLaws ? '0' : undefined}
-            role={c.hasLaws ? 'button' : undefined}
-            aria-label={c.hasLaws ? `View HREDD laws for ${c.key}` : undefined}
-          />
-        ))}
-      </svg>
+  <div class="page-pad">
+    <div class="tracker-stats">
+      <div class="t-stat"><div class="num">{laws.length}</div><div class="lab">Laws tracked</div></div>
+      <div class="t-stat"><div class="num">{inForce}</div><div class="lab">In force</div></div>
+      <div class="t-stat"><div class="num">{pending}</div><div class="lab">Pending</div></div>
+      <div class="t-stat"><div class="num">{proposed}</div><div class="lab">Proposed</div></div>
+      <div class="t-stat"><div class="num">{delayed}</div><div class="lab">Delayed</div></div>
     </div>
+  </div>
 
-    <div class="map-legend">
-      <div class="legend-item">
-        <span class="legend-swatch legend-swatch--laws"></span>
-        <span>Has HREDD legislation</span>
-      </div>
-      <div class="legend-item">
-        <span class="legend-swatch legend-swatch--none"></span>
-        <span>No tracked legislation</span>
-      </div>
-      <div class="legend-item">
-        <span class="legend-swatch legend-swatch--selected"></span>
-        <span>Selected</span>
-      </div>
-    </div>
+  <a class="update-banner" href="#movements">
+    Updated {formatMonthYear(mostRecent.toISOString())} &middot; Next update {formatMonthYear(nextUpdate.toISOString())}
+  </a>
 
-    <div class="country-panel" id="country-panel">
-      <p class="country-panel-default">Select a highlighted country to view its HREDD legislation.</p>
+  <section class="world-map-wrap page-pad" aria-label="World map of tracked laws">
+    <svg viewBox={`0 0 ${map.width} ${map.height}`} role="img" aria-label="Map of countries with tracked HREDD laws" id="tracker-map">
+      {map.paths.map((p) => (
+        <path
+          d={p.d}
+          class={`map-country${p.hasLaws ? ' has-laws' : ''}`}
+          data-code={p.code}
+          data-name={p.name}
+          tabindex={p.hasLaws ? '0' : undefined}
+          role={p.hasLaws ? 'button' : undefined}
+          aria-label={p.hasLaws ? `Show laws for ${p.name}` : undefined}
+        />
+      ))}
+    </svg>
+    <div class="map-caption">
+      <span class="key"><span class="swatch" style="background: var(--map-dark);"></span> Tracked laws apply</span>
+      <span class="key"><span class="swatch" style="background: var(--map-light);"></span> No tracked laws</span>
+      <span>Click a dark country to see its laws</span>
     </div>
   </section>
 
-  <!-- SECTION 3: FULL TABLE -->
-  <section class="full-table-section page snap-section" id="full-table">
-    <div class="table-controls">
-      <div class="filter-tabs" id="status-tabs">
-        <button class="filter-tab active" data-status="all">All</button>
-        <button class="filter-tab" data-status="in-force">In force</button>
-        <button class="filter-tab" data-status="pending">Pending</button>
-        <button class="filter-tab" data-status="proposed">Proposed</button>
-      </div>
-      <span class="row-count" id="row-count">Showing {laws.length} of {laws.length}</span>
-    </div>
-
-    <table class="tracker-table" id="full-tracker-table">
-      <colgroup>
-        <col class="col-law" />
-        <col class="col-juris" />
-        <col class="col-status" />
-        <col class="col-date" />
-      </colgroup>
-      <thead>
-        <tr>
-          <th>Statute</th>
-          <th>Jurisdiction</th>
-          <th>Status</th>
-          <th style="text-align:right">In force since</th>
-        </tr>
-      </thead>
-      <tbody>
-        {laws.map((law: any) => (
-          <tr data-status={law.status} data-row>
-            <td>
-              <a href={`/laws/${law.slug}`} class="law-name">{law.name}</a>
-              {law.nativeName && <p class="law-native">{law.nativeName}</p>}
-            </td>
-            <td class="law-jurisdiction">{law.jurisdiction}</td>
-            <td>
-              <span class={`tag ${tagClass(law.status)}`}>{statusLabel(law.status)}</span>
-            </td>
-            <td class="law-date" style="text-align:right">
-              {law.inForce ? formatInForce(law.inForce) : ''}
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+  <section class="country-panel page-pad" id="country-panel" aria-live="polite">
+    <h3 id="panel-country-name"></h3>
+    <div id="panel-laws"></div>
   </section>
 
-</BaseLayout>
+  <section class="movements page-pad" id="movements">
+    <h2 class="rule-primary" style="padding-top: 28px;">This month&rsquo;s movements</h2>
+    {movements.map((law) => (
+      <div class="movement-item">
+        <span class="m-date">{formatMonthYear(law.lastUpdated)}</span>
+        <span class="m-text">
+          <a href={`/laws/${law.slug}/`}>{law.shortName || law.name}</a>: {law.tableUpdateText}
+        </span>
+      </div>
+    ))}
+  </section>
 
-<style>
-  :global(html) {
-    scroll-snap-type: y mandatory;
-    scroll-behavior: smooth;
-  }
+  <section class="page-pad" style="padding-bottom: 64px;">
+    <div class="section-head rule-primary" style="margin-top: 40px;">
+      <h2>All tracked laws</h2>
+    </div>
+    <div class="filter-tabs" role="tablist" aria-label="Filter laws by status">
+      {tabs.map((t, i) => (
+        <button data-filter={t.key} class={i === 0 ? 'active' : ''} role="tab" aria-selected={i === 0 ? 'true' : 'false'}>{t.label}</button>
+      ))}
+    </div>
+    <div id="law-table">
+      {laws.map((law) => (
+        <div class="law-row" data-status={law.statusType}>
+          <a class="law-name" href={`/laws/${law.slug}/`}>{law.name}</a>
+          <span class="law-jur">{law.jurisdiction}</span>
+          <span class={`status-badge status-${law.statusType}`}>{law.status}</span>
+          <span class="law-update">{law.tableUpdateText}</span>
+          <a class="law-link" href={`/laws/${law.slug}/`}>Read &rarr;</a>
+        </div>
+      ))}
+    </div>
+  </section>
 
-  @media (max-width: 768px) {
-    :global(html) { scroll-snap-type: y proximity; }
-  }
+  <script type="application/json" id="country-law-data" set:html={JSON.stringify(countryIndex)} />
 
-  .snap-section {
-    scroll-snap-align: start;
-    scroll-snap-stop: always;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
+  <script>
+    const dataEl = document.getElementById('country-law-data');
+    const indexData = dataEl ? JSON.parse(dataEl.textContent || '{}') : { laws: [], byCountry: {} };
+    const panel = document.getElementById('country-panel');
+    const panelName = document.getElementById('panel-country-name');
+    const panelLaws = document.getElementById('panel-laws');
+    let selected = null;
 
-  /* PAGE HEADER */
-  .page-header {
-    text-align: center;
-    padding: 40px var(--pad-x) 48px;
-    border-bottom: 1px solid var(--rule);
-    max-width: var(--max);
-    margin: 0 auto;
-    width: 100%;
-  }
-
-  .page-header .eyebrow { margin-bottom: 24px; display: block; }
-
-  .page-title {
-    font-size: 72px;
-    font-weight: 400;
-    line-height: 1.0;
-    letter-spacing: -0.02em;
-    margin: 0 0 20px;
-  }
-
-  .page-title em { font-style: italic; color: var(--accent); }
-
-  .page-deck {
-    font-style: italic;
-    font-size: 20px;
-    color: var(--ink-2);
-    margin-bottom: 20px;
-  }
-
-  .page-meta {
-    font-family: var(--sans);
-    font-size: 13px;
-    color: var(--ink-3);
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    align-items: center;
-  }
-
-  .meta-dot { color: var(--rule); }
-
-  /* MAP */
-  .map-section {
-    padding-top: 40px;
-    padding-bottom: 40px;
-    border-bottom: 1px solid var(--rule);
-  }
-
-  .map-instruction {
-    font-family: var(--serif);
-    font-style: italic;
-    font-size: 14px;
-    color: var(--ink-3);
-    text-align: center;
-    margin-bottom: 20px;
-  }
-
-  .map-container {
-    max-width: 900px;
-    margin: 0 auto;
-    background: var(--bg-warm);
-    border: 1px solid var(--rule);
-    overflow: hidden;
-  }
-
-  #world-map { width: 100%; height: auto; display: block; }
-
-  .country {
-    fill: #D8CFB8;
-    stroke: #EEE9DD;
-    stroke-width: 0.4;
-    cursor: default;
-  }
-
-  .country.has-laws {
-    fill: #3D332B;
-    cursor: pointer;
-    transition: stroke 0.15s, stroke-width 0.15s;
-  }
-
-  .country.has-laws:hover,
-  .country.has-laws:focus {
-    stroke: #B8460E;
-    stroke-width: 1.5;
-    outline: none;
-  }
-
-  .country.selected { fill: #B8460E; }
-
-  .map-legend {
-    display: flex;
-    justify-content: center;
-    gap: 24px;
-    margin-top: 12px;
-    font-family: var(--sans);
-    font-size: 12px;
-    color: var(--ink-3);
-  }
-
-  .legend-item { display: flex; align-items: center; gap: 8px; }
-
-  .legend-swatch { display: inline-block; width: 14px; height: 14px; flex-shrink: 0; }
-  .legend-swatch--laws     { background: #3D332B; }
-  .legend-swatch--none     { background: #D8CFB8; }
-  .legend-swatch--selected { background: #B8460E; }
-
-  .country-panel {
-    border: 1px solid var(--rule);
-    padding: 24px;
-    background: var(--bg);
-    margin-top: 16px;
-    max-width: 900px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  .country-panel-default {
-    font-family: var(--serif);
-    font-style: italic;
-    font-size: 14px;
-    color: var(--ink-3);
-    text-align: center;
-  }
-
-  :global(.panel-country-name) {
-    font-family: var(--serif);
-    font-size: 24px;
-    font-weight: 500;
-    margin-bottom: 16px;
-    color: var(--ink);
-  }
-
-  :global(.panel-law-list) {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-  }
-
-  :global(.panel-law-item) {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 16px;
-    padding: 14px 0;
-    border-bottom: 1px solid var(--rule-soft);
-  }
-
-  :global(.panel-law-item:last-child) { border-bottom: none; }
-
-  :global(.panel-law-info) { flex: 1; }
-
-  :global(.panel-law-name) {
-    font-family: var(--serif);
-    font-size: 17px;
-    color: var(--ink);
-    display: block;
-    margin-bottom: 4px;
-  }
-
-  :global(.panel-law-name:hover) { color: var(--accent); }
-
-  :global(.panel-law-scope) {
-    font-family: var(--sans);
-    font-size: 13px;
-    color: var(--ink-2);
-    line-height: 1.5;
-  }
-
-  :global(.panel-law-meta) {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 8px;
-    flex-shrink: 0;
-  }
-
-  :global(.panel-read-more) {
-    font-family: var(--sans);
-    font-size: 12px;
-    color: var(--accent);
-    white-space: nowrap;
-  }
-
-  :global(.panel-read-more:hover) { opacity: 0.7; }
-
-  /* FULL TABLE */
-  .full-table-section {
-    padding-top: 40px;
-    padding-bottom: 60px;
-  }
-
-  .table-controls {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 24px;
-  }
-
-  .row-count {
-    font-family: var(--serif);
-    font-style: italic;
-    font-size: 13px;
-    color: var(--ink-3);
-  }
-
-  .col-law    { width: 35%; }
-  .col-juris  { width: 22%; }
-  .col-status { width: 18%; }
-  .col-date   { width: 25%; }
-
-  .law-native {
-    font-family: var(--sans);
-    font-size: 11px;
-    color: var(--ink-3);
-    margin: 2px 0 0;
-  }
-
-  @media (max-width: 768px) {
-    .snap-section {
-      min-height: unset;
-      scroll-snap-align: none;
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, (c) => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      })[c]);
     }
 
-    .page-title { font-size: 48px; }
+    function openCountry(el) {
+      const code = el.getAttribute('data-code');
+      const name = el.getAttribute('data-name');
+      const laws = (indexData.byCountry[code] || []).map((i) => indexData.laws[i]);
+      if (!laws.length) return;
 
-    .map-section, .full-table-section {
-      padding-left: var(--pad-x-narrow);
-      padding-right: var(--pad-x-narrow);
+      if (selected) selected.classList.remove('selected');
+      el.classList.add('selected');
+      selected = el;
+
+      panelName.textContent = name;
+      panelLaws.innerHTML = laws
+        .map(
+          (l) => `
+        <a class="panel-law" href="/laws/${escapeHtml(l.slug)}/">
+          <span class="pl-head">
+            <span class="pl-name">${escapeHtml(l.name)}</span>
+            <span class="status-badge status-${escapeHtml(l.statusType)}">${escapeHtml(l.status)}</span>
+          </span>
+          <span class="pl-summary">${escapeHtml(l.summary)}</span>
+          <span class="pl-more">Read more &rarr;</span>
+        </a>`
+        )
+        .join('');
+      panel.classList.add('open');
+      panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
-    .col-date { display: none; }
-  }
-</style>
-
-<script define:vars={{ lawsByIso, countryDisplayNames }}>
-  const mapEl = document.getElementById('world-map');
-  const panelEl = document.getElementById('country-panel');
-  let selectedCountry = null;
-
-  if (mapEl && panelEl) {
-    mapEl.querySelectorAll('.country.has-laws').forEach(el => {
-      el.addEventListener('click', () => handleCountryClick(el));
+    document.querySelectorAll('.map-country.has-laws').forEach((el) => {
+      el.addEventListener('click', () => openCountry(el));
       el.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
-          handleCountryClick(el);
+          openCountry(el);
         }
       });
     });
-  }
 
-  function handleCountryClick(el) {
-    if (!panelEl || !mapEl) return;
-    const country = el.dataset.country || '';
-
-    mapEl.querySelectorAll('.country.selected').forEach(c => c.classList.remove('selected'));
-
-    if (selectedCountry === country) {
-      selectedCountry = null;
-      panelEl.innerHTML = '<p class="country-panel-default">Select a highlighted country to view its HREDD legislation.</p>';
-    } else {
-      selectedCountry = country;
-      el.classList.add('selected');
-      renderPanel(country);
-    }
-  }
-
-  function renderPanel(country) {
-    if (!panelEl) return;
-    const countryLaws = lawsByIso[country] || [];
-    if (countryLaws.length === 0) return;
-
-    const name = countryDisplayNames[country] || country;
-
-    const lawsHtml = countryLaws.map(law =>
-      `<div class="panel-law-item">
-        <div class="panel-law-info">
-          <a href="/laws/${law.slug}" class="panel-law-name">${law.name}</a>
-          ${law.scope ? `<p class="panel-law-scope">${law.scope}</p>` : ''}
-        </div>
-        <div class="panel-law-meta">
-          <span class="tag ${law.tag}">${law.status}</span>
-          <a href="/laws/${law.slug}" class="panel-read-more">Read more &rarr;</a>
-        </div>
-      </div>`
-    ).join('');
-
-    panelEl.innerHTML = `
-      <p class="panel-country-name">${name}</p>
-      <div class="panel-law-list">${lawsHtml}</div>
-    `;
-  }
-
-  // Status filter tabs
-  const statusTabs = document.getElementById('status-tabs');
-  const tableEl = document.getElementById('full-tracker-table');
-  const rowCountEl = document.getElementById('row-count');
-
-  if (statusTabs && tableEl) {
-    const totalRows = tableEl.querySelectorAll('[data-row]').length;
-
-    statusTabs.querySelectorAll('.filter-tab').forEach(tab => {
+    const tabs = document.querySelectorAll('.filter-tabs button');
+    const rows = document.querySelectorAll('#law-table .law-row');
+    tabs.forEach((tab) => {
       tab.addEventListener('click', () => {
-        statusTabs.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-
-        const status = tab.dataset.status || 'all';
-        let visible = 0;
-
-        tableEl.querySelectorAll('[data-row]').forEach(row => {
-          const rowStatus = row.dataset.status || '';
-          const show = status === 'all' || rowStatus === status;
-          row.style.display = show ? '' : 'none';
-          if (show) visible++;
+        tabs.forEach((t) => {
+          t.classList.remove('active');
+          t.setAttribute('aria-selected', 'false');
         });
-
-        if (rowCountEl) {
-          rowCountEl.textContent = `Showing ${visible} of ${totalRows}`;
-        }
+        tab.classList.add('active');
+        tab.setAttribute('aria-selected', 'true');
+        const f = tab.getAttribute('data-filter');
+        rows.forEach((r) => {
+          r.style.display = f === 'all' || r.getAttribute('data-status') === f ? '' : 'none';
+        });
       });
     });
-  }
-</script>
+  </script>
+</Base>

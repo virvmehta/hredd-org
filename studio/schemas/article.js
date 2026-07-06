@@ -1,111 +1,83 @@
+// REMINDER: after any change to this schema, redeploy the studio with
+// `npx sanity deploy` from the studio folder so the fields appear at
+// https://hredd-org.sanity.studio, then publish content to trigger the
+// Cloudflare rebuild webhook.
+
 export default {
   name: 'article',
   title: 'Article',
   type: 'document',
   fields: [
-    {
-      name: 'title',
-      title: 'Title',
-      type: 'string',
-      validation: Rule => Rule.required(),
-    },
+    { name: 'title', title: 'Title', type: 'string', validation: (Rule) => Rule.required() },
     {
       name: 'slug',
       title: 'Slug',
       type: 'slug',
       options: { source: 'title' },
-      validation: Rule => Rule.required(),
+      validation: (Rule) => Rule.required()
     },
     {
       name: 'deck',
-      title: 'Deck',
+      title: 'Deck (subtitle, shown on the article page below the headline)',
       type: 'text',
-      rows: 2,
-      description: 'One sentence shown below the title. No em dashes.',
+      rows: 3,
+      validation: (Rule) => Rule.max(280).warning('Keep the deck under 280 characters.')
+    },
+    {
+      name: 'excerpt',
+      title: 'Excerpt (shown on article cards under the title)',
+      type: 'text',
+      rows: 3,
+      validation: (Rule) => Rule.max(220).warning('Keep the excerpt under 220 characters.')
     },
     {
       name: 'category',
       title: 'Category',
       type: 'string',
       options: {
-        list: ['Analysis', 'Legal Analysis', 'Implementation', 'From the Field', 'Case Studies', 'Tracker', 'Opinion', 'Interview'],
-      },
-      validation: Rule => Rule.required(),
+        list: [
+          'Analysis',
+          'Field Report',
+          'Interview',
+          'Commentary',
+          'Case Study',
+          'Dispatch',
+          'From the Field'
+        ]
+      }
     },
-    {
-      name: 'authorName',
-      title: 'Author Name',
-      type: 'string',
-    },
-    {
-      name: 'authorRole',
-      title: 'Author Role',
-      type: 'string',
-      description: 'One line, e.g. "Research Fellow, Institute for Responsible Business"',
-    },
-    {
-      name: 'authorBio',
-      title: 'Author Bio',
-      type: 'text',
-      rows: 4,
-      description: 'One paragraph. Appears at the bottom of the article page.',
-    },
-    {
-      name: 'publishedAt',
-      title: 'Published Date',
-      type: 'date',
-      validation: Rule => Rule.required(),
-    },
+    { name: 'authorName', title: 'Author name', type: 'string' },
+    { name: 'authorBio', title: 'Author bio', type: 'text', rows: 2 },
+    { name: 'authorLocation', title: 'Author location', type: 'string' },
+    { name: 'publishedAt', title: 'Published at', type: 'datetime' },
     {
       name: 'readTime',
-      title: 'Read Time (minutes)',
-      type: 'number',
+      title: 'Read time',
+      type: 'string',
+      description: 'e.g. 8 min read'
     },
+    {
+      name: 'featured',
+      title: 'Featured (lead article on the homepage)',
+      type: 'boolean',
+      initialValue: false
+    },
+    { name: 'heroImage', title: 'Hero image', type: 'image', options: { hotspot: true } },
+    { name: 'heroCaption', title: 'Hero image caption', type: 'string' },
+    { name: 'heroCredit', title: 'Hero image photo credit', type: 'string' },
     {
       name: 'body',
       title: 'Body',
       type: 'array',
       of: [
+        { type: 'block' },
+        { type: 'image', options: { hotspot: true }, fields: [
+          { name: 'caption', type: 'string', title: 'Caption' },
+          { name: 'alt', type: 'string', title: 'Alt text' }
+        ] },
         {
-          type: 'block',
-          styles: [
-            { title: 'Normal', value: 'normal' },
-            { title: 'H2', value: 'h2' },
-            { title: 'Pull Quote', value: 'pullQuote' },
-          ],
-          marks: {
-            decorators: [
-              { title: 'Italic', value: 'em' },
-              { title: 'Bold', value: 'strong' },
-            ],
-          },
-        },
-        {
-          type: 'object',
-          name: 'callout',
-          title: 'Callout Block',
-          fields: [
-            { name: 'label', type: 'string', title: 'Label' },
-            { name: 'body', type: 'text', title: 'Body' },
-          ],
-        },
-        {
-          type: 'object',
-          name: 'sectionBreak',
-          title: 'Section Break',
-          fields: [
-            {
-              name: 'placeholder',
-              type: 'string',
-              title: 'Placeholder',
-              initialValue: 'section-break',
-              hidden: true,
-            },
-          ],
-        },
-        {
-          type: 'object',
           name: 'dataBlock',
+          type: 'object',
           title: 'Data Block (3 stats)',
           fields: [
             { name: 'stat1number', type: 'string', title: 'Stat 1 Number' },
@@ -113,28 +85,31 @@ export default {
             { name: 'stat2number', type: 'string', title: 'Stat 2 Number' },
             { name: 'stat2label', type: 'string', title: 'Stat 2 Label' },
             { name: 'stat3number', type: 'string', title: 'Stat 3 Number' },
-            { name: 'stat3label', type: 'string', title: 'Stat 3 Label' },
-          ],
-        },
-      ],
+            { name: 'stat3label', type: 'string', title: 'Stat 3 Label' }
+          ]
+        }
+      ]
     },
     {
-      name: 'referencedLaws',
-      title: 'Laws Referenced',
+      name: 'relatedLaws',
+      title: 'Laws referenced',
       type: 'array',
-      of: [{ type: 'reference', to: [{ type: 'law' }] }],
+      of: [{ type: 'reference', to: [{ type: 'trackerLaw' }] }]
     },
     {
       name: 'relatedArticles',
-      title: 'Related Articles',
+      title: 'Related articles',
       type: 'array',
-      of: [{ type: 'reference', to: [{ type: 'article' }] }],
+      of: [{ type: 'reference', to: [{ type: 'article' }] }]
     },
+    {
+      name: 'disclosureOverride',
+      title: 'Custom disclosure (overrides the site default disclaimer)',
+      type: 'text',
+      rows: 3
+    }
   ],
   preview: {
-    select: {
-      title: 'title',
-      subtitle: 'publishedAt',
-    },
-  },
+    select: { title: 'title', subtitle: 'category' }
+  }
 };

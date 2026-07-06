@@ -1,604 +1,73 @@
 ---
-import BaseLayout from '../../layouts/Base.astro';
-import { client, renderPortableText } from '../../lib/sanity.js';
-import { ARTICLE_BY_SLUG_QUERY, ARTICLES_QUERY } from '../../lib/queries.js';
-import { STATIC_ARTICLES } from '../../lib/staticData.js';
+import Base from '../../layouts/Base.astro';
+import { getAllArticles, getSiteSettings, renderBody, formatDate } from '../../lib/sanity.js';
 
 export async function getStaticPaths() {
-  let articles: any[] = [];
-  try {
-    const fetched = await client.fetch(ARTICLES_QUERY);
-    articles = fetched && fetched.length > 0 ? fetched : STATIC_ARTICLES;
-  } catch {
-    articles = STATIC_ARTICLES;
-  }
-  return articles.map((a: any) => {
-    const s = typeof a.slug === 'object' ? a.slug.current : a.slug;
-    return { params: { slug: s }, props: { slug: s } };
-  });
+  const articles = await getAllArticles();
+  return articles.map((article) => ({ params: { slug: article.slug }, props: { article } }));
 }
 
-const { slug } = Astro.params;
-let article: any = null;
-
-try {
-  article = await client.fetch(ARTICLE_BY_SLUG_QUERY, { slug });
-} catch { /* fall through */ }
-
-if (!article) {
-  article = STATIC_ARTICLES.find((a: any) => {
-    const s = typeof a.slug === 'object' ? a.slug.current : a.slug;
-    return s === slug;
-  });
-}
-
-if (!article) return Astro.redirect('/articles');
-
-// The deck shows on the article page; the excerpt shows on cards.
-// If deck is not set, fall back to excerpt on the article page.
-const articleDeck = article.deck || article.excerpt || '';
-const articleDisclaimer = 'The views expressed are the author\'s own. hredd.org is an independent platform.';
-
-function formatDate(dateStr: string) {
-  if (!dateStr) return '';
-  try {
-    return new Date(dateStr).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-  } catch { return dateStr; }
-}
-
-function authorInitial(name: string) {
-  return name ? name.charAt(0).toUpperCase() : '?';
-}
-
-function renderBody(body: any[]) {
-  if (!body || !Array.isArray(body)) return '';
-
-  if (body.length > 0 && body[0].type) {
-    return body.map((block: any) => {
-      if (block.type === 'paragraph') {
-        return `<p class="article-p">${block.text}</p>`;
-      }
-      if (block.type === 'h2') {
-        return `<h2 class="article-h2">${block.text}</h2>`;
-      }
-      if (block.type === 'pullQuote') {
-        return `<div class="pull-quote"><blockquote><p>${block.text}</p></blockquote>${block.attribution ? `<p class="pull-quote-attr">${block.attribution}</p>` : ''}</div>`;
-      }
-      if (block.type === 'sectionBreak') {
-        return `<div class="section-break"><div class="section-break-line"></div><span class="section-break-dots">&middot; &middot; &middot;</span><div class="section-break-line"></div></div>`;
-      }
-      if (block.type === 'callout') {
-        return `<div class="callout-block"><span class="callout-label">${block.label || ''}</span><p>${block.body || ''}</p></div>`;
-      }
-      if (block.type === 'dataBlock') {
-        return `<div class="data-block">
-          <div class="data-stat"><span class="data-number">${block.stat1number || ''}</span><span class="data-label">${block.stat1label || ''}</span></div>
-          <div class="data-stat"><span class="data-number">${block.stat2number || ''}</span><span class="data-label">${block.stat2label || ''}</span></div>
-          <div class="data-stat"><span class="data-number">${block.stat3number || ''}</span><span class="data-label">${block.stat3label || ''}</span></div>
-        </div>`;
-      }
-      return '';
-    }).join('');
-  }
-
-  return renderPortableText(body);
-}
-
+const { article } = Astro.props;
+const settings = await getSiteSettings();
 const bodyHtml = renderBody(article.body);
-const relatedArticles = article.relatedArticles ||
-  STATIC_ARTICLES.filter((a: any) => {
-    const s = typeof a.slug === 'object' ? a.slug.current : a.slug;
-    return s !== slug;
-  }).slice(0, 2);
-
-const referencedLaws = article.referencedLaws || [];
-
-const ogDescription = article.deck || article.excerpt || '';
+const disclaimer = article.disclosureOverride || settings.articleDisclaimer;
 ---
-
-<BaseLayout
-  title={`${article.title} — hredd.org`}
-  description={ogDescription}
-  ogType="article"
+<Base
+  title={`${article.title} | hredd.org`}
+  description={article.excerpt || article.deck || article.title}
+  activePage="articles"
 >
+  <article>
+    <header class="article-hero page-pad">
+      <span class="label label-accent">{article.category}</span>
+      <h1>{article.title}</h1>
+      {article.deck && <p class="deck">{article.deck}</p>}
+      <p class="art-meta">
+        {article.authorName}
+        {article.authorLocation && <Fragment> &middot; {article.authorLocation}</Fragment>}
+        &middot; {formatDate(article.publishedAt)} &middot; {article.readTime}
+      </p>
+    </header>
 
-  <!-- ARTICLE HEADER -->
-  <header class="article-header">
-    <p class="article-category">{article.category}</p>
-    <h1 class="article-title">{article.title}</h1>
-    {articleDeck && <p class="article-deck">{articleDeck}</p>}
-
-    <div class="article-meta-row">
-      <div class="author-meta">
-        <span class="author-name">{article.author}</span>
-        {article.authorRole && <span class="author-role">{article.authorRole}</span>}
+    <div class="page-pad">
+      <div class="article-body">
+        <Fragment set:html={bodyHtml} />
       </div>
-      <div class="meta-divider"></div>
-      <div class="article-dates">
-        {article.publishedAt && <span class="article-date">{formatDate(article.publishedAt)}</span>}
-        {article.readTime && <span class="article-read-time">{article.readTime} min read</span>}
+
+      <div class="author-block">
+        <div class="a-name">{article.authorName}</div>
+        {article.authorBio && <div class="a-bio">{article.authorBio}</div>}
       </div>
-    </div>
-  </header>
 
-  <!-- ARTICLE BODY -->
-  <div class="article-body-wrapper">
-    <div class="article-body" set:html={bodyHtml} />
-  </div>
+      {disclaimer && <div class="article-disclaimer">{disclaimer}</div>}
 
-  <!-- ARTICLE FOOTER -->
-  <footer class="article-footer">
-
-    <div class="footer-rule"></div>
-
-    <!-- AUTHOR BLOCK -->
-    <div class="author-block">
-      <div class="author-initial">{authorInitial(article.author)}</div>
-      <div class="author-info">
-        <p class="author-full-name">{article.author}</p>
-        {article.authorRole && <p class="author-role-full">{article.authorRole}</p>}
-        {article.authorBio && <p class="author-bio">{article.authorBio}</p>}
-        {articleDisclaimer && <p class="author-disclaimer">{articleDisclaimer}</p>}
-      </div>
-    </div>
-
-    <!-- REFERENCED LAWS -->
-    {referencedLaws.length > 0 && (
-      <div class="laws-referenced">
-        <p class="laws-label">Laws referenced in this article</p>
-        <div class="laws-pills">
-          {referencedLaws.map((law: any) => {
-            const lSlug = typeof law === 'string' ? law : (law.slug?.current || law.slug);
-            const lName = typeof law === 'string' ? law : (law.shortName || law.name || law);
-            return (
-              <a href={`/laws/${lSlug}`} class="law-pill">{lName}</a>
-            );
-          })}
+      {article.relatedLaws?.length > 0 && (
+        <div class="ref-laws">
+          <h3>Laws referenced</h3>
+          {article.relatedLaws.map((law) => (
+            <a class="panel-law" href={`/laws/${law.slug}/`}>
+              <span class="pl-head">
+                <span class="pl-name">{law.name}</span>
+                <span class={`status-badge status-${law.statusType}`}>{law.status}</span>
+              </span>
+              <span class="pl-summary">{law.oneLineSummary}</span>
+              <span class="pl-more">View tracker entry &rarr;</span>
+            </a>
+          ))}
         </div>
-      </div>
-    )}
+      )}
 
-    <!-- RELATED ARTICLES -->
-    {relatedArticles.length > 0 && (
-      <div class="related-reading">
-        <p class="related-label">Continue reading</p>
-        <div class="related-grid">
-          {relatedArticles.slice(0, 2).map((rel: any) => {
-            const rSlug = rel.slug?.current || rel.slug;
-            return (
-              <article class="related-card">
-                <p class="related-card-category">{rel.category}</p>
-                <h3 class="related-card-title">
-                  <a href={`/articles/${rSlug}`}>{rel.title}</a>
-                </h3>
-                {rel.excerpt && <p class="related-card-excerpt">{rel.excerpt}</p>}
-                <p class="related-card-byline">{rel.author} &middot; {rel.readTime} min read</p>
-              </article>
-            );
-          })}
+      {article.relatedArticles?.length > 0 && (
+        <div class="related-arts">
+          <h3>Related reading</h3>
+          {article.relatedArticles.map((r) => (
+            <a class="r-item" href={`/articles/${r.slug}/`}>
+              <span class="r-title">{r.title}</span>
+              <div class="r-meta">{r.category} &middot; {formatDate(r.publishedAt)} &middot; {r.readTime}</div>
+            </a>
+          ))}
         </div>
-      </div>
-    )}
-
-  </footer>
-
-</BaseLayout>
-
-<style>
-  /* ====================================================
-     ARTICLE HEADER
-     ==================================================== */
-
-  .article-header {
-    max-width: 780px;
-    margin: 0 auto;
-    padding: 56px 56px 40px;
-    border-bottom: 1px solid var(--rule-light);
-  }
-
-  .article-category {
-    font-family: var(--font-sans);
-    font-size: var(--text-10);
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.16em;
-    color: var(--accent);
-    margin-bottom: 16px;
-  }
-
-  .article-title {
-    font-family: var(--font-serif);
-    font-size: var(--text-56);
-    font-weight: 400;
-    line-height: 1.05;
-    letter-spacing: -0.02em;
-    margin-bottom: 20px;
-  }
-
-  /* Deck: subtitle below headline, italic, generous spacing (New Yorker style) */
-  .article-deck {
-    font-family: var(--font-serif);
-    font-style: italic;
-    font-size: var(--text-22);
-    color: #4A3F32;
-    line-height: 1.5;
-    margin-bottom: 32px;
-    padding-bottom: 28px;
-    border-bottom: 1px solid var(--rule-light);
-  }
-
-  .article-meta-row {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-  }
-
-  .author-meta {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-
-  .author-name {
-    font-family: var(--font-sans);
-    font-size: var(--text-14);
-    font-weight: 500;
-    color: var(--text);
-  }
-
-  .author-role {
-    font-family: var(--font-serif);
-    font-style: italic;
-    font-size: var(--text-13);
-    color: var(--text-muted);
-  }
-
-  .meta-divider {
-    width: 1px;
-    height: 32px;
-    background: var(--rule-light);
-    flex-shrink: 0;
-  }
-
-  .article-dates {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-
-  .article-date,
-  .article-read-time {
-    font-family: var(--font-sans);
-    font-size: var(--text-12);
-    color: var(--text-muted);
-  }
-
-  /* ====================================================
-     ARTICLE BODY with text justification
-     ==================================================== */
-
-  .article-body-wrapper {
-    max-width: 780px;
-    margin: 0 auto;
-    padding: 0 56px 56px;
-  }
-
-  .article-body :global(.article-p) {
-    font-family: var(--font-serif);
-    font-size: var(--text-20);
-    line-height: 1.7;
-    color: #1A1510;
-    margin-bottom: 28px;
-    text-align: justify;
-    hyphens: auto;
-    word-break: normal;
-  }
-
-  .article-body :global(.article-h2) {
-    font-family: var(--font-serif);
-    font-size: var(--text-32);
-    font-weight: 400;
-    line-height: 1.2;
-    letter-spacing: -0.01em;
-    margin: 56px 0 20px;
-    color: var(--text);
-  }
-
-  .article-body :global(.pull-quote) {
-    margin: 48px -80px;
-    padding: 40px 80px;
-    border-top: 2px solid var(--text);
-    border-bottom: 2px solid var(--text);
-  }
-
-  .article-body :global(.pull-quote blockquote p) {
-    font-family: var(--font-serif);
-    font-style: italic;
-    font-size: var(--text-30);
-    line-height: 1.35;
-    letter-spacing: -0.01em;
-    color: var(--text);
-    margin-bottom: 0;
-  }
-
-  .article-body :global(.pull-quote-attr) {
-    font-family: var(--font-sans);
-    font-size: var(--text-11);
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    color: var(--accent);
-    margin-top: 16px;
-  }
-
-  .article-body :global(.section-break) {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin: 48px 0;
-  }
-
-  .article-body :global(.section-break-line) {
-    flex: 1;
-    height: 1px;
-    background: var(--rule-light);
-  }
-
-  .article-body :global(.section-break-dots) {
-    font-family: var(--font-serif);
-    color: var(--accent);
-    font-size: var(--text-16);
-    letter-spacing: 0.2em;
-  }
-
-  .article-body :global(.callout-block) {
-    background: var(--surface);
-    border-left: 3px solid var(--accent);
-    padding: 32px 36px;
-    margin: 40px 0;
-  }
-
-  .article-body :global(.callout-label) {
-    display: block;
-    font-family: var(--font-sans);
-    font-size: var(--text-10);
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: var(--accent);
-    margin-bottom: 12px;
-  }
-
-  .article-body :global(.callout-block p) {
-    font-family: var(--font-serif);
-    font-size: var(--text-17);
-    line-height: 1.6;
-    color: var(--text);
-    margin-bottom: 0;
-  }
-
-  .article-body :global(.data-block) {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    border: 1px solid var(--rule);
-    padding: 32px 36px;
-    margin: 40px 0;
-    gap: 24px;
-  }
-
-  .article-body :global(.data-stat) {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .article-body :global(.data-number) {
-    font-family: var(--font-serif);
-    font-size: var(--text-48);
-    font-weight: 400;
-    color: var(--accent);
-    line-height: 1;
-  }
-
-  .article-body :global(.data-label) {
-    font-family: var(--font-sans);
-    font-size: var(--text-12);
-    color: var(--text-mid);
-  }
-
-  .article-body :global(.law-ref) {
-    font-family: var(--font-sans);
-    font-size: var(--text-11);
-    font-weight: 500;
-    text-transform: uppercase;
-    color: var(--accent);
-    border: 1px solid var(--accent);
-    padding: 2px 8px;
-    transition: background 0.15s, color 0.15s;
-  }
-
-  .article-body :global(.law-ref:hover) {
-    background: var(--accent);
-    color: var(--inverse-text);
-  }
-
-  /* ====================================================
-     ARTICLE FOOTER
-     ==================================================== */
-
-  .article-footer {
-    max-width: 780px;
-    margin: 0 auto;
-    padding: 0 56px 56px;
-  }
-
-  .footer-rule {
-    height: 1px;
-    background: var(--text);
-    margin-bottom: 40px;
-  }
-
-  .author-block {
-    display: flex;
-    gap: 24px;
-    margin-bottom: 48px;
-    padding-bottom: 48px;
-    border-bottom: 1px solid var(--rule-light);
-  }
-
-  .author-initial {
-    width: 52px;
-    height: 52px;
-    background: var(--text);
-    color: var(--inverse-text);
-    font-family: var(--font-serif);
-    font-size: var(--text-24);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-
-  .author-info {
-    flex: 1;
-  }
-
-  .author-full-name {
-    font-family: var(--font-sans);
-    font-size: var(--text-15);
-    font-weight: 500;
-    color: var(--text);
-    margin-bottom: 2px;
-  }
-
-  .author-role-full {
-    font-family: var(--font-serif);
-    font-style: italic;
-    font-size: var(--text-14);
-    color: var(--text-muted);
-    margin-bottom: 10px;
-  }
-
-  .author-bio {
-    font-family: var(--font-sans);
-    font-size: var(--text-13);
-    color: var(--text-mid);
-    line-height: 1.6;
-    margin-bottom: 10px;
-  }
-
-  .author-disclaimer {
-    font-family: var(--font-sans);
-    font-size: var(--text-13);
-    color: var(--text-muted);
-    font-style: italic;
-  }
-
-  .laws-referenced {
-    margin-bottom: 48px;
-    padding-bottom: 48px;
-    border-bottom: 1px solid var(--rule-light);
-  }
-
-  .laws-label {
-    font-family: var(--font-sans);
-    font-size: var(--text-10);
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: var(--accent);
-    margin-bottom: 14px;
-  }
-
-  .laws-pills {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .law-pill {
-    font-family: var(--font-sans);
-    font-size: var(--text-12);
-    border: 1px solid var(--rule);
-    padding: 6px 14px;
-    color: var(--text);
-    transition: border-color 0.15s, color 0.15s;
-  }
-
-  .law-pill:hover {
-    border-color: var(--accent);
-    color: var(--accent);
-  }
-
-  .related-reading {
-    margin-bottom: 0;
-  }
-
-  .related-label {
-    font-family: var(--font-sans);
-    font-size: var(--text-10);
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: var(--accent);
-    margin-bottom: 24px;
-  }
-
-  .related-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0;
-  }
-
-  .related-card {
-    padding: 28px 24px 28px 0;
-    border-top: 1px solid var(--rule-light);
-  }
-
-  .related-card:nth-child(even) {
-    padding-left: 24px;
-    padding-right: 0;
-    border-left: 1px solid var(--rule-light);
-  }
-
-  .related-card-category {
-    font-family: var(--font-sans);
-    font-size: var(--text-10);
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.16em;
-    color: var(--accent);
-    margin-bottom: 10px;
-  }
-
-  .related-card-title {
-    font-family: var(--font-serif);
-    font-size: var(--text-20);
-    font-weight: 400;
-    line-height: 1.2;
-    margin-bottom: 10px;
-  }
-
-  .related-card-title a {
-    color: var(--text);
-    transition: color 0.15s;
-  }
-
-  .related-card-title a:hover {
-    color: var(--accent);
-  }
-
-  .related-card-excerpt {
-    font-family: var(--font-sans);
-    font-size: var(--text-13);
-    line-height: 1.6;
-    color: var(--text-mid);
-    margin-bottom: 12px;
-  }
-
-  .related-card-byline {
-    font-family: var(--font-sans);
-    font-size: var(--text-11);
-    color: var(--text-muted);
-  }
-</style>
+      )}
+    </div>
+  </article>
+</Base>

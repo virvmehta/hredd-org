@@ -1,19 +1,28 @@
 ---
-import { client } from '../../lib/sanity.js';
-import { LAWS_QUERY } from '../../lib/queries.js';
-import { STATIC_LAWS } from '../../lib/staticData.js';
+/**
+ * Legacy route. Law detail pages moved from /tracker/[slug] to
+ * /laws/[slug] in the April 2026 rebuild; this page preserves old
+ * links with a static meta refresh redirect per law.
+ */
+import { getAllLaws } from '../../lib/sanity.js';
 
 export async function getStaticPaths() {
-  let laws: any[] = [];
-  try {
-    const fetched = await client.fetch(LAWS_QUERY);
-    laws = fetched && fetched.length > 0 ? fetched : STATIC_LAWS;
-  } catch {
-    laws = STATIC_LAWS;
-  }
-  return laws.map((law: any) => ({ params: { slug: law.slug } }));
+  const laws = await getAllLaws();
+  return laws.map((law) => ({ params: { slug: law.slug }, props: { slug: law.slug } }));
 }
 
-const { slug } = Astro.params;
-return Astro.redirect(`/laws/${slug}`, 301);
+const { slug } = Astro.props;
+const target = `/laws/${slug}/`;
 ---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Redirecting</title>
+    <meta http-equiv="refresh" content={`0; url=${target}`} />
+    <link rel="canonical" href={target} />
+  </head>
+  <body>
+    <p>This page has moved. Continue to <a href={target}>the law entry</a>.</p>
+  </body>
+</html>

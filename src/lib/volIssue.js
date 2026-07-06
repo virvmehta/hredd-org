@@ -1,25 +1,44 @@
-import { STATIC_SETTINGS } from './staticData.js';
+/**
+ * Compute the masthead volume and issue string.
+ * Volume: current year minus 2025, rendered as a Roman numeral.
+ * Issue: count of distinct calendar months in the current volume year
+ * that contain at least one published article.
+ * Date: the build month and year, upper-cased for the strip.
+ * Example output: "VOL I \u00B7 NO III \u00B7 JULY 2026"
+ */
 
-const ROMAN = [[50,'L'],[40,'XL'],[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']];
-
-function toRoman(n) {
+function toRoman(num) {
+  const table = [
+    [1000, 'M'], [900, 'CM'], [500, 'D'], [400, 'CD'],
+    [100, 'C'], [90, 'XC'], [50, 'L'], [40, 'XL'],
+    [10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I']
+  ];
   let out = '';
-  for (const [v, r] of ROMAN) { while (n >= v) { out += r; n -= v; } }
+  for (const [value, glyph] of table) {
+    while (num >= value) {
+      out += glyph;
+      num -= value;
+    }
+  }
   return out || 'I';
 }
 
-function formatMonth(dateStr) {
-  if (!dateStr) return '';
-  const d = new Date(dateStr + 'T12:00:00Z');
-  return d.toLocaleString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' }).toUpperCase();
-}
+export function computeVolIssue(articles) {
+  const now = new Date();
+  const year = now.getFullYear();
+  const volume = toRoman(Math.max(1, year - 2025));
 
-export function getVolLabel(settings) {
-  const s = settings || STATIC_SETTINGS;
-  const vol = s.vol || 'VOL I';
-  const issue = s.issue || 5;
-  const month = formatMonth(s.issueDate) || 'APRIL 2026';
-  return `${vol} · NO ${toRoman(issue)} · ${month}`;
-}
+  const months = new Set();
+  for (const a of articles || []) {
+    if (!a.publishedAt) continue;
+    const d = new Date(a.publishedAt);
+    if (d.getFullYear() === year) months.add(d.getMonth());
+  }
+  const issue = toRoman(Math.max(1, months.size));
 
-export const DEFAULT_VOL = getVolLabel(STATIC_SETTINGS);
+  const dateStr = now
+    .toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })
+    .toUpperCase();
+
+  return `VOL ${volume} \u00B7 NO ${issue} \u00B7 ${dateStr}`;
+}

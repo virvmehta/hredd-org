@@ -1,32 +1,43 @@
+// REMINDER: after any change to this schema, redeploy the studio with
+// `npx sanity deploy` from the studio folder.
+
 export default {
   name: 'siteSettings',
   title: 'Site Settings',
   type: 'document',
-  __experimental_actions: ['update', 'publish'],
   fields: [
+    { name: 'siteTitle', title: 'Site title', type: 'string' },
     {
-      name: 'vol',
-      title: 'Volume Label',
-      type: 'string',
-      description: 'e.g. "VOL I"',
-      initialValue: 'VOL I',
+      name: 'tagline',
+      title: 'Masthead tagline',
+      type: 'text',
+      rows: 2,
+      description: 'Shown under the homepage masthead title.'
     },
     {
-      name: 'issue',
-      title: 'Issue Number',
-      type: 'number',
-      description: 'Displayed as Roman numerals in the TopStrip.',
+      name: 'editorialQuote',
+      title: 'Editorial quote (homepage dark strip)',
+      type: 'text',
+      rows: 3
     },
     {
-      name: 'issueDate',
-      title: 'Issue Date',
-      type: 'date',
-      description: 'The date of the current issue. Used to compute the month label in TopStrip.',
+      name: 'editorialQuoteAttribution',
+      title: 'Editorial quote attribution',
+      type: 'string'
     },
     {
-      name: 'nextIssueDate',
-      title: 'Next Issue Date',
-      type: 'date',
+      name: 'newsletterBlurb',
+      title: 'Newsletter blurb',
+      type: 'text',
+      rows: 2
     },
-  ],
+    {
+      name: 'articleDisclaimer',
+      title: 'Article disclaimer (shown at the bottom of every article)',
+      type: 'text',
+      rows: 3,
+      description: 'A single site-wide disclaimer. Individual articles can override it with their custom disclosure field.'
+    },
+    { name: 'contactEmail', title: 'Contact email', type: 'string' }
+  ]
 };

@@ -1,61 +1,28 @@
-export const LAWS_QUERY = `*[_type == "law"] | order(year desc) {
-  _id,
-  name,
-  nativeName,
-  "slug": slug.current,
-  jurisdiction,
-  iso,
-  year,
-  inForce,
-  status,
-  scope
-}`;
-
-export const LAW_BY_SLUG_QUERY = `*[_type == "law" && slug.current == $slug][0] {
-  _id,
-  name,
-  nativeName,
-  "slug": slug.current,
-  jurisdiction,
-  iso,
-  year,
-  inForce,
-  status,
-  scope,
-  provisions,
-  timeline,
-  "relatedLaws": relatedLaws[]-> {
-    name,
+/**
+ * All GROQ queries used by the site, kept in one place so schema
+ * changes only ever require edits in a single file.
+ */
+export const queries = {
+  allLaws: `*[_type == "trackerLaw"] {
     "slug": slug.current,
-    jurisdiction,
-    year,
-    status
-  }
-}`;
+    name, shortName, jurisdiction, region, status, statusType,
+    lastUpdated, tableUpdateText, enactedDate, firstComplianceDeadline,
+    companiesInScope, maxPenalty, civilLiability, enforcementBody,
+    sectorsAffected, supplierCountries, countryCode, countryCodes,
+    oneLineSummary, summary, obligations, timeline, changelog, sources, order
+  }`,
 
-export const ARTICLES_QUERY = `*[_type == "article"] | order(publishedAt desc) {
-  _id,
-  title,
-  "slug": slug.current,
-  deck,
-  category,
-  "author": authorName,
-  publishedAt,
-  readTime
-}`;
+  allArticles: `*[_type == "article"] {
+    "slug": slug.current,
+    title, deck, excerpt, category, authorName, authorBio, authorLocation,
+    publishedAt, readTime, featured, heroCaption, heroCredit, body,
+    disclosureOverride,
+    "relatedLaws": relatedLaws[]->{ "slug": slug.current, name, shortName, status, statusType, jurisdiction, oneLineSummary },
+    "relatedArticles": relatedArticles[]->{ "slug": slug.current, title, category, publishedAt, readTime }
+  }`,
 
-export const ARTICLE_BY_SLUG_QUERY = `*[_type == "article" && slug.current == $slug][0] {
-  _id,
-  title,
-  "slug": slug.current,
-  deck,
-  category,
-  "author": authorName,
-  authorRole,
-  authorBio,
-  publishedAt,
-  readTime,
-  body
-}`;
-
-export const SITE_SETTINGS_QUERY = `*[_id == "siteSettings"][0]`;
+  siteSettings: `*[_type == "siteSettings"][0] {
+    siteTitle, tagline, editorialQuote, editorialQuoteAttribution,
+    newsletterBlurb, articleDisclaimer, contactEmail
+  }`
+};

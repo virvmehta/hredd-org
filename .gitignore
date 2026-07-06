@@ -1,4 +1,7 @@
 node_modules/
 dist/
-.env
 .astro/
+.env.local
+.DS_Store
+studio/node_modules/
+studio/dist/
