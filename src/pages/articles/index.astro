@@ -1,6 +1,6 @@
----
-import Base from '../../layouts/Base.astro';
-import { getAllArticles, formatDate } from '../../lib/sanity.js';
+﻿---
+import Base from "../../layouts/Base.astro";
+import { getAllArticles, formatDate } from "../../lib/sanity.js";
 
 const articles = await getAllArticles();
 const categories = [...new Set(articles.map((a) => a.category).filter(Boolean))];
@@ -10,52 +10,57 @@ const categories = [...new Set(articles.map((a) => a.category).filter(Boolean))]
   description="Analysis, commentary and field reporting on HREDD legislation from the supplier side of global supply chains."
   activePage="articles"
 >
-  <section class="page-title-block page-pad">
-    <h1>Articles</h1>
-    <p class="subtitle">
-      Analysis, commentary and field reporting, written from the supplier side
-      of the chain rather than the boardroom side.
-    </p>
-  </section>
-
-  <div class="page-pad">
-    <div class="filter-tabs" role="tablist" aria-label="Filter articles by category">
-      <button data-cat="all" class="active" role="tab" aria-selected="true">All</button>
-      {categories.map((c) => (
-        <button data-cat={c} role="tab" aria-selected="false">{c}</button>
-      ))}
+  <section class="section" style="padding-bottom:clamp(36px,4vw,56px)">
+    <div class="wrap">
+      <p class="kicker reveal">Articles</p>
+      <h1 class="display reveal" data-delay="1" style="font-size:clamp(40px,5.6vw,80px)">From the supplier side<br />of the <em>chain</em></h1>
+      <p class="standfirst reveal" data-delay="2" style="margin-top:26px">
+        Analysis, commentary and field reporting, written from the supplier
+        side of the chain rather than the boardroom side.
+      </p>
     </div>
-  </div>
-
-  <section class="articles-list page-pad" id="articles-list" style="padding-top: 20px;">
-    {articles.map((a) => (
-      <a class="index-article" href={`/articles/${a.slug}/`} data-cat={a.category}>
-        <span class="ia-cat">{a.category}</span>
-        <span>
-          <h3>{a.title}</h3>
-          <p class="ia-excerpt">{a.excerpt}</p>
-        </span>
-        <span class="ia-meta">{formatDate(a.publishedAt)} &middot; {a.readTime}</span>
-      </a>
-    ))}
   </section>
 
-  <script>
-    const tabs = document.querySelectorAll('.filter-tabs button');
-    const items = document.querySelectorAll('#articles-list .index-article');
-    tabs.forEach((tab) => {
-      tab.addEventListener('click', () => {
-        tabs.forEach((t) => {
-          t.classList.remove('active');
-          t.setAttribute('aria-selected', 'false');
-        });
-        tab.classList.add('active');
-        tab.setAttribute('aria-selected', 'true');
-        const c = tab.getAttribute('data-cat');
-        items.forEach((el) => {
-          el.style.display = c === 'all' || el.getAttribute('data-cat') === c ? '' : 'none';
+  <section class="section" style="padding-top:0">
+    <div class="wrap">
+      <div class="tabs reveal" id="cat-tabs" style="margin-bottom:clamp(30px,4vw,48px)">
+        <button class="tab on" data-cat="all">All</button>
+        {categories.map((c) => (
+          <button class="tab" data-cat={c}>{c}</button>
+        ))}
+      </div>
+      <div class="law-rows reveal" data-delay="1" id="article-rows">
+        {articles.map((a) => (
+          <a class="law-row" href={`/articles/${a.slug}/`} data-cat={a.category}>
+            <div>
+              <h3>{a.title}</h3>
+              <p class="sub">{a.excerpt}</p>
+            </div>
+            <span class="jur">{a.authorName} &middot; {formatDate(a.publishedAt)}</span>
+            <span class="chip">{a.category}</span>
+          </a>
+        ))}
+      </div>
+      <p class="mono faint reveal" style="margin-top:32px">
+        More monthly: <a class="gold" href="/subscribe/">subscribe to the digest</a> to catch each one.
+      </p>
+    </div>
+  </section>
+
+  <script is:inline>
+  (function () {
+    var tabs = document.querySelectorAll("#cat-tabs .tab");
+    var rows = document.querySelectorAll("#article-rows .law-row");
+    tabs.forEach(function (tab) {
+      tab.addEventListener("click", function () {
+        tabs.forEach(function (t) { t.classList.remove("on"); });
+        tab.classList.add("on");
+        var c = tab.getAttribute("data-cat");
+        rows.forEach(function (r) {
+          r.style.display = c === "all" || r.getAttribute("data-cat") === c ? "" : "none";
         });
       });
     });
+  })();
   </script>
 </Base>

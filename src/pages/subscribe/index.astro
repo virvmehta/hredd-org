@@ -1,6 +1,6 @@
----
-import Base from '../../layouts/Base.astro';
-import { getSiteSettings } from '../../lib/sanity.js';
+﻿---
+import Base from "../../layouts/Base.astro";
+import { getSiteSettings } from "../../lib/sanity.js";
 
 const settings = await getSiteSettings();
 ---
@@ -9,34 +9,19 @@ const settings = await getSiteSettings();
   description="One email a month covering every tracker movement and every new analysis."
   activePage="subscribe"
 >
-  <section class="prose-page page-pad">
-    <h1>Subscribe</h1>
-
-    <p class="lede">{settings.newsletterBlurb}</p>
-
-    <p>
-      The digest goes out at the start of each month and contains three things:
-      every movement on the tracker with a plain-language note on what changed,
-      every article published in the previous month, and one thing worth
-      reading from elsewhere. There is nothing else in it, and there never will
-      be.
-    </p>
-
-    <div class="newsletter" style="border-top: 1px solid var(--rule-light); text-align: left; padding-top: 40px;">
-      <form action={`mailto:${settings.contactEmail}?subject=Subscribe%20to%20the%20hredd.org%20digest`} method="post" enctype="text/plain" style="justify-content: flex-start;">
-        <input type="email" name="email" placeholder="you@example.org" aria-label="Email address" required />
-        <button type="submit">Subscribe</button>
-      </form>
-      <p style="margin-top: 16px; font-size: var(--text-12); color: var(--text-muted); text-align: left; max-width: none;">
-        Submitting opens an email to the editor while the automated list is
-        being set up. Your address is never shared with anyone, ever.
+  <section class="section sub-band" style="min-height:56vh; display:grid; align-items:center">
+    <div class="wrap">
+      <p class="kicker reveal" style="justify-content:center">The monthly digest</p>
+      <h1 class="display reveal" data-delay="1" style="font-size:clamp(40px,5.6vw,80px)">One briefing.<br /><em>Every movement.</em></h1>
+      <p class="standfirst reveal" data-delay="2" style="margin:26px auto 0">
+        What moved, what it means for your trade relationships, and what to
+        prepare before your buyers ask. Twelve issues a year. No noise.
       </p>
+      <form class="sub-form reveal" data-delay="3" data-mailto={settings.contactEmail}>
+        <input type="email" placeholder="you@example.org" required aria-label="Email address" />
+        <button class="btn solid" type="submit"><span>Subscribe</span></button>
+      </form>
+      <p class="form-note reveal" data-delay="3">Monthly &middot; Free &middot; Unsubscribe anytime</p>
     </div>
-
-    <h2>RSS</h2>
-    <p>
-      A feed is on the roadmap for the next release of this site. Until it
-      ships, the monthly digest is the reliable way to follow new entries.
-    </p>
   </section>
 </Base>

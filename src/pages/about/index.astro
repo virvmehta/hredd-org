@@ -1,6 +1,6 @@
----
-import Base from '../../layouts/Base.astro';
-import { getSiteSettings } from '../../lib/sanity.js';
+﻿---
+import Base from "../../layouts/Base.astro";
+import { getSiteSettings } from "../../lib/sanity.js";
 
 const settings = await getSiteSettings();
 ---
@@ -9,66 +9,72 @@ const settings = await getSiteSettings();
   description="Why hredd.org exists, its editorial position, and how to contribute."
   activePage="about"
 >
-  <section class="prose-page page-pad">
-    <h1>About hredd<span style="color: var(--accent);">&middot;</span>org</h1>
+  <section class="section" style="padding-bottom:clamp(36px,4vw,56px)">
+    <div class="wrap">
+      <p class="kicker reveal">About</p>
+      <h1 class="display reveal" data-delay="1" style="font-size:clamp(40px,5.6vw,80px)">Tracked from the side<br />that answers the <em>questionnaires</em></h1>
+      <p class="standfirst reveal" data-delay="2" style="margin-top:26px">
+        hredd.org tracks global human rights and environmental due diligence
+        legislation and its implications for those most affected and least
+        consulted. Independent. Monthly. Published from Noida, India, since 2026.
+      </p>
+    </div>
+  </section>
 
-    <p class="lede">
-      Most writing about human rights and environmental due diligence is
-      produced in the jurisdictions that write the laws. This publication is
-      produced in the jurisdictions that answer to them.
-    </p>
-
-    <h2>The mission</h2>
-    <p>
-      hredd.org tracks every mandatory HREDD regime that reaches Global South
-      supply chains, and analyses what those regimes mean for the workers,
-      farmers, contractors and enterprises who experience them as
-      questionnaires, audits and contract clauses rather than as legislation.
-    </p>
-    <p>
-      The tracker is maintained monthly, every entry carries a changelog, and
-      every claim links to a primary source. Analysis is written for
-      practitioners: sustainability managers at mills and factories, programme
-      staff at civil society organisations, and anyone who has ever had to
-      translate a directive into a field protocol.
-    </p>
-
-    <h2>The editorial position</h2>
-    <p>
-      This publication supports mandatory due diligence and is impatient with
-      how it is currently done. Those two positions are compatible, and holding
-      both at once is the entire point. Disclosure without consequences has
-      demonstrably failed, yet compliance regimes designed without supplier
-      knowledge produce burden without protection, and both failures deserve
-      documentation.
-    </p>
-    <p>
-      hredd.org is independent, carries no advertising, and accepts no funding
-      from companies within the scope of the laws it tracks.
-    </p>
-
-    <h2>The editor</h2>
-    <p>
-      Vir Mehta is a decent work and supply chain sustainability practitioner
-      based in Noida, India. He has spent his career on the supplier side of
-      agricultural and garment supply chains across South and Southeast Asia,
-      authored the first practitioner-facing CSDDD self-assessment toolkit, and
-      writes here in a personal capacity.
-    </p>
-
-    <h2>Contribute</h2>
-    <p>
-      Field reports, analysis and corrections are welcome, particularly from
-      practitioners writing about laws as they land in producing countries.
-      Pitches should be short, specific and grounded in first-hand knowledge of
-      a supply chain.
-    </p>
-
-    <h2 id="contact">Contact</h2>
-    <p>
-      Write to <a href={`mailto:${settings.contactEmail}`} style="border-bottom: 1px solid var(--rule);">{settings.contactEmail}</a>
-      for pitches, corrections, tracker suggestions and anything else. Every
-      message is read, though replies can take a week during field travel.
-    </p>
+  <section class="section" style="padding-top:0">
+    <div class="wrap" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:24px">
+      <div class="panel reveal">
+        <h4>Why we exist</h4>
+        <p style="margin:0; color:var(--ink-dim)">
+          HREDD law is written in Brussels, Washington and Canberra, but it
+          lands on factory floors and farm gates in the Global South. We read
+          every regime from the receiving end.
+        </p>
+      </div>
+      <div class="panel reveal" data-delay="1">
+        <h4>How we work</h4>
+        <p style="margin:0; color:var(--ink-dim)">
+          Eighteen laws, reviewed monthly, with a changelog on every entry.
+          No paywalls and no consulting upsell: a public ledger of who must
+          do what, and by when, with a primary source behind every claim.
+        </p>
+      </div>
+      <div class="panel reveal" data-delay="2">
+        <h4>The editorial position</h4>
+        <p style="margin:0; color:var(--ink-dim)">
+          This publication supports mandatory due diligence and is impatient
+          with how it is currently done. Disclosure without consequences has
+          failed, yet compliance designed without supplier knowledge produces
+          burden without protection, and both failures deserve documentation.
+        </p>
+      </div>
+      <div class="panel reveal" data-delay="3">
+        <h4>The editor</h4>
+        <p style="margin:0; color:var(--ink-dim)">
+          Vir Mehta is a decent work and supply chain sustainability
+          practitioner based in Noida, India. He has spent his career on the
+          supplier side of agricultural and garment supply chains, authored
+          the first practitioner-facing CSDDD self-assessment toolkit, and
+          writes here in a personal capacity.
+        </p>
+      </div>
+      <div class="panel reveal" data-delay="1">
+        <h4>Contribute</h4>
+        <p style="margin:0; color:var(--ink-dim)">
+          Field reports, analysis and corrections are welcome, particularly
+          from practitioners writing about laws as they land in producing
+          countries. Pitches should be short, specific and grounded in
+          first-hand knowledge of a supply chain.
+        </p>
+      </div>
+      <div class="panel reveal" data-delay="2" id="contact">
+        <h4>Contact</h4>
+        <p style="margin:0 0 18px; color:var(--ink-dim)">
+          Corrections, tips, pitches and field reports are welcome. Every
+          message is read, though replies can take a week during field travel.
+        </p>
+        <a class="btn" href={`mailto:${settings.contactEmail}`}><span>Write to us</span></a>
+      </div>
+    </div>
   </section>
 </Base>

@@ -1,132 +1,202 @@
----
-import Base from '../../layouts/Base.astro';
-import { getAllLaws } from '../../lib/sanity.js';
+﻿---
+import Base from "../../layouts/Base.astro";
+import { getAllLaws } from "../../lib/sanity.js";
+import { buildBuyers } from "../../lib/redesignData.js";
 
 const laws = await getAllLaws();
+const buyers = buildBuyers(laws);
 
-/**
- * Buyer jurisdictions shown as pills. Selecting a buyer country shows
- * every national law of that country plus every EU-level law where the
- * country is an EU member state, because EU buyers carry both layers.
- */
-const EU_MEMBER_A3 = new Set([
-  'AUT', 'BEL', 'BGR', 'HRV', 'CYP', 'CZE', 'DNK', 'EST', 'FIN', 'FRA',
-  'DEU', 'GRC', 'HUN', 'IRL', 'ITA', 'LVA', 'LTU', 'LUX', 'MLT', 'NLD',
-  'POL', 'PRT', 'ROU', 'SVK', 'SVN', 'ESP', 'SWE'
-]);
-
-const buyers = [
-  { code: 'EU', label: 'European Union (any member)' },
-  { code: 'DEU', label: 'Germany' },
-  { code: 'FRA', label: 'France' },
-  { code: 'NLD', label: 'Netherlands' },
-  { code: 'NOR', label: 'Norway' },
-  { code: 'CHE', label: 'Switzerland' },
-  { code: 'GBR', label: 'United Kingdom' },
-  { code: 'USA', label: 'United States' },
-  { code: 'CAN', label: 'Canada' },
-  { code: 'AUS', label: 'Australia' },
-  { code: 'JPN', label: 'Japan' },
-  { code: 'KOR', label: 'South Korea' }
-];
-
-const isEuLaw = (law) => law.region === 'European Union';
-
-function lawsForBuyer(code) {
-  if (code === 'EU') return laws.filter(isEuLaw);
-  return laws.filter((law) => {
-    const codes = law.countryCodes || (law.countryCode ? [law.countryCode] : []);
-    if (isEuLaw(law)) return EU_MEMBER_A3.has(code);
-    return codes.includes(code);
-  });
-}
-
-const buyerIndex = Object.fromEntries(
-  buyers.map((b) => [b.code, lawsForBuyer(b.code).map((l) => l.slug)])
-);
+const lawPayload = laws.map((l) => ({
+  slug: l.slug,
+  short: l.shortName || l.name,
+  group: l.statusType
+}));
 ---
 <Base
   title="Buyer compliance mapping | hredd.org"
   description="Suppliers: select your buyer countries to see which HREDD laws apply to your trade relationships."
   activePage="buyer-mapping"
 >
-  <section class="page-title-block page-pad">
-    <h1>Buyer compliance mapping</h1>
-    <p class="subtitle">
-      Suppliers: select your buyer countries to see which HREDD laws apply to
-      your trade relationships.
-    </p>
-  </section>
-
-  <div class="page-pad rule-primary">
-    <div class="buyer-pills" role="group" aria-label="Select buyer countries">
-      {buyers.map((b) => (
-        <button data-buyer={b.code} aria-pressed="false">{b.label}</button>
-      ))}
-    </div>
-  </div>
-
-  <section class="buyer-results page-pad">
-    <p class="result-count" id="result-count">
-      Select one or more buyer countries above to map the laws that reach your trade relationships.
-    </p>
-    <div id="buyer-law-cards">
-      {laws.map((law) => (
-        <a class="law-card" href={`/laws/${law.slug}/`} data-slug={law.slug} style="display: none;">
-          <span class="lc-head">
-            <span class="lc-name">{law.name}</span>
-            <span class={`status-badge status-${law.statusType}`}>{law.status}</span>
-          </span>
-          <span class="lc-jur">{law.jurisdiction}</span>
-          <p class="lc-summary">{law.oneLineSummary}</p>
-          <span class="lc-more">Read more &rarr;</span>
-        </a>
-      ))}
+  <section class="section" style="padding-bottom:clamp(36px,4vw,56px)">
+    <div class="wrap">
+      <p class="kicker reveal">Buyer compliance mapping</p>
+      <h1 class="display reveal" data-delay="1" style="font-size:clamp(40px,5.6vw,80px)">Which laws reach<br /><em>your</em> order book?</h1>
+      <p class="standfirst reveal" data-delay="2" style="margin-top:26px">
+        Select your buyer countries. We map every HREDD regime that applies to
+        those trade relationships, and what each one will ask of you.
+      </p>
     </div>
   </section>
 
-  <script type="application/json" id="buyer-index-data" set:html={JSON.stringify(buyerIndex)} />
+  <section class="section" style="padding-top:0">
+    <div class="wrap">
+      <p class="kicker reveal" style="margin-bottom:22px">Your buyers</p>
+      <div class="buyer-chips reveal" data-delay="1" id="chips">
+        {buyers.map((b) => (
+          <button class="bchip" data-id={b.id}>{b.label}</button>
+        ))}
+      </div>
+    </div>
+  </section>
 
-  <script>
-    const dataEl = document.getElementById('buyer-index-data');
-    const buyerIndex = dataEl ? JSON.parse(dataEl.textContent || '{}') : {};
-    const pills = document.querySelectorAll('.buyer-pills button');
-    const cards = document.querySelectorAll('#buyer-law-cards .law-card');
-    const countEl = document.getElementById('result-count');
-    const active = new Set();
+  <section class="section" style="padding-top:clamp(30px,4vw,48px)">
+    <div class="wrap">
+      <div class="net-panel reveal">
+        <svg id="network" viewBox="0 0 1200 620" role="img" aria-label="Network diagram linking your factory to buyer countries and the laws that apply"></svg>
+        <div class="net-empty" id="net-empty">Select one or more buyer countries above<br />to map the laws that reach your trade relationships.</div>
+      </div>
+    </div>
+  </section>
 
-    function refresh() {
-      const slugs = new Set();
-      active.forEach((code) => (buyerIndex[code] || []).forEach((s) => slugs.add(s)));
-      let shown = 0;
-      cards.forEach((card) => {
-        const visible = slugs.has(card.getAttribute('data-slug'));
-        card.style.display = visible ? '' : 'none';
-        if (visible) shown += 1;
+  <section class="section" style="padding-top:0">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <p class="kicker">The obligations</p>
+          <h2 class="h2" id="result-title">All tracked laws</h2>
+        </div>
+        <span class="mono faint" id="result-count"></span>
+      </div>
+      <div class="law-grid" id="grid">
+        {laws.map((l) => (
+          <article class="law-card" data-g={l.statusType} data-slug={l.slug}>
+            <div class="law-top"><span class="jur">{l.jurisdiction}</span><span class="chip" data-g={l.statusType}>{l.status}</span></div>
+            <h3><a href={`/laws/${l.slug}/`}>{l.name}</a></h3>
+            <p>{l.tableUpdateText}</p>
+            <a class="textlink" href={`/laws/${l.slug}/`}>Read <i>&rarr;</i></a>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <script type="application/json" id="buyer-data" set:html={JSON.stringify(buyers)} />
+  <script type="application/json" id="law-min-data" set:html={JSON.stringify(lawPayload)} />
+
+  <script is:inline src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+  <script is:inline>
+  (function () {
+    var buyers = JSON.parse(document.getElementById("buyer-data").textContent || "[]");
+    var lawList = JSON.parse(document.getElementById("law-min-data").textContent || "[]");
+    var bySlug = {};
+    lawList.forEach(function (l) { bySlug[l.slug] = l; });
+    var total = lawList.length;
+
+    var chips = document.getElementById("chips");
+    var grid = document.getElementById("grid");
+    var cards = Array.prototype.slice.call(grid.querySelectorAll(".law-card"));
+    var netEmpty = document.getElementById("net-empty");
+    var selected = new Set();
+
+    chips.addEventListener("click", function (e) {
+      var b = e.target.closest(".bchip"); if (!b) return;
+      b.classList.toggle("on");
+      selected.has(b.dataset.id) ? selected.delete(b.dataset.id) : selected.add(b.dataset.id);
+      update();
+    });
+
+    function activeSlugs() {
+      var slugs = new Set();
+      selected.forEach(function (id) {
+        var buyer = buyers.find(function (b) { return b.id === id; });
+        if (buyer) buyer.laws.forEach(function (s) { slugs.add(s); });
       });
-      if (active.size === 0) {
-        countEl.textContent =
-          'Select one or more buyer countries above to map the laws that reach your trade relationships.';
-      } else {
-        const lawWord = shown === 1 ? 'law applies' : 'laws apply';
-        countEl.textContent = `${shown} ${lawWord} to your selected buyer countries.`;
-      }
+      return slugs;
     }
 
-    pills.forEach((pill) => {
-      pill.addEventListener('click', () => {
-        const code = pill.getAttribute('data-buyer');
-        if (active.has(code)) {
-          active.delete(code);
-          pill.classList.remove('active');
-          pill.setAttribute('aria-pressed', 'false');
-        } else {
-          active.add(code);
-          pill.classList.add('active');
-          pill.setAttribute('aria-pressed', 'true');
+    function update() {
+      var slugs = selected.size ? activeSlugs() : null;
+      var shown = 0;
+      cards.forEach(function (c) {
+        var visible = !slugs || slugs.has(c.getAttribute("data-slug"));
+        c.classList.toggle("hide", !visible);
+        if (visible) {
+          c.classList.add("pop");
+          setTimeout(function () { c.classList.remove("pop"); }, 40 + shown * 40);
+          shown += 1;
         }
-        refresh();
       });
-    });
+      document.getElementById("result-title").innerHTML = selected.size
+        ? "Laws reaching <em>your</em> buyers" : "All tracked laws";
+      document.getElementById("result-count").textContent = shown + " of " + total + " laws";
+      drawNetwork(slugs);
+    }
+
+    var sim = null;
+    var svg = window.d3 ? d3.select("#network") : null;
+    function drawNetwork(slugs) {
+      if (!svg) { netEmpty.style.display = selected.size ? "none" : "grid"; return; }
+      svg.selectAll("*").remove();
+      if (sim) sim.stop();
+      if (!selected.size) { netEmpty.style.display = "grid"; return; }
+      netEmpty.style.display = "none";
+
+      var W = 1200, H = 620;
+      var nodes = [{ id: "you", type: "you", label: "Your factory" }];
+      var links = [];
+      selected.forEach(function (id) {
+        var b = buyers.find(function (x) { return x.id === id; });
+        nodes.push({ id: "b:" + id, type: "buyer", label: b.label.replace(" (any member)", "") });
+        links.push({ source: "you", target: "b:" + id });
+        b.laws.forEach(function (slug) {
+          if (!nodes.some(function (n) { return n.id === "l:" + slug; }))
+            nodes.push({ id: "l:" + slug, type: "law", label: bySlug[slug].short,
+                         group: bySlug[slug].group, slug: slug });
+          links.push({ source: "b:" + id, target: "l:" + slug });
+        });
+      });
+
+      var color = { force: "#93b07d", pending: "#c9a35f", proposed: "#93a4bd", delayed: "#c07b68" };
+
+      var link = svg.append("g").selectAll("line").data(links).join("line")
+        .attr("stroke", "rgba(201,163,95,.25)").attr("stroke-width", 1);
+
+      var node = svg.append("g").selectAll("g").data(nodes).join("g")
+        .style("cursor", function (d) { return d.type === "law" ? "pointer" : "default"; })
+        .on("click", function (ev, d) { if (d.type === "law") location.href = "/laws/" + d.slug + "/"; });
+
+      node.append("circle")
+        .attr("r", function (d) { return d.type === "you" ? 34 : d.type === "buyer" ? 22 : 8; })
+        .attr("fill", function (d) {
+          return d.type === "you" ? "#c9a35f" : d.type === "buyer" ? "rgba(201,163,95,.15)" : color[d.group];
+        })
+        .attr("stroke", function (d) { return d.type === "law" ? "rgba(14,13,10,.9)" : "#c9a35f"; })
+        .attr("stroke-width", function (d) { return d.type === "you" ? 0 : 1; });
+
+      node.append("text")
+        .text(function (d) { return d.label; })
+        .attr("text-anchor", "middle")
+        .attr("dy", function (d) { return d.type === "you" ? 4 : d.type === "buyer" ? 4 : 24; })
+        .attr("font-family", "IBM Plex Mono, monospace")
+        .attr("font-size", function (d) { return d.type === "law" ? 11 : 10; })
+        .attr("letter-spacing", "1")
+        .attr("fill", function (d) { return d.type === "you" ? "#14120d" : d.type === "buyer" ? "#e2c286" : "#b1a892"; })
+        .style("text-transform", "uppercase")
+        .style("pointer-events", "none");
+
+      sim = d3.forceSimulation(nodes)
+        .force("link", d3.forceLink(links).id(function (d) { return d.id; })
+          .distance(function (l) { return l.source.id === "you" ? 170 : 110; }))
+        .force("charge", d3.forceManyBody().strength(-500))
+        .force("center", d3.forceCenter(W / 2, H / 2))
+        .force("collide", d3.forceCollide(48))
+        .on("tick", function () {
+          nodes.forEach(function (d) {
+            d.x = Math.max(70, Math.min(W - 70, d.x));
+            d.y = Math.max(50, Math.min(H - 50, d.y));
+          });
+          link.attr("x1", function (d) { return d.source.x; }).attr("y1", function (d) { return d.source.y; })
+              .attr("x2", function (d) { return d.target.x; }).attr("y2", function (d) { return d.target.y; });
+          node.attr("transform", function (d) { return "translate(" + d.x + "," + d.y + ")"; });
+        });
+
+      node.call(d3.drag()
+        .on("start", function (ev, d) { if (!ev.active) sim.alphaTarget(.25).restart(); d.fx = d.x; d.fy = d.y; })
+        .on("drag", function (ev, d) { d.fx = ev.x; d.fy = ev.y; })
+        .on("end", function (ev, d) { if (!ev.active) sim.alphaTarget(0); d.fx = null; d.fy = null; }));
+    }
+
+    update();
+  })();
   </script>
 </Base>

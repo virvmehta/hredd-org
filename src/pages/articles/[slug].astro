@@ -1,6 +1,6 @@
----
-import Base from '../../layouts/Base.astro';
-import { getAllArticles, getSiteSettings, renderBody, formatDate } from '../../lib/sanity.js';
+﻿---
+import Base from "../../layouts/Base.astro";
+import { getAllArticles, getSiteSettings, renderBody, formatDate } from "../../lib/sanity.js";
 
 export async function getStaticPaths() {
   const articles = await getAllArticles();
@@ -12,62 +12,65 @@ const settings = await getSiteSettings();
 const bodyHtml = renderBody(article.body);
 const disclaimer = article.disclosureOverride || settings.articleDisclaimer;
 ---
-<Base
-  title={`${article.title} | hredd.org`}
-  description={article.excerpt || article.deck || article.title}
-  activePage="articles"
->
+<Base title={`${article.title} | hredd.org`} description={article.excerpt || article.deck || article.title} activePage="articles">
   <article>
-    <header class="article-hero page-pad">
-      <span class="label label-accent">{article.category}</span>
-      <h1>{article.title}</h1>
-      {article.deck && <p class="deck">{article.deck}</p>}
-      <p class="art-meta">
-        {article.authorName}
-        {article.authorLocation && <Fragment> &middot; {article.authorLocation}</Fragment>}
-        &middot; {formatDate(article.publishedAt)} &middot; {article.readTime}
-      </p>
-    </header>
-
-    <div class="page-pad">
-      <div class="article-body">
-        <Fragment set:html={bodyHtml} />
+    <section class="section" style="padding-bottom:clamp(30px,4vw,48px)">
+      <div class="wrap" style="max-width:900px">
+        <span class="chip reveal">{article.category}</span>
+        <h1 class="display reveal" data-delay="1" style="font-size:clamp(36px,5vw,68px); margin-top:24px">{article.title}</h1>
+        {article.deck && (<p class="standfirst reveal" data-delay="2" style="margin-top:24px">{article.deck}</p>)}
+        <p class="byline reveal" data-delay="3">
+          <b>{article.authorName}</b>
+          {article.authorLocation && <Fragment> &middot; {article.authorLocation}</Fragment>}
+          &middot; {formatDate(article.publishedAt)}
+          {article.readTime && <Fragment> &middot; {article.readTime}</Fragment>}
+        </p>
       </div>
-
-      <div class="author-block">
-        <div class="a-name">{article.authorName}</div>
-        {article.authorBio && <div class="a-bio">{article.authorBio}</div>}
+    </section>
+    <hr class="hairline" />
+    <section class="section">
+      <div class="wrap">
+        <div class="prose"><Fragment set:html={bodyHtml} /></div>
+        <div class="author-panel panel">
+          <h4>The author</h4>
+          <p style="margin:0; font:400 18px/1.6 var(--serif);">{article.authorName}</p>
+          {article.authorBio && (<p style="margin:10px 0 0; color:var(--ink-dim); font-size:15px;">{article.authorBio}</p>)}
+        </div>
+        {disclaimer && <p class="disclaimer">{disclaimer}</p>}
       </div>
-
-      {disclaimer && <div class="article-disclaimer">{disclaimer}</div>}
-
-      {article.relatedLaws?.length > 0 && (
-        <div class="ref-laws">
-          <h3>Laws referenced</h3>
-          {article.relatedLaws.map((law) => (
-            <a class="panel-law" href={`/laws/${law.slug}/`}>
-              <span class="pl-head">
-                <span class="pl-name">{law.name}</span>
-                <span class={`status-badge status-${law.statusType}`}>{law.status}</span>
-              </span>
-              <span class="pl-summary">{law.oneLineSummary}</span>
-              <span class="pl-more">View tracker entry &rarr;</span>
-            </a>
-          ))}
+    </section>
+    {article.relatedLaws?.length > 0 && (
+      <section class="section" style="padding-top:0">
+        <div class="wrap">
+          <div class="section-head reveal"><div><p class="kicker">Laws referenced</p><h2 class="h2">Tracker entries</h2></div></div>
+          <div class="law-grid reveal" data-delay="1">
+            {article.relatedLaws.map((l) => (
+              <article class="law-card" data-g={l.statusType}>
+                <div class="law-top"><span class="jur">{l.jurisdiction}</span><span class="chip" data-g={l.statusType}>{l.status}</span></div>
+                <h3><a href={`/laws/${l.slug}/`}>{l.name}</a></h3>
+                <p>{l.oneLineSummary}</p>
+                <a class="textlink" href={`/laws/${l.slug}/`}>View tracker entry <i>&rarr;</i></a>
+              </article>
+            ))}
+          </div>
         </div>
-      )}
-
-      {article.relatedArticles?.length > 0 && (
-        <div class="related-arts">
-          <h3>Related reading</h3>
-          {article.relatedArticles.map((r) => (
-            <a class="r-item" href={`/articles/${r.slug}/`}>
-              <span class="r-title">{r.title}</span>
-              <div class="r-meta">{r.category} &middot; {formatDate(r.publishedAt)} &middot; {r.readTime}</div>
-            </a>
-          ))}
+      </section>
+    )}
+    {article.relatedArticles?.length > 0 && (
+      <section class="section" style="padding-top:0">
+        <div class="wrap">
+          <div class="section-head reveal"><div><p class="kicker">Related reading</p><h2 class="h2">More from the field</h2></div></div>
+          <div class="law-rows reveal" data-delay="1">
+            {article.relatedArticles.map((r) => (
+              <a class="law-row" href={`/articles/${r.slug}/`}>
+                <div><h3>{r.title}</h3></div>
+                <span class="jur">{formatDate(r.publishedAt)}{r.readTime && ` \u00B7 ${r.readTime}`}</span>
+                <span class="chip">{r.category}</span>
+              </a>
+            ))}
+          </div>
         </div>
-      )}
-    </div>
+      </section>
+    )}
   </article>
 </Base>

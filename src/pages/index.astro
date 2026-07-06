@@ -1,114 +1,205 @@
----
+﻿---
 import Base from '../layouts/Base.astro';
 import { getAllArticles, getAllLaws, getSiteSettings, formatDate, formatMonthYear } from '../lib/sanity.js';
+import { buildMovements, trackedGeoIds } from '../lib/redesignData.js';
 
 const articles = await getAllArticles();
 const laws = await getAllLaws();
 const settings = await getSiteSettings();
 
 const lead = articles.find((a) => a.featured) || articles[0];
-const rest = articles.filter((a) => a !== lead).slice(0, 3);
-
-const previewLaws = laws.slice(0, 5);
 
 const inForce = laws.filter((l) => l.statusType === 'force').length;
 const pending = laws.filter((l) => l.statusType === 'pending').length;
 const proposed = laws.filter((l) => l.statusType === 'proposed').length;
+const delayed = laws.filter((l) => l.statusType === 'delayed').length;
+
+const jurisdictions = new Set(laws.map((l) => l.jurisdiction)).size;
 
 const mostRecent = laws.reduce((latest, l) => {
   const d = new Date(l.lastUpdated || 0);
   return d > latest ? d : latest;
 }, new Date(0));
+const nextUpdate = new Date(mostRecent.getFullYear(), mostRecent.getMonth() + 1, 1);
 const movementsThisCycle = laws.filter((l) => {
   const d = new Date(l.lastUpdated || 0);
   return d.getFullYear() === mostRecent.getFullYear() && d.getMonth() === mostRecent.getMonth();
 }).length;
+
+const movements = buildMovements(laws, 6);
+const previewLaws = laws.slice(0, 5);
+const geoTracked = trackedGeoIds(laws);
 ---
 <Base title="hredd.org | Human rights and environmental due diligence, tracked from the Global South" activePage="home">
-  <section class="masthead page-pad">
-    <div>
-      <h1 class="masthead-title">
-        Human rights<br />
-        <span class="line-italic">&amp; environmental</span><br />
-        due diligence
-      </h1>
-      <p class="masthead-tagline">{settings.tagline}</p>
-      <p class="masthead-meta">Established 2026 &middot; Independent &middot; Monthly</p>
-    </div>
-    <aside class="this-month">
-      <h2>This month</h2>
-      <div class="stat">
-        <div class="num">{laws.length}</div>
-        <div class="lab">Laws tracked</div>
-      </div>
-      <div class="stat">
-        <div class="num">{movementsThisCycle}</div>
-        <div class="lab">Movements in {formatMonthYear(mostRecent.toISOString())}</div>
-      </div>
-      <div class="stat">
-        <div class="num">{inForce}</div>
-        <div class="lab">Regimes in force</div>
-      </div>
-    </aside>
-  </section>
-
-  <section class="page-pad">
-    <div class="section-head rule-primary">
-      <h2>Latest</h2>
-      <a class="see-all" href="/articles/">All articles &rarr;</a>
-    </div>
-    <div class="article-grid featured-layout">
-      {lead && (
-        <a class="article-card lead" href={`/articles/${lead.slug}/`}>
-          <span class="cat">{lead.category}</span>
-          <h3>{lead.title}</h3>
-          <p class="excerpt">{lead.excerpt}</p>
-          <p class="byline">{lead.authorName} &middot; {formatDate(lead.publishedAt)} &middot; {lead.readTime}</p>
-        </a>
-      )}
-      {rest.map((a) => (
-        <a class="article-card" href={`/articles/${a.slug}/`}>
-          <span class="cat">{a.category}</span>
-          <h3>{a.title}</h3>
-          <p class="excerpt">{a.excerpt}</p>
-          <p class="byline">{a.authorName} &middot; {formatDate(a.publishedAt)} &middot; {a.readTime}</p>
-        </a>
-      ))}
-    </div>
-  </section>
-
-  <section class="page-pad">
-    <div class="section-head rule-primary">
-      <h2>The tracker</h2>
-      <a class="see-all" href="/tracker/">Full tracker: {laws.length} laws &rarr;</a>
-    </div>
-    <div style="padding-bottom: 48px;">
-      {previewLaws.map((law) => (
-        <div class="law-row">
-          <a class="law-name" href={`/laws/${law.slug}/`}>{law.name}</a>
-          <span class="law-jur">{law.jurisdiction}</span>
-          <span class={`status-badge status-${law.statusType}`}>{law.status}</span>
-          <span class="law-update">{law.tableUpdateText}</span>
-          <a class="law-link" href={`/laws/${law.slug}/`}>Read &rarr;</a>
+  <section class="hero">
+    <div class="wrap">
+      <div>
+        <p class="kicker reveal">A Global South perspective</p>
+        <h1 class="display reveal" data-delay="1">Human rights<br />&amp; <em>environmental</em><br />due diligence</h1>
+        <p class="standfirst reveal" data-delay="2">
+          {laws.length} laws now decide who sells into the world&rsquo;s richest markets.
+          We track every one of them: monthly, from the supplier side of the chain.
+        </p>
+        <div class="hero-ctas reveal" data-delay="3">
+          <a class="btn solid" href="/tracker/"><span>Explore the tracker</span> <i>&rarr;</i></a>
+          <a class="btn" href="/buyer-mapping/"><span>Map your buyers</span></a>
         </div>
+      </div>
+      <div class="hero-globe reveal" data-delay="2">
+        <canvas id="globe" width="1120" height="1120" aria-label="Rotating globe highlighting jurisdictions with HREDD laws"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <div class="ticker" aria-label="This month's movements">
+    <div class="ticker-inner">
+      {[...movements, ...movements].map((m) => (
+        <span class="ticker-item"><b>{m.tag}</b> {m.date} &middot; {m.latest.split(';')[0]}</span>
       ))}
     </div>
-    <p style="padding-bottom: 56px; font-size: var(--text-13); color: var(--text-muted);">
-      {inForce} in force &middot; {pending} pending &middot; {proposed} proposed &middot; Updated monthly with a changelog on every entry.
-    </p>
+  </div>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div>
+          <p class="kicker">This month</p>
+          <h2 class="h2">The state of play</h2>
+        </div>
+        <span class="mono faint">Updated {formatMonthYear(mostRecent.toISOString())} &middot; Next update {formatMonthYear(nextUpdate.toISOString())}</span>
+      </div>
+      <div class="stats reveal" data-delay="1">
+        <div class="stat"><b data-count={laws.length}>{laws.length}</b><span>Laws tracked</span></div>
+        <div class="stat"><b data-count={movementsThisCycle}>{movementsThisCycle}</b><span>Movements in {formatMonthYear(mostRecent.toISOString())}</span></div>
+        <div class="stat"><b data-count={inForce}>{inForce}</b><span>Regimes in force</span></div>
+        <div class="stat"><b data-count={jurisdictions}>{jurisdictions}</b><span>Jurisdictions covered</span></div>
+      </div>
+    </div>
   </section>
 
-  <section class="quote-strip page-pad">
-    <blockquote>&ldquo;{settings.editorialQuote}&rdquo;</blockquote>
-    <cite>{settings.editorialQuoteAttribution}</cite>
+  <section class="section" style="padding-top:0">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div>
+          <p class="kicker">Latest</p>
+          <h2 class="h2">From the field</h2>
+        </div>
+        <a class="textlink" href="/articles/">All articles <i>&rarr;</i></a>
+      </div>
+      {lead && (
+        <div class="feature reveal" data-delay="1">
+          <div>
+            <span class="chip">{lead.category}</span>
+            <h3><a href={`/articles/${lead.slug}/`}>{lead.title}</a></h3>
+            <p class="standfirst">{lead.excerpt}</p>
+            <p class="byline"><b>{lead.authorName}</b> &middot; {formatDate(lead.publishedAt)}</p>
+          </div>
+          {lead.deck && (
+            <div>
+              <p class="standfirst" style="font-style:italic; border-left:1px solid var(--gold-dim); padding-left:26px;">
+                &ldquo;{lead.deck}&rdquo;
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
   </section>
 
-  <section class="newsletter page-pad">
-    <h2>The monthly digest</h2>
-    <p>{settings.newsletterBlurb}</p>
-    <form action="/subscribe/" method="get">
-      <input type="email" name="email" placeholder="you@example.org" aria-label="Email address" required />
-      <button type="submit">Subscribe</button>
-    </form>
+  <section class="section" style="padding-top:0">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div>
+          <p class="kicker">The tracker</p>
+          <h2 class="h2">{laws.length} laws, <em>one ledger</em></h2>
+        </div>
+        <a class="textlink" href="/tracker/">Full tracker: {laws.length} laws <i>&rarr;</i></a>
+      </div>
+      <div class="law-rows reveal" data-delay="1">
+        {previewLaws.map((l) => (
+          <a class="law-row" href={`/laws/${l.slug}/`}>
+            <div>
+              <h3>{l.name}</h3>
+              <p class="sub">{l.tableUpdateText}</p>
+            </div>
+            <span class="jur">{l.jurisdiction}</span>
+            <span class="chip" data-g={l.statusType}>{l.status}</span>
+          </a>
+        ))}
+      </div>
+      <p class="mono faint reveal" style="margin-top:26px">
+        {inForce} in force &middot; {pending} pending &middot; {proposed} proposed &middot; {delayed} delayed, updated monthly with a changelog on every entry
+      </p>
+    </div>
   </section>
+
+  <section class="quote-band">
+    <div class="wrap">
+      <blockquote class="reveal">{settings.editorialQuote}
+        {settings.editorialQuoteAttribution || 'hredd·org editorial position'}
+      </blockquote>
+    </div>
+  </section>
+
+  <section class="section sub-band">
+    <div class="wrap">
+      <p class="kicker reveal" style="justify-content:center">The monthly digest</p>
+      <h2 class="h2 reveal" data-delay="1">One briefing. <em>Every movement.</em></h2>
+      <p class="standfirst reveal" data-delay="2" style="margin:20px auto 0">{settings.newsletterBlurb}</p>
+      <form class="sub-form reveal" data-delay="3" action="/subscribe/" method="get">
+        <input type="email" name="email" placeholder="you@example.org" required aria-label="Email address" />
+        <button class="btn solid" type="submit"><span>Subscribe</span></button>
+      </form>
+      <p class="form-note reveal" data-delay="3">Monthly &middot; Free &middot; Unsubscribe anytime</p>
+    </div>
+  </section>
+
+  <script type="application/json" id="globe-data" set:html={JSON.stringify(geoTracked)} />
+
+  <script is:inline src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+  <script is:inline src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
+  <script is:inline>
+  (function () {
+    var canvas = document.getElementById('globe');
+    var dataEl = document.getElementById('globe-data');
+    if (!canvas || !window.d3 || !window.topojson || !dataEl) {
+      if (canvas) canvas.style.display = 'none';
+      return;
+    }
+    var ctx = canvas.getContext('2d');
+    var size = canvas.width, R = size / 2 - 10;
+    var tracked = new Set(JSON.parse(dataEl.textContent || '[]'));
+    var projection = d3.geoOrthographic().translate([size / 2, size / 2]).scale(R).clipAngle(90);
+    var path = d3.geoPath(projection, ctx);
+    var graticule = d3.geoGraticule10();
+    var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json')
+      .then(function (r) { return r.json(); })
+      .then(function (world) {
+        var countries = topojson.feature(world, world.objects.countries).features;
+        var sphere = { type: 'Sphere' };
+        var t = 0;
+        function frame() {
+          projection.rotate([-20 + t * 4, -12]);
+          ctx.clearRect(0, 0, size, size);
+          var g = ctx.createRadialGradient(size / 2, size / 2, R * .5, size / 2, size / 2, R * 1.05);
+          g.addColorStop(0, 'rgba(201,163,95,0)'); g.addColorStop(1, 'rgba(201,163,95,.10)');
+          ctx.beginPath(); path(sphere); ctx.fillStyle = g; ctx.fill();
+          ctx.beginPath(); path(sphere); ctx.strokeStyle = 'rgba(201,163,95,.35)'; ctx.lineWidth = 1; ctx.stroke();
+          ctx.beginPath(); path(graticule); ctx.strokeStyle = 'rgba(234,228,213,.06)'; ctx.lineWidth = .7; ctx.stroke();
+          countries.forEach(function (c) {
+            var on = tracked.has(+c.id);
+            ctx.beginPath(); path(c);
+            ctx.fillStyle = on ? 'rgba(201,163,95,.55)' : 'rgba(234,228,213,.10)';
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(14,13,10,.9)'; ctx.lineWidth = .6; ctx.stroke();
+          });
+          if (!reduced) { t += 0.016; requestAnimationFrame(frame); }
+        }
+        frame();
+      })
+      .catch(function () { canvas.style.display = 'none'; });
+  })();
+  </script>
 </Base>
