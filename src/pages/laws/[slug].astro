@@ -35,6 +35,15 @@ const updatedLabel = law.lastUpdated ? formatMonthYear(law.lastUpdated) : '';
   active="tracker"
 >
 
+<script type="application/ld+json" set:html={JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "Legislation",
+  "name": law.name,
+  "legislationJurisdiction": law.jurisdiction,
+  "description": law.oneLineSummary,
+  "dateModified": law.lastUpdated
+})} />
+
 <section class="law-head">
   <div class="wrap">
     <p class="kicker reveal"><a href="/tracker/">The tracker</a>&nbsp;·&nbsp;{law.jurisdiction}</p>

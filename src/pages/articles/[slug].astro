@@ -21,6 +21,17 @@ const relatedArticles = article.relatedArticles || [];
   active="articles"
 >
 
+<script type="application/ld+json" set:html={JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "NewsArticle",
+  "headline": article.title,
+  "description": article.excerpt || article.deck || article.title,
+  "author": { "@type": "Person", "name": article.authorName },
+  "publisher": { "@type": "Organization", "name": "hredd.org" },
+  "datePublished": article.publishedAt,
+  "mainEntityOfPage": `https://hredd.org/articles/${article.slug}/`
+})} />
+
 <section class="section" style="padding-bottom:clamp(30px,4vw,48px)">
   <div class="wrap" style="max-width:900px">
     <nav class="crumb reveal"><a href="/">hredd·org</a><span>/</span><a href="/articles/">Articles</a><span>/</span><span>{article.category || 'Analysis'}</span></nav>

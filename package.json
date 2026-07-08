@@ -10,6 +10,7 @@
     "preview": "astro preview"
   },
   "dependencies": {
+    "@astrojs/sitemap": "^3.7.3",
     "@portabletext/to-html": "^2.0.17",
     "@sanity/client": "^6.22.5",
     "astro": "^5.1.1",

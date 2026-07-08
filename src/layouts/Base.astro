@@ -12,6 +12,7 @@ const {
 const articles = await getAllArticles();
 const settings = await getSiteSettings();
 const volIssue = computeVolIssue(articles);
+const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
 const tagline = settings?.tagline || 'Tracking global HREDD legislation and its implications for those most affected and least consulted. Established 2026.';
 ---
 <!DOCTYPE html>
@@ -24,6 +25,22 @@ const tagline = settings?.tagline || 'Tracking global HREDD legislation and its 
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
 <meta property="og:type" content="website" />
+<link rel="canonical" href={canonicalURL} />
+<meta property="og:site_name" content="hredd.org" />
+<meta property="og:url" content={canonicalURL} />
+<meta property="og:image" content="https://hredd.org/og-default.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content="https://hredd.org/og-default.png" />
+<script type="application/ld+json" set:html={JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "hredd.org",
+  "url": "https://hredd.org",
+  "description": "Tracking global HREDD legislation and its implications for those most affected and least consulted.",
+  "publisher": { "@type": "Organization", "name": "hredd.org", "url": "https://hredd.org" }
+})} />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -39,14 +56,6 @@ const tagline = settings?.tagline || 'Tracking global HREDD legislation and its 
 <body>
 
 <header class="masthead">
-  <div class="mast-top">
-    <div class="wrap">
-      <span class="mono faint">{volIssue}</span>
-      <div class="mast-top-links mono">
-        <a href="/articles/">Archive</a><a href="/about/#contact">Contact</a><a href="/subscribe/">Subscribe</a>
-      </div>
-    </div>
-  </div>
   <div class="mast-main">
     <div class="wrap">
       <nav class="mast-nav left">
