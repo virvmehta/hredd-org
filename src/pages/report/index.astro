@@ -1,0 +1,566 @@
+---
+import Base from '../../layouts/Base.astro';
+---
+<Base
+  title="Supplier exposure report | hredd.org"
+  description="Answer eight questions and download a personalised report on how the EUDR and the CSDDD touch your trade, what buyers may demand, and what they may not."
+  active="report"
+>
+
+<section class="law-head">
+  <div class="wrap">
+    <p class="kicker reveal">Free · No signup · Nothing leaves your device</p>
+    <h1 class="display reveal" data-delay="1" style="font-size:clamp(38px,5.4vw,72px)">Your supplier<br><em>exposure report</em></h1>
+    <p class="standfirst reveal" data-delay="2">Eight questions, two minutes, one dated PDF. It explains how the EU Deforestation Regulation and the Corporate Sustainability Due Diligence Directive are likely to touch your trade, what those laws entitle your buyers to ask of you, and what they do not. Your answers never leave this page.</p>
+  </div>
+</section>
+
+<section class="section" style="padding-top:clamp(40px,5vw,70px)">
+  <div class="wrap" style="max-width:820px">
+
+    <form id="rq" novalidate>
+
+      <div class="q reveal" data-n="01">
+        <p class="qnum mono">Question 01</p>
+        <h3 class="qtitle">Where is your business located?</h3>
+        <div class="opts" data-q="country" data-type="single">
+          <button type="button" data-v="India">India</button>
+          <button type="button" data-v="Bangladesh">Bangladesh</button>
+          <button type="button" data-v="Sri Lanka">Sri Lanka</button>
+          <button type="button" data-v="Vietnam">Vietnam</button>
+          <button type="button" data-v="Indonesia">Indonesia</button>
+          <button type="button" data-v="Thailand">Thailand</button>
+          <button type="button" data-v="Brazil">Brazil</button>
+          <button type="button" data-v="Kenya">Kenya</button>
+          <button type="button" data-v="Ethiopia">Ethiopia</button>
+          <button type="button" data-v="Other Asia">Other Asia</button>
+          <button type="button" data-v="Other Africa">Other Africa</button>
+          <button type="button" data-v="Other Latin America">Other Latin America</button>
+          <button type="button" data-v="Europe">Europe</button>
+          <button type="button" data-v="Other">Other</button>
+        </div>
+      </div>
+
+      <div class="q reveal" data-n="02">
+        <p class="qnum mono">Question 02</p>
+        <h3 class="qtitle">Which best describes your business size?</h3>
+        <div class="opts" data-q="size" data-type="single">
+          <button type="button" data-v="Under 50 workers">Under 50 workers</button>
+          <button type="button" data-v="50 to 250 workers">50 to 250 workers</button>
+          <button type="button" data-v="250 to 1,000 workers">250 to 1,000 workers</button>
+          <button type="button" data-v="Over 1,000 workers">Over 1,000 workers</button>
+        </div>
+      </div>
+
+      <div class="q reveal" data-n="03">
+        <p class="qnum mono">Question 03</p>
+        <h3 class="qtitle">Do you produce, process, or trade any of the following, including products made from them?</h3>
+        <p class="qhint">Select every one that applies to your trade.</p>
+        <div class="opts" data-q="commodities" data-type="multi" data-none="None of these">
+          <button type="button" data-v="Cattle or leather">Cattle or leather</button>
+          <button type="button" data-v="Cocoa">Cocoa</button>
+          <button type="button" data-v="Coffee">Coffee</button>
+          <button type="button" data-v="Oil palm">Oil palm</button>
+          <button type="button" data-v="Rubber">Rubber</button>
+          <button type="button" data-v="Soya">Soya</button>
+          <button type="button" data-v="Wood, paper, or furniture">Wood, paper, or furniture</button>
+          <button type="button" data-v="None of these">None of these</button>
+        </div>
+      </div>
+
+      <div class="q reveal" data-n="04">
+        <p class="qnum mono">Question 04</p>
+        <h3 class="qtitle">Do your goods reach the European Union, directly or through buyers who sell there?</h3>
+        <div class="opts" data-q="eu" data-type="single">
+          <button type="button" data-v="direct">Yes, we export directly to the EU</button>
+          <button type="button" data-v="via">Yes, through intermediaries or buyers who sell into the EU</button>
+          <button type="button" data-v="unsure">Not sure</button>
+          <button type="button" data-v="no">No EU connection that we know of</button>
+        </div>
+      </div>
+
+      <div class="q reveal" data-n="05">
+        <p class="qnum mono">Question 05</p>
+        <h3 class="qtitle">Do any of your buyers have more than roughly 5,000 employees or a turnover above 1.5 billion euro?</h3>
+        <div class="opts" data-q="bigbuyer" data-type="single">
+          <button type="button" data-v="yes">Yes</button>
+          <button type="button" data-v="probably">Probably, they are large multinationals</button>
+          <button type="button" data-v="unsure">Not sure</button>
+          <button type="button" data-v="no">No, all our buyers are smaller companies</button>
+        </div>
+      </div>
+
+      <div class="q reveal" data-n="06">
+        <p class="qnum mono">Question 06</p>
+        <h3 class="qtitle">Have you already received sustainability questionnaires, codes of conduct, or audit requests from buyers?</h3>
+        <div class="opts" data-q="questionnaires" data-type="single">
+          <button type="button" data-v="freq">Yes, frequently</button>
+          <button type="button" data-v="occ">Yes, occasionally</button>
+          <button type="button" data-v="none">Not yet</button>
+        </div>
+      </div>
+
+      <div class="q reveal" data-n="07">
+        <p class="qnum mono">Question 07</p>
+        <h3 class="qtitle">Do you use labour contractors, recruiters, or intermediaries to engage any part of your workforce?</h3>
+        <div class="opts" data-q="contractors" data-type="single">
+          <button type="button" data-v="yes">Yes</button>
+          <button type="button" data-v="no">No</button>
+          <button type="button" data-v="seasonal">Sometimes, seasonally</button>
+        </div>
+      </div>
+
+      <div class="q reveal" data-n="08">
+        <p class="qnum mono">Question 08</p>
+        <h3 class="qtitle">Do you currently hold any of the following certifications or verified memberships?</h3>
+        <p class="qhint">Select every scheme you currently hold.</p>
+        <div class="opts" data-q="certs" data-type="multi" data-none="None currently">
+          <button type="button" data-v="Bonsucro">Bonsucro</button>
+          <button type="button" data-v="Rainforest Alliance">Rainforest Alliance</button>
+          <button type="button" data-v="Fairtrade">Fairtrade</button>
+          <button type="button" data-v="SA8000">SA8000</button>
+          <button type="button" data-v="SMETA audit through Sedex">SMETA (Sedex)</button>
+          <button type="button" data-v="amfori BSCI">amfori BSCI</button>
+          <button type="button" data-v="Better Cotton">Better Cotton</button>
+          <button type="button" data-v="GOTS or OEKO-TEX">GOTS / OEKO-TEX</button>
+          <button type="button" data-v="FSC or PEFC">FSC / PEFC</button>
+          <button type="button" data-v="ISO 14001 or ISO 45001">ISO 14001 / 45001</button>
+          <button type="button" data-v="WRAP">WRAP</button>
+          <button type="button" data-v="another recognised scheme">Another scheme</button>
+          <button type="button" data-v="None currently">None currently</button>
+        </div>
+      </div>
+
+      <div class="gen-row reveal">
+        <button type="button" class="btn solid" id="gen"><span>Generate my report</span> <i>→</i></button>
+        <p class="mono faint" id="gen-msg" style="margin:14px 0 0"></p>
+      </div>
+    </form>
+
+    <div class="ring" id="ring" title="Answered so far" role="progressbar" aria-label="Questions answered">
+      <svg viewBox="0 0 74 74" aria-hidden="true">
+        <circle cx="37" cy="37" r="33"></circle>
+        <circle class="fill" cx="37" cy="37" r="33"></circle>
+      </svg>
+      <span class="rlabel" id="rlabel">0/8</span>
+    </div>
+
+    <div id="result" hidden>
+      <div class="dossier-head reveal in">
+        <p class="dh-kicker">hredd.org · prepared without transmission · nothing stored</p>
+        <h2 class="dh-title">Supplier <em>exposure report</em></h2>
+        <div class="dh-meta">
+          <span>Dated <b id="dh-date"></b></span>
+          <span>Regimes <b>EUDR · CSDDD</b></span>
+          <span>Status <b>verified against tracker</b></span>
+        </div>
+        <svg class="dh-seal" viewBox="0 0 104 104" aria-hidden="true">
+          <circle cx="52" cy="52" r="49" fill="none" stroke="var(--gold)" stroke-width="1.5"/>
+          <circle cx="52" cy="52" r="40" fill="none" stroke="var(--gold-dim)" stroke-width=".6" opacity=".5"/>
+          <circle cx="52" cy="52" r="28" fill="none" stroke="var(--gold-dim)" stroke-width=".6" opacity=".35"/>
+          <text x="52" y="59" text-anchor="middle" font-family="Newsreader, Georgia, serif" font-size="26"
+            fill="var(--ink)">h<tspan fill="var(--gold)">·</tspan>o</text>
+        </svg>
+      </div>
+      <div class="result-bar">
+        <p class="kicker">Your report is ready</p>
+        <button type="button" class="btn solid" id="dl"><span>Download PDF</span> <i>↓</i></button>
+      </div>
+      <div class="prose" id="preview"></div>
+    </div>
+
+  </div>
+</section>
+
+<style>
+  /* ---- question dossier ---- */
+  .q{ position:relative; padding:44px 0 40px; border-bottom:1px solid var(--line-soft); }
+  .q::after{ content:attr(data-n); position:absolute; right:0; top:26px;
+    font:400 clamp(64px,8vw,110px)/1 var(--serif); color:var(--ink);
+    opacity:.045; pointer-events:none; letter-spacing:-.02em;
+    transition:opacity .5s, color .5s; }
+  .q.done::after{ color:var(--gold); opacity:.14; }
+  .q.missing::after{ color:var(--st-delayed); opacity:.18; }
+  .qnum{ color:var(--gold); font-size:10px; letter-spacing:.24em; margin:0 0 12px;
+    display:flex; align-items:center; gap:12px; }
+  .qnum::after{ content:""; height:1px; flex:0 0 34px; background:var(--gold-dim);
+    transform:scaleX(0); transform-origin:left; transition:transform .5s cubic-bezier(.16,1,.3,1); }
+  .q.done .qnum::after{ transform:scaleX(1); }
+  .qtitle{ font:400 clamp(22px,2.4vw,27px)/1.35 var(--serif); margin:0 0 20px; max-width:56ch; }
+  .qhint{ margin:-10px 0 20px; font-size:14px; color:var(--ink-faint); font-style:italic; }
+  .q.missing .qtitle{ color:var(--st-delayed); }
+
+  /* ---- selection chips: diamond markers, gold sweep ---- */
+  .opts{ display:flex; flex-wrap:wrap; gap:10px; }
+  .opts button{ font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase;
+    border:1px solid var(--line); background:none; color:var(--ink-dim); padding:13px 20px;
+    cursor:pointer; display:inline-flex; align-items:center; gap:11px;
+    position:relative; overflow:hidden; transition:border-color .3s, color .3s; }
+  .opts button::before{ content:""; width:6px; height:6px; flex:0 0 6px;
+    border:1px solid var(--ink-faint); transform:rotate(45deg);
+    transition:background .3s, border-color .3s, box-shadow .3s; }
+  .opts button::after{ content:""; position:absolute; inset:0; background:var(--gold-ghost);
+    transform:scaleX(0); transform-origin:left; transition:transform .35s cubic-bezier(.16,1,.3,1); z-index:-1; }
+  .opts button:hover{ border-color:var(--gold-dim); color:var(--ink); }
+  .opts button:focus-visible{ outline:1px solid var(--gold); outline-offset:2px; }
+  .opts button.on{ border-color:var(--gold); color:var(--gold-hi); }
+  .opts button.on::before{ background:var(--gold); border-color:var(--gold); box-shadow:0 0 8px var(--gold); }
+  .opts button.on::after{ transform:scaleX(1); }
+
+  /* ---- progress ring ---- */
+  .ring{ position:fixed; right:clamp(16px,3vw,40px); bottom:clamp(16px,3vw,40px); z-index:90;
+    width:74px; height:74px; cursor:pointer; opacity:0; transform:translateY(12px);
+    transition:opacity .5s, transform .5s; }
+  .ring.show{ opacity:1; transform:none; }
+  .ring svg{ width:100%; height:100%; transform:rotate(-90deg); }
+  .ring circle{ fill:rgba(14,13,10,.85); stroke:var(--line); stroke-width:1.5; }
+  .ring circle.fill{ fill:none; stroke:var(--gold); stroke-width:1.5;
+    stroke-dasharray:207; stroke-dashoffset:207;
+    transition:stroke-dashoffset .6s cubic-bezier(.16,1,.3,1);
+    filter:drop-shadow(0 0 6px var(--gold-ghost)); }
+  .ring .rlabel{ position:absolute; inset:0; display:grid; place-items:center;
+    font-family:var(--mono); font-size:12px; letter-spacing:.12em; color:var(--ink-dim); }
+  .ring.full .rlabel{ color:var(--gold-hi); }
+
+  /* ---- generate row ---- */
+  .gen-row{ padding:54px 0 10px; display:flex; flex-direction:column; align-items:flex-start; gap:0; }
+  #gen-msg{ margin:16px 0 0; color:var(--st-delayed); }
+
+  /* ---- the dossier ---- */
+  #result{ margin-top:clamp(50px,7vw,90px); }
+  .dossier-head{ border:1px solid var(--gold-dim); background:
+    radial-gradient(140% 160% at 50% -30%, var(--panel-2), var(--bg) 70%);
+    padding:clamp(30px,4vw,50px); position:relative; overflow:hidden; margin-bottom:clamp(36px,5vw,60px); }
+  .dossier-head::before{ content:""; position:absolute; inset:6px; border:1px solid var(--line-soft);
+    pointer-events:none; }
+  .dh-kicker{ font-family:var(--mono); font-size:10px; letter-spacing:.26em; text-transform:uppercase;
+    color:var(--gold); margin:0 0 16px; }
+  .dh-title{ font:400 clamp(30px,4vw,46px)/1.1 var(--serif); margin:0; letter-spacing:-.01em; }
+  .dh-title em{ font-style:italic; color:var(--gold-hi); }
+  .dh-meta{ margin-top:22px; display:flex; gap:26px; flex-wrap:wrap;
+    font-family:var(--mono); font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-faint); }
+  .dh-meta b{ color:var(--ink-dim); font-weight:400; }
+  .dh-seal{ position:absolute; right:clamp(20px,4vw,44px); top:50%; transform:translateY(-50%);
+    width:clamp(70px,9vw,104px); opacity:.9; }
+  @media (max-width:640px){ .dh-seal{ display:none; } }
+  .result-bar{ display:flex; justify-content:space-between; align-items:center; gap:20px; flex-wrap:wrap;
+    padding:0 0 34px; margin:0 0 34px; border-bottom:1px solid var(--line); }
+  #preview h2{ font:400 30px/1.25 var(--serif); margin:2em 0 .6em; color:var(--gold-hi);
+    padding-top:1.2em; border-top:1px solid var(--line-soft); }
+  #preview h2::before{ content:"◆"; color:var(--gold-dim); font-size:9px; display:block; margin-bottom:14px; }
+  #preview h3{ font:400 22px/1.3 var(--serif); margin:1.7em 0 .5em; }
+</style>
+
+<script>
+import { jsPDF } from 'jspdf';
+/* ---------------- form state ---------------- */
+const answers = { country:null, size:null, commodities:[], eu:null, bigbuyer:null, questionnaires:null, contractors:null, certs:[] };
+
+document.querySelectorAll('.opts').forEach(group => {
+  const q = group.dataset.q, type = group.dataset.type, noneVal = group.dataset.none;
+  group.addEventListener('click', e => {
+    const b = e.target.closest('button'); if(!b) return;
+    const v = b.dataset.v;
+    if(type === 'single'){
+      group.querySelectorAll('button').forEach(x => x.classList.remove('on'));
+      b.classList.add('on'); answers[q] = v;
+    } else {
+      if(v === noneVal){
+        group.querySelectorAll('button').forEach(x => x.classList.remove('on'));
+        b.classList.add('on'); answers[q] = [noneVal];
+      } else {
+        group.querySelector(`button[data-v="${noneVal}"]`)?.classList.remove('on');
+        answers[q] = answers[q].filter(x => x !== noneVal);
+        b.classList.toggle('on');
+        if(b.classList.contains('on')) answers[q].push(v);
+        else answers[q] = answers[q].filter(x => x !== v);
+      }
+    }
+    const qEl = group.closest('.q');
+    qEl.classList.remove('missing');
+    const filled = type === 'multi' ? answers[q].length > 0 : !!answers[q];
+    qEl.classList.toggle('done', filled);
+    updateRing();
+  });
+});
+
+/* ---------------- progress ring ---------------- */
+const ringEl = document.getElementById('ring');
+const ringFill = ringEl.querySelector('.fill');
+const ringLabel = document.getElementById('rlabel');
+const CIRC = 207;
+function answeredCount(){
+  let n = 0;
+  for(const k of ['country','size','eu','bigbuyer','questionnaires','contractors']) if(answers[k]) n++;
+  for(const k of ['commodities','certs']) if(answers[k].length) n++;
+  return n;
+}
+function updateRing(){
+  const n = answeredCount();
+  ringFill.style.strokeDashoffset = String(CIRC - (CIRC * n / 8));
+  ringLabel.textContent = n + '/8';
+  ringEl.classList.toggle('show', n > 0 && n < 8 || n === 8 && document.getElementById('result').hidden);
+  ringEl.classList.toggle('full', n === 8);
+  if(n === 8) ringLabel.textContent = '✦';
+}
+ringEl.addEventListener('click', () => {
+  const target = [...document.querySelectorAll('.q')].find(q => !q.classList.contains('done'));
+  (target || document.getElementById('gen')).scrollIntoView({ behavior:'smooth', block:'center' });
+});
+
+/* ---------------- report content ---------------- */
+const TODAY = new Date().toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
+
+function buildReport(a){
+  const S = [];
+  const add = (h, ps, level=2) => S.push({ h, ps, level });
+
+  const hasCommodity = a.commodities.length > 0 && !a.commodities.includes('None of these');
+  const eudrDirect = hasCommodity && a.eu === 'direct';
+  const eudrCascade = hasCommodity && (a.eu === 'via' || a.eu === 'unsure');
+  const eudrNoEU = hasCommodity && a.eu === 'no';
+  const csdddCascade = ['yes','probably','unsure'].includes(a.bigbuyer);
+  const intermediaries = ['yes','seasonal'].includes(a.contractors);
+  const experienced = ['freq','occ'].includes(a.questionnaires);
+  const certs = a.certs.filter(c => c !== 'None currently');
+  const hasCerts = certs.length > 0;
+
+  /* cover */
+  add('Your HREDD exposure report', [
+    `This report was prepared by hredd.org on ${TODAY}. Based on your answers, it explains which of the European Union's supply chain laws are likely to touch your trade, what those laws entitle your buyers to ask of you, and what preparation is worth making before the questions arrive. This report is general information rather than legal advice, and nothing in it should be read as an assessment of your compliance with any law. Laws move monthly, and this report reflects the tracker at hredd.org as of the date above.`
+  ], 1);
+
+  add('Your answers, in summary', [
+    `You described a business located in ${a.country}, with ${a.size.toLowerCase()}, whose trade ${hasCommodity ? 'involves ' + a.commodities.join(', ').toLowerCase() : 'involves none of the seven EUDR commodities'}, and which ${{direct:'exports directly to the European Union', via:'reaches the European Union through intermediaries', unsure:'may reach the European Union through routes you cannot fully see', no:'has no known connection to the European Union'}[a.eu]}. You told us that large in-scope buyers are ${{yes:'part of your customer base', probably:'probably part of your customer base', unsure:'possibly part of your customer base', no:'not part of your customer base'}[a.bigbuyer]}, that buyer questionnaires have ${{freq:'arrived frequently', occ:'arrived occasionally', none:'not yet arrived'}[a.questionnaires]}, that labour intermediaries are ${{yes:'part of how you engage workers', no:'not part of how you engage workers', seasonal:'part of how you engage workers seasonally'}[a.contractors]}, and that you currently hold ${hasCerts ? certs.join(', ') : 'no certifications'}.`
+  ]);
+
+  /* ---------------- EUDR ---------------- */
+  if(eudrDirect || eudrCascade){
+    add('Part one: the EU Deforestation Regulation', [], 1);
+
+    if(eudrDirect){
+      add('The EUDR and your trade', [
+        'The EUDR prohibits placing on the EU market, or exporting from it, seven commodities and their derived products unless they are deforestation-free and legally produced. Your answers indicate you work with at least one covered commodity and that your goods reach the EU. Although the legal duties sit on the EU operator or trader rather than on you, those duties cannot be discharged without information that only you and your upstream chain hold. In practice, this makes you part of the traceability chain the regulation creates, and your buyers will require specific data from you as a condition of trade.'
+      ]);
+    } else {
+      add('The EUDR and your trade', [
+        'The EUDR prohibits placing on the EU market, or exporting from it, seven commodities and their derived products unless they are deforestation-free and legally produced. Your answers indicate you work with at least one covered commodity, and that your goods may reach the EU through buyers or intermediaries rather than through your own direct exports. The regulation never names businesses in your position, yet its obligations travel down the chain contractually, because the EU operator at the top cannot file its due diligence statement without information gathered from every link below it. Uncertainty about whether your goods reach the EU is itself a reason to prepare, since the request usually arrives before the visibility does.'
+      ]);
+    }
+
+    add('What geolocation means in practice', [
+      'The central EUDR requirement is that every consignment traces back to the plot of land where the commodity was produced, expressed as geolocation coordinates, with production after 31 December 2020 shown to be deforestation-free. For a single farm this means at least one coordinate point, and for plots above four hectares it means polygon boundaries. Buyers will ask you for these coordinates, and where you aggregate from many farms, they will ask for all of them. Collecting coordinates requires farmer consent and effort, so beginning before the request arrives is materially easier than beginning after.'
+    ]);
+
+    add('The dates that matter under the EUDR', [
+      'Application began for large operators and traders on 30 December 2025. Micro and small enterprises established before 31 December 2020 follow from 30 June 2026. Country benchmarking classifies producing countries as low, standard, or high risk, and the classification of your country shapes how much scrutiny consignments from it receive. Buyer information requests typically arrive one to two seasons before the buyer\u2019s own filing obligations, so demand tends to run ahead of the legal calendar rather than behind it.'
+    ]);
+
+    const eudrEntitled = ['What your buyers are entitled to ask under the EUDR', [
+      'Under the EUDR, buyers filing due diligence statements legitimately need from you the geolocation coordinates of production plots, the date or time range of production, evidence of legal production under the laws of your country, covering land use rights, environmental rules, labour and human rights law, and tax and anti-corruption law, and documentation of your own suppliers where you aggregate. Requests of this kind are proportionate to the regulation and worth answering well, since they recur every season.'
+    ]];
+    const eudrNot = ['What the EUDR does not require of you', [
+      'The EUDR does not require certification under any voluntary scheme, and no buyer can lawfully claim that a specific certificate is an EUDR requirement, although certificates may support their risk assessment. The regulation does not require you to bear the cost of the buyer\u2019s due diligence system, does not give buyers rights to unannounced facility access, and does not require disclosure of commercially sensitive information unrelated to traceability, such as your pricing or your full customer list. Where a request goes beyond traceability and legality evidence, you are entitled to ask which provision of the regulation the request rests on.'
+    ]];
+    const eudrPair = experienced ? [eudrNot, eudrEntitled] : [eudrEntitled, eudrNot];
+    eudrPair.forEach(([h, ps]) => add(h, ps));
+
+    add('Country risk classification', [
+      'The Commission classifies producing countries into three risk tiers, and the tier determines the intensity of checks EU authorities apply to consignments. A standard or high risk classification for your country does not restrict your trade by itself, but it raises the documentation quality your buyers will need, and it makes complete geolocation data more valuable rather than less. The current classification for your country is maintained on the tracker at hredd.org.'
+    ]);
+  } else if (eudrNoEU) {
+    add('Part one: the EU Deforestation Regulation', [], 1);
+    add('The EUDR and your trade', [
+      'You work with at least one commodity the EUDR covers, but you report no known connection to the EU market. On those facts, the regulation is unlikely to touch your trade directly today. Two cautions are still worth carrying anyway. Visibility past your first buyer is rarely complete, and goods frequently reach the EU through routes their producers never see, so a buyer request citing the EUDR should not surprise you. And traceability infrastructure built once serves every market that later demands it, since the direction of travel in commodity regulation is the same worldwide.'
+    ]);
+  } else {
+    add('Part one: the EU Deforestation Regulation', [], 1);
+    add('The EUDR and your trade', [
+      'The EUDR covers seven commodities and their derived products: cattle, cocoa, coffee, oil palm, rubber, soya, and wood. Your answers indicate your trade involves none of them, which places you outside the regulation\u2019s scope entirely. Buyers occasionally send EUDR-style questionnaires across their whole supplier base regardless of commodity, usually because their systems make no distinction, and you are entitled to respond that the regulation does not apply to your products.'
+    ]);
+  }
+
+  /* ---------------- CSDDD ---------------- */
+  add('Part two: the Corporate Sustainability Due Diligence Directive', [], 1);
+
+  if(csdddCascade){
+    add('The CSDDD and how it reaches you', [
+      'The Corporate Sustainability Due Diligence Directive obliges the largest companies operating in the EU, those above 5,000 employees and 1.5 billion euro in worldwide turnover after the 2026 omnibus amendments, to identify and address human rights and environmental risks in their chains of activities. Your answers indicate at least one of your buyers likely sits in scope, or that you cannot rule it out, which for practical purposes amounts to the same preparation. The directive reaches you through contract rather than through law: in-scope buyers will seek contractual assurances from suppliers, will request information to map risk, and will expect cooperation with prevention and corrective measures where risks are found.'
+    ]);
+
+    const csdddLimits = ['Two limits on what can be asked of you', [
+      'The amended framework contains two distinct protections worth knowing by name. First, under Article 8(4) of the amended CSDDD, buyers must conduct their risk scoping using information that is already reasonably available, and may seek additional information from business partners with fewer than 5,000 employees only as a last resort, where the information is necessary and cannot reasonably be obtained by other means, with every request required to be targeted, reasonable and proportionate. Second, under the amended CSRD reporting rules, companies preparing sustainability reports may not request information from partners with fewer than 1,000 employees beyond what the voluntary VSME standard specifies, and smaller partners can generally establish their protected status by self-declaration. Where a buyer\u2019s questionnaire runs far beyond these boundaries, you are entitled to raise the relevant provision by name and ask which requirement the request rests on. Familiarity with the VSME data points is therefore worth more to you than familiarity with any single buyer\u2019s format.'
+    ]];
+
+    const csdddEntitled = ['What your buyers are entitled to ask under the CSDDD', [
+      'In-scope buyers legitimately need information proportionate to risk mapping, covering your workforce arrangements, wages and working time records, health and safety systems, environmental permits and practices, grievance channels, and your own significant suppliers. They may seek contractual assurances that you observe their code of conduct, and cooperation where prevention or correction measures are needed. Requests within this territory reflect the directive rather than overreach.'
+    ]];
+    const csdddNot = ['What the directive does not require of you', [
+      'The directive does not oblige you to obtain any certification, and after the omnibus the information that should be sought from smaller chain partners is bounded in the ways described above. It does not require you to absorb the cost of the buyer\u2019s compliance programme, and its own provisions on responsible purchasing recognise that buyer pricing and payment practices are part of the risk picture rather than outside it. It does not apply to you directly at all, which means no authority can sanction you under it, and every obligation you take on arises from your contract rather than from the directive itself. Contracts, unlike directives, are always open to negotiation.'
+    ]];
+
+    if(experienced){
+      add(...csdddNot); add(...csdddLimits); add(...csdddEntitled);
+    } else {
+      add(...csdddLimits); add(...csdddEntitled); add(...csdddNot);
+    }
+
+    add('Why termination is now the buyer\u2019s last resort in fact', [
+      'The amended directive removed the earlier obligation on buyers to terminate relationships where risks could not be resolved, and added protection for buyers who stay engaged with a supplier under a credible corrective action plan. The practical meaning for you is significant: a buyer who finds a problem in your operations is now legally safer working with you on an improvement plan than walking away from you. Where a risk is raised, proposing a concrete corrective plan with milestones is not merely cooperative, it actively gives your buyer the legal cover the directive now rewards.'
+    ]);
+
+    add('The dates that matter under the CSDDD', [
+      'The amending directive entered into force on 18 March 2026. Member states must transpose it into national law by 26 July 2028, and the obligations apply to in-scope companies from 26 July 2029. Commission guidance and model contractual clauses are due by 26 July 2027, and those model clauses will likely become the template your buyers put in front of you. As with the EUDR, buyer requests run ahead of legal deadlines, and most large companies are building their programmes now rather than waiting for 2029.'
+    ]);
+  } else {
+    add('The CSDDD and your trade', [
+      'The directive applies only to the largest companies, those above 5,000 employees and 1.5 billion euro in worldwide turnover, and your answers indicate your buyers sit below that line. Direct contractual cascade from the CSDDD is therefore unlikely for you today. Market practice nonetheless follows the direction of regulation rather than its precise perimeter, and mid-sized buyers increasingly mirror the requests their own larger customers make of them. The dates remain worth knowing: national transposition runs to 26 July 2028, and obligations on in-scope companies apply from 26 July 2029.'
+    ]);
+  }
+
+  if(intermediaries){
+    add('Contract labour and recruitment channels', [
+      'Your answers indicate you engage workers through contractors or intermediaries for at least part of your workforce. In every buyer due diligence framework, recruitment channels and contract labour receive the closest scrutiny of any topic, because recruitment fees, wage deductions, and opaque intermediary arrangements are where the severest risks concentrate. Three records are worth maintaining regardless of which buyer asks: written agreements with each contractor covering wages and deductions, evidence that wages reach workers rather than stopping with the intermediary, and attestations that workers paid no recruitment fees. Holding these before the question arrives converts your most examined topic into your best documented one.'
+    ]);
+  }
+
+  if(hasCerts && csdddCascade){
+    add('Your certifications now carry procedural weight', [
+      `Your answers indicate you currently hold ${certs.join(', ')}. Under the amended directive, this changes the sequence a buyer must follow before questioning you. Article 8(4) requires in-scope companies to conduct their risk scoping using information that is already reasonably available, and to seek additional information from smaller partners only as a last resort, where it cannot reasonably be obtained from existing or secondary sources. Your current certifications, audit reports, and scheme memberships are precisely such sources. When a questionnaire arrives that duplicates ground your certification already covers, you are entitled to respond by presenting the certification first and asking specifically which necessary information it fails to provide, since the burden of that gap now sits with the buyer rather than with you.`,
+      'Two honest limits apply to this position. Certifications do not exempt your buyer from its own legal responsibility, and Article 29(4) states this expressly, so a buyer facing a specific reported risk, whether through its complaints channel, media coverage, or an authority, may still make targeted requests that no certificate can deflect. And certification carries this procedural weight under the CSDDD without carrying it under every regime: the EUDR, for instance, accepts certificates only as supporting information and never as a substitute for geolocation and legality evidence. Within those limits, a current, credible certification has quietly become one of the few instruments that reduces your questionnaire burden as a matter of law rather than goodwill.'
+    ]);
+  }
+
+  /* ---------------- preparedness ---------------- */
+  const prep = [];
+  if(eudrDirect || eudrCascade){
+    prep.push('For the EUDR: begin collecting plot geolocation data with farmer consent, assemble legality documentation under your national law, and map which of your own suppliers you would need data from.');
+  }
+  if(csdddCascade){
+    prep.push('For the CSDDD: obtain and read the VSME standard so you know the boundary of reasonable requests, document your workforce arrangements including any contractors, and prepare a one-page description of your grievance channel, since it is the single most requested item in every framework.');
+  }
+  if(!hasCerts){
+    prep.push('On certification: a recognised scheme, whatever its limits, now carries procedural weight under the amended CSDDD, because buyers must consult available information before questioning you, and a certification is exactly such information.');
+  }
+  if(prep.length){
+    add('Preparations worth making now', prep, 1);
+  }
+
+  add('Keeping this current', [
+    `The laws in this report moved repeatedly in the last year, and they will move again. This report reflects the hredd.org tracker as of ${TODAY}, and regenerating it each quarter takes two minutes. The monthly digest at hredd.org covers every movement as it happens, written from the supplier side of the chain.`
+  ], 1);
+
+  add('Disclaimer', [
+    'This report is general information prepared from publicly available legal texts, and it is not legal advice, a compliance assessment, or a substitute for professional counsel. hredd.org is an independent publication with no affiliation to any organisation, and accepts no liability for decisions taken on the basis of this document. Verify current requirements against the primary sources listed below.'
+  ], 1);
+
+  add('Primary sources', [
+    'Regulation (EU) 2023/1115 on deforestation-free products (EUDR): https://eur-lex.europa.eu/eli/reg/2023/1115/oj',
+    'Directive (EU) 2024/1760 on corporate sustainability due diligence (CSDDD): https://eur-lex.europa.eu/eli/dir/2024/1760/oj',
+    'Directive (EU) 2026/470 amending the CSDDD and the CSRD (the omnibus): https://eur-lex.europa.eu/eli/dir/2026/470/oj',
+    'European Commission, EUDR implementation page: https://green-business.ec.europa.eu/deforestation-regulation-implementation_en',
+    'The full tracker, updated monthly: https://hredd.org/tracker/'
+  ], 1);
+
+  return S;
+}
+
+/* ---------------- generate + preview ---------------- */
+let currentReport = null;
+
+document.getElementById('gen').addEventListener('click', () => {
+  const missing = [];
+  document.querySelectorAll('.opts').forEach(g => {
+    const q = g.dataset.q;
+    const empty = g.dataset.type === 'multi' ? answers[q].length === 0 : !answers[q];
+    g.closest('.q').classList.toggle('missing', empty);
+    if(empty) missing.push(q);
+  });
+  const msg = document.getElementById('gen-msg');
+  if(missing.length){
+    msg.textContent = 'Please answer the highlighted questions above.';
+    document.querySelector('.q.missing').scrollIntoView({ behavior:'smooth', block:'center' });
+    return;
+  }
+  msg.textContent = '';
+  const genBtn = document.getElementById('gen');
+  genBtn.querySelector('span').textContent = 'Compiling…';
+  genBtn.disabled = true;
+  currentReport = buildReport(answers);
+  document.getElementById('dh-date').textContent = TODAY;
+
+  const pv = document.getElementById('preview');
+  pv.innerHTML = '';
+  currentReport.forEach(sec => {
+    if(sec.h){
+      const h = document.createElement(sec.level === 1 ? 'h2' : 'h3');
+      h.textContent = sec.h; pv.appendChild(h);
+    }
+    sec.ps.forEach(t => {
+      const p = document.createElement('p'); p.textContent = t; pv.appendChild(p);
+    });
+  });
+  setTimeout(() => {
+    const r = document.getElementById('result');
+    r.hidden = false;
+    ringEl.classList.remove('show');
+    genBtn.querySelector('span').textContent = 'Regenerate report';
+    genBtn.disabled = false;
+    r.scrollIntoView({ behavior:'smooth', block:'start' });
+  }, 550);
+});
+
+/* ---------------- PDF ---------------- */
+document.getElementById('dl').addEventListener('click', () => {
+  if(!currentReport) return;
+  const doc = new jsPDF({ unit:'mm', format:'a4' });
+  const W = 210, M = 22, maxW = W - M * 2, bottom = 275;
+  let y = 0;
+
+  const newPage = () => { doc.addPage(); y = 24; foot(); };
+  const foot = () => {
+    doc.setFont('courier','normal'); doc.setFontSize(7); doc.setTextColor(140);
+    doc.text('hredd.org  ·  supplier exposure report  ·  ' + TODAY, M, 288);
+    doc.setTextColor(30);
+  };
+  const ensure = need => { if(y + need > bottom) newPage(); };
+
+  /* masthead */
+  y = 26;
+  doc.setFont('times','normal'); doc.setFontSize(26); doc.setTextColor(30);
+  doc.text('hredd.org', M, y);
+  doc.setFont('courier','normal'); doc.setFontSize(8); doc.setTextColor(120);
+  doc.text('SUPPLIER EXPOSURE REPORT  ·  ' + TODAY.toUpperCase(), M, y + 7);
+  doc.setDrawColor(180); doc.setLineWidth(.3); doc.line(M, y + 12, W - M, y + 12);
+  doc.setTextColor(30);
+  y += 24; foot();
+
+  currentReport.forEach(sec => {
+    if(sec.h){
+      const size = sec.level === 1 ? 15 : 12;
+      ensure(14);
+      doc.setFont('times', sec.level === 1 ? 'normal' : 'italic'); doc.setFontSize(size);
+      const hl = doc.splitTextToSize(sec.h, maxW);
+      doc.text(hl, M, y); y += hl.length * (size * .45) + 3;
+    }
+    doc.setFont('times','normal'); doc.setFontSize(10.5);
+    sec.ps.forEach(t => {
+      const lines = doc.splitTextToSize(t, maxW);
+      const lineH = 4.9;
+      let idx = 0;
+      while(idx < lines.length){
+        ensure(lineH);
+        const fit = Math.min(lines.length - idx, Math.floor((bottom - y) / lineH) || 1);
+        doc.text(lines.slice(idx, idx + fit), M, y);
+        y += fit * lineH; idx += fit;
+      }
+      y += 3;
+    });
+    y += sec.level === 1 ? 4 : 2;
+  });
+
+  doc.save('hredd-supplier-exposure-report.pdf');
+});
+</script>
+
+</Base>
