@@ -319,6 +319,7 @@ p{ text-wrap:pretty; }
 .crumb a:hover{ color:var(--gold); }
 
 .prose{ max-width:680px; margin:0 auto; font-size:18.5px; line-height:1.75; }
+.prose p, .prose li{ text-align:justify; text-justify:inter-word; hyphens:auto; -webkit-hyphens:auto; }
 .prose p{ margin:0 0 1.4em; }
 .prose > p:first-of-type::first-letter, .prose > div > p:first-of-type::first-letter{
   font-size:3.4em; line-height:.85; float:left; padding:6px 12px 0 0; color:var(--gold); }
