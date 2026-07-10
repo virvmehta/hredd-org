@@ -1,0 +1,105 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getAllLaws, formatDate } from '../../lib/sanity.js';
+import { countries, lawsForCountry, CHANNEL_LABELS, CHANNEL_EXPLAINERS } from '../../lib/countryData.js';
+
+export async function getStaticPaths(){
+  return countries.map(c => ({ params: { slug: c.slug }, props: { country: c } }));
+}
+
+const { country } = Astro.props;
+const allLaws = await getAllLaws();
+const rows = lawsForCountry(country, allLaws);
+
+const byChannel = {};
+for(const r of rows){
+  (byChannel[r.meta.channel] ||= []).push(r);
+}
+const channelOrder = ['border', 'diligence', 'disclosure'].filter(c => byChannel[c]);
+
+const inForce = rows.filter(r => (r.law.statusType || '').toLowerCase() === 'force').length;
+const updated = rows.reduce((m, r) => r.law.lastUpdated > m ? r.law.lastUpdated : m, '');
+---
+<Base
+  title={`HREDD exposure of ${country.name} | hredd.org`}
+  description={`The due diligence laws touching ${country.name}'s exports, the mechanism behind each, and the dates that matter. Generated from the hredd.org tracker.`}
+  active="tracker"
+>
+
+<script type="application/ld+json" set:html={JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "Dataset",
+  "name": `HREDD exposure profile: ${country.name}`,
+  "description": `Supply chain due diligence laws relevant to ${country.name}'s export sectors, derived from the hredd.org legislation tracker.`,
+  "creator": { "@type": "Organization", "name": "hredd.org", "url": "https://hredd.org" },
+  "license": "https://creativecommons.org/licenses/by/4.0/"
+})} />
+
+<section class="law-head">
+  <div class="wrap">
+    <p class="crumb reveal"><a href="/">hredd·org</a> <span>/</span> <a href="/tracker/">Tracker</a> <span>/</span> {country.name}</p>
+    <p class="kicker reveal" style="margin-top:26px">{country.region} · Country exposure profile</p>
+    <h1 class="display reveal" data-delay="1" style="font-size:clamp(40px,5.6vw,80px)">The HREDD exposure<br>of <em>{country.name}</em></h1>
+    <p class="standfirst reveal" data-delay="2">{country.profile}</p>
+    <div class="law-meta reveal" data-delay="3">
+      <span class="chip" data-g="force">{inForce} regimes in force</span>
+      <span class="chip">{rows.length} laws relevant</span>
+      <span class="mono faint">Regenerated from the tracker · updated {formatDate(updated)}</span>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-top:clamp(44px,5vw,70px); padding-bottom:0">
+  <div class="wrap">
+    <div class="facts reveal">
+      <div class="fact"><span>Key export sectors</span><b>{country.sectors.join(' · ')}</b></div>
+      <div class="fact"><span>Principal markets</span><b>{country.keyMarkets.join(' · ')}</b></div>
+      <div class="fact"><span>EUDR commodities produced</span><b>{country.eudrCommodities.length ? country.eudrCommodities.join(' · ') : 'None of the seven covered commodities'}</b></div>
+    </div>
+  </div>
+</section>
+
+{channelOrder.map(ch => (
+  <section class="section" style="padding-bottom:0">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div>
+          <p class="kicker">{CHANNEL_LABELS[ch]}</p>
+          <h2 class="h2" style="font-size:clamp(24px,2.8vw,34px); max-width:30ch">{CHANNEL_EXPLAINERS[ch]}</h2>
+        </div>
+      </div>
+      <div class="law-rows reveal" data-delay="1">
+        {byChannel[ch].map(({ law, note }) => (
+          <div>
+            <a class="law-row" href={`/laws/${law.slug}/`}>
+              <div>
+                <h3>{law.name}</h3>
+                <p class="sub">{law.tableUpdateText || law.oneLineSummary}</p>
+              </div>
+              <span class="jur">{law.jurisdiction}</span>
+              <span class="chip" data-g={law.statusType}>{law.status}</span>
+            </a>
+            {note && <p class="cnote">{note}</p>}
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+))}
+
+<section class="section">
+  <div class="wrap" style="max-width:820px">
+    <div class="panel reveal">
+      <h4>What this page is</h4>
+      <p style="margin:0; color:var(--ink-dim); font-size:15.5px; line-height:1.7">This profile is generated automatically from the hredd.org legislation tracker, and it regenerates every time any law on it moves, so the statuses and dates above are as current as the tracker itself. It is general information rather than legal advice, and country-level relevance is indicative rather than an assessment of any individual business. For a profile of your own operation, the <a href="/report/" style="color:var(--gold)">supplier exposure report</a> takes eight questions and two minutes.</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cnote{ margin:0; padding:16px 18px 22px 22px; border-left:2px solid var(--gold-dim);
+    font-size:15px; line-height:1.65; color:var(--ink-dim); font-style:italic;
+    border-bottom:1px solid var(--line-soft); }
+</style>
+
+</Base>

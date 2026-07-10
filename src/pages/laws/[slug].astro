@@ -1,5 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
+import tradeData from '../../../public/data/trade-exposure.json';
 import { getAllLaws, getAllArticles, getSiteSettings, renderBody, formatDate, formatMonthYear } from '../../lib/sanity.js';
 
 export async function getStaticPaths() {
@@ -28,10 +29,23 @@ const facts = [
 
 const summaryHtml = renderBody(law.summary);
 const updatedLabel = law.lastUpdated ? formatMonthYear(law.lastUpdated) : '';
+
+// Trade exposure panel (Regulated Trade Index, phase one)
+const tradeRows = Object.entries(tradeData.countries)
+  .map(([cslug, c]) => ({ cslug, name: c.name,
+    value: (c.regimes_2030[law.slug]?.value?.[1]) || 0 }))
+  .filter(r => r.value > 0)
+  .sort((a, b) => b.value - a.value)
+  .slice(0, 6);
+const tradeTotal = tradeRows.reduce((s, r) => s + r.value, 0);
+const tradeMax = tradeRows.length ? tradeRows[0].value : 0;
+const usdBn = v => '$' + (v / 1e9).toFixed(v >= 1e10 ? 0 : 1) + 'bn';
+
+const clampDesc = s => s.length <= 158 ? s : s.slice(0, 155).replace(/\s+\S*$/, '') + '.';
 ---
 <Base
-  title={`${law.name} | hredd.org`}
-  description={law.oneLineSummary || `Tracker entry for the ${law.name}.`}
+  title={`${(law.name.length <= 56 ? law.name : (law.shortName || law.name)).trim()} | hredd.org`}
+  description={clampDesc(law.oneLineSummary || `Tracker entry for the ${law.name}.`)}
   active="tracker"
 >
 
@@ -136,6 +150,25 @@ const updatedLabel = law.lastUpdated ? formatMonthYear(law.lastUpdated) : '';
             <span class="date">{c.date}</span>
             <p style="margin-top:8px">{c.text}</p>
           </div>
+        ))}
+      </div>
+    </div>
+  </section>
+)}
+
+{tradeRows.length > 0 && (
+  <section class="section" style="padding-bottom:0">
+    <div class="wrap">
+      <div class="panel reveal">
+        <h4>Trade under this regime · Regulated Trade Index</h4>
+        <p class="mono faint" style="margin:0 0 18px">Exposed export value at full application, across the ten tracked origins · {tradeData.sample_data ? 'SAMPLE DATA, ILLUSTRATIVE ONLY' : tradeData.vintage} · <a href="/methodology/" style="color:var(--gold)">methodology</a></p>
+        <div style="font:400 42px/1 var(--serif); color:var(--gold-hi); margin-bottom:20px">{usdBn(tradeTotal)}</div>
+        {tradeRows.map(r => (
+          <a href={`/trade/#${r.cslug}`} style="display:grid; grid-template-columns:120px 1fr 74px; gap:14px; align-items:center; padding:8px 0; border-bottom:1px solid var(--line-soft)">
+            <span style="font-size:14px; color:var(--ink-dim)">{r.name}</span>
+            <span style="height:6px; background:var(--panel-2); position:relative; display:block"><i style={`position:absolute; inset:0; width:${Math.round(r.value / tradeMax * 100)}%; background:linear-gradient(90deg,var(--gold-dim),var(--gold))`}></i></span>
+            <span class="mono faint" style="text-align:right">{usdBn(r.value)}</span>
+          </a>
         ))}
       </div>
     </div>

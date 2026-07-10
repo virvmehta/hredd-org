@@ -1,0 +1,34 @@
+name: Refresh trade exposure data
+# Flaw-three fix: the pipeline runs here in the cloud, never on a laptop.
+# Yearly on 15 July (after Comtrade final annual data lands), plus manual runs.
+on:
+  schedule:
+    - cron: "0 6 15 7 *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run mapping and invariant tests
+        run: python pipeline/test_mapping.py
+      - name: Run pipeline (live)
+        env:
+          COMTRADE_KEY: ${{ secrets.COMTRADE_KEY }}
+        run: python pipeline/compute.py --live
+      - name: Re-run invariants on live output
+        run: python pipeline/test_mapping.py
+      - name: Commit refreshed data
+        run: |
+          git config user.name "hredd-pipeline"
+          git config user.email "pipeline@hredd.org"
+          git add public/data/trade-exposure.json public/data/trade-exposure.csv
+          git diff --cached --quiet || git commit -m "Data: annual trade exposure refresh [automated]"
+          git push

@@ -1,0 +1,80 @@
+---
+import Base from '../../layouts/Base.astro';
+import data from '../../../public/data/trade-exposure.json';
+import scope from '../../../pipeline/law_scope.json';
+---
+<Base
+  title="Methodology: the Regulated Trade Index | hredd.org"
+  description="Every source, every assumption, every limitation, and the open dataset behind the hredd.org trade exposure figures. Every number carries its working."
+  active="about"
+>
+
+<section class="law-head">
+  <div class="wrap">
+    <p class="kicker reveal">Every number carries its working</p>
+    <h1 class="display reveal" data-delay="1" style="font-size:clamp(38px,5vw,68px)">Methodology &amp;<br><em>open data</em></h1>
+    <p class="standfirst reveal" data-delay="2">This page exists so that a sceptical reader can attack our figures with everything we know about their weaknesses already in hand. It states where each number comes from, the rules that keep it honest, the assumptions it rests on, and the limits of what it can say.</p>
+    <div class="law-meta reveal" data-delay="3">
+      <span class="chip">Dataset v{data.dataset_version}</span>
+      <span class="chip">Mapping v{scope.mapping_version}</span>
+      <span class="mono faint">Vintage: {data.vintage}</span>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-bottom:0">
+  <div class="wrap" style="max-width:860px">
+    <div class="prose">
+
+      <h2>The three-minute version</h2>
+      <p>We take observed trade flows from official statistical authorities, we map them against the product and market scope of every law on this tracker, and we compute what share of a country's exports passes through regulated cells. Future values apply the statutory application calendar, which is public and certain, to the latest observed year of trade, which is held constant. The result is arithmetic on known law and observed trade, never a forecast of behaviour, and everything needed to reproduce or dispute it is downloadable below.</p>
+
+      <h2>Sources, and why importer data</h2>
+      <p>All European Union destination figures come from Eurostat Comext, queried through its public API at combined nomenclature detail, because the statistical office of the regulating jurisdiction is the natural authority for flows into it. Denominators, meaning each country's total exports to the world, come from UN Comtrade under its free registered tier. We use importer-reported values wherever both sides report, since customs authorities that collect duties record imports rigorously while export records in many producing countries undercount. The one bias this introduces is disclosed rather than hidden: imports are valued CIF while exports are valued FOB, which inflates absolute import values by roughly five percent on average, and largely cancels in the share-based indicators this index publishes.</p>
+
+      <h2>Estimation classes, the honesty system</h2>
+      <p>Laws differ enormously in how cleanly their scope maps to trade data, so every regime carries a class badge wherever its figures appear. Class A means directly mappable: the law defines its scope by product and destination, so the exposed trade is a query with no assumptions. Class B means mappable with a published assumption: regimes whose scope depends on buyer characteristics, such as the CSDDD, appear as ranges resting on the numbered assumptions in the register below, and their indicators are deliberately named demand exposure rather than legal coverage, because no trade dataset can compute statutory buyer-scope coverage. Class C means not quantifiable: where no defensible mapping exists, as with regimes covering embedded minerals, we publish no number at all, because declining to quantify is part of what makes the rest credible.</p>
+
+      <h2>The mapping, regime by regime</h2>
+    </div>
+
+    <div class="law-rows" style="margin-top:26px">
+      {scope.regimes.map(r => (
+        <div class="law-row" style="grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) auto; cursor:default">
+          <div>
+            <h3>{r.shortName}</h3>
+            <p class="sub">{r.granularity} · {r.steps && r.steps.length ? 'applies ' + r.steps.map(s => s.date).join(', ') : 'no statutory dates, excluded from projection'} · <a href={r.legal_source_url} style="color:var(--gold)">{r.legal_source}</a></p>
+          </div>
+          <span class="jur">{r.market} · {r.mechanism}</span>
+          <span class="chip">Class {r.class}</span>
+        </div>
+      ))}
+    </div>
+
+    <div class="prose" style="margin-top:40px">
+      <h2>The assumption register</h2>
+      <p>Every Class B figure rests on exactly one of the numbered assumptions below, its band travels with it wherever it appears, and disputing a figure means disputing its assumption, which the open dataset makes recomputable.</p>
+      {data.assumptions.map(a => (
+        <p><strong>{a.id}, {a.name}.</strong> {a.text}</p>
+      ))}
+
+      <h2>The calculation, formally</h2>
+      <p>For a country and a date, the regulated trade share is the value of exports entering market and product cells covered by at least one regime in application, divided by total exports, with coverage computed at the level of destination market crossed with HS4 product line so that a cell facing three regimes counts exactly once. Mechanism decomposition reports border control, buyer diligence, and disclosure exposure separately, and these components intentionally sum to more than the union, because one consignment can face several regimes at once. Regimes with phased application contribute proportionally between their first and final steps, and regimes without fixed statutory dates are excluded from every projection and shown only qualitatively.</p>
+
+      <h2>Accuracy controls</h2>
+      <p>The computation runs as one open pipeline with no manual edits anywhere between downloaded input and published output. Input files are recorded with SHA-256 checksums inside the dataset itself, the current release carries flows checksum {data.input_checksums.flows.slice(0,12)} and mapping checksum {data.input_checksums.law_scope.slice(0,12)}, and a test suite binds every mapped product code to the legal annex it came from before any data can be committed. Country totals are cross-checked against WTO and World Bank published aggregates on each live run, our EUDR coverage total is compared against the Commission's own impact assessment as an external anchor, and any divergence beyond tolerance blocks publication until explained.</p>
+
+      <h2>Limitations, stated bluntly</h2>
+      <p>This index measures direct exports into regulated markets and products, and it cannot see input-level exposure, which is precisely how the UFLPA most often bites, through embedded cotton or polysilicon in goods assembled elsewhere. Re-export hubs distort origin attribution, and we mitigate this by using country of origin where the destination dataset distinguishes it, while stating the residual plainly. The projection holds trade patterns constant, so it answers what share of last year's trade would be regulated on each future date, and deliberately refuses to model growth, substitution, or diversion. Current figures rest on the HS4 approximation of legal annexes noted in the mapping table, with full CN8 enumeration scheduled for the next mapping version. And this entire release is computed on illustrative sample flows pending the first live pipeline run, which every page states in a banner until real data lands.</p>
+
+      <h2>Corrections and versions</h2>
+      <p>Errors found after publication are corrected in a new versioned data release and recorded here, never silently. The dataset version and vintage travel with every figure on every page, so any citation of this index can name exactly which release it drew from.</p>
+
+      <h2>Downloads and licence</h2>
+      <p>The complete dataset is available as <a href="/data/trade-exposure.json">JSON</a> and <a href="/data/trade-exposure.csv">CSV</a>, the mapping table as <a href="/data/law-scope.json">law-scope JSON</a>, all under a CC BY 4.0 licence: use anything, cite hredd.org. The pipeline source, including the test suite and the scheduled refresh workflow, lives in the site repository. Eurostat data is reused under its open policy, and UN Comtrade figures appear only as derived indicators in line with its re-dissemination terms.</p>
+
+    </div>
+  </div>
+</section>
+
+</Base>

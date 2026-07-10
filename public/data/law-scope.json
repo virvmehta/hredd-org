@@ -1,0 +1,58 @@
+{
+  "mapping_version": "2026.1",
+  "notes": "Product scope at HS4 approximation of the legal annexes for phase one. Full CN8 enumeration is scheduled for mapping version 2026.2. Every regime lists its legal source. Estimation classes: A directly mappable, B mappable with published assumption, C not quantifiable.",
+  "regimes": [
+    {
+      "slug": "eu-deforestation-regulation",
+      "shortName": "EUDR",
+      "market": "EU27",
+      "mechanism": "border",
+      "estimation_class": "A",
+      "granularity": "HS4 approximation of CN8 Annex I",
+      "legal_source": "Regulation (EU) 2023/1115, Annex I",
+      "legal_source_url": "https://eur-lex.europa.eu/eli/reg/2023/1115/oj",
+      "application_steps": [
+        {"date": "2025-12-30", "label": "Large operators and traders"},
+        {"date": "2026-06-30", "label": "Micro and small enterprises"}
+      ],
+      "hs4_codes": ["0102","0201","0202","0206","1602","4101","4104","4107",
+                     "1801","1802","1803","1804","1805","1806",
+                     "0901",
+                     "1207","1511","1513","2306","3823",
+                     "4001","4005","4006","4007","4008","4011","4012","4013",
+                     "1201","1208","1507","2304",
+                     "4401","4402","4403","4406","4407","4408","4409","4410","4411","4412","4413","4414","4415","4416","4417","4418","4419","4420","4421",
+                     "4701","4702","4703","4704","4705","4801","4802","4803","4804","4805","4806","4807","4808","4809","4810","4811","4817","4818","4819","4820","4821","4822","4823",
+                     "9401","9403","9406"]
+    },
+    {
+      "slug": "eu-forced-labour-regulation",
+      "shortName": "EU FLR",
+      "market": "EU27",
+      "mechanism": "border",
+      "estimation_class": "A",
+      "granularity": "All products, no product filter",
+      "legal_source": "Regulation (EU) 2024/3015",
+      "legal_source_url": "https://eur-lex.europa.eu/eli/reg/2024/3015/oj",
+      "application_steps": [
+        {"date": "2027-12-14", "label": "Application to all products"}
+      ],
+      "hs4_codes": ["*"]
+    },
+    {
+      "slug": "eu-batteries-regulation",
+      "shortName": "EU Batteries",
+      "market": "EU27",
+      "mechanism": "diligence",
+      "estimation_class": "A",
+      "granularity": "HS4 battery headings",
+      "legal_source": "Regulation (EU) 2023/1542, due diligence chapter",
+      "legal_source_url": "https://eur-lex.europa.eu/eli/reg/2023/1542/oj",
+      "application_steps": [
+        {"date": "2027-08-18", "label": "Due diligence obligations apply (postponed by omnibus)"}
+      ],
+      "hs4_codes": ["8506","8507"]
+    }
+  ],
+  "horizon_regimes_note": "Regimes without fixed statutory application dates are excluded from all projections and shown qualitatively only. This is drawn from the tracker at build time using statusType proposed or pending without a firstComplianceDeadline."
+}

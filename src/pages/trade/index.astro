@@ -1,0 +1,203 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getAllLaws } from '../../lib/sanity.js';
+import data from '../../../public/data/trade-exposure.json';
+
+const allLaws = await getAllLaws();
+const lawBySlug = Object.fromEntries(allLaws.map(l => [l.slug, l]));
+
+const MARKET_LABELS = { EU27: 'European Union', USA: 'United States', GBR: 'United Kingdom',
+  CHE: 'Switzerland', NOR: 'Norway', CAN: 'Canada', AUS: 'Australia', JPN: 'Japan', KOR: 'South Korea' };
+
+const pct = v => { const p = v * 100; return (p >= 10 ? p.toFixed(0) : p >= 1 ? p.toFixed(1) : '<1') + '%'; };
+const usd = v => v >= 1e9 ? '$' + (v/1e9).toFixed(v >= 1e10 ? 0 : 1) + 'bn' : '$' + Math.max(1, Math.round(v/1e6)) + 'M';
+const yearOf = d => d ? d.slice(0, 4) : '';
+
+const countries = Object.entries(data.countries).map(([slug, c]) => ({ slug, ...c }));
+const DEFAULT = 'bangladesh';
+
+function ledgerOf(c){
+  const rows = [], quiet = [];
+  for(const [slug, r] of Object.entries(c.regimes_2030)){
+    const law = lawBySlug[slug];
+    if(!law) continue;
+    if(r.class === 'C' || !r.share || r.share[2] === 0){
+      quiet.push({ slug, law, r });
+    } else {
+      rows.push({ slug, law, r });
+    }
+  }
+  rows.sort((a, b) => b.r.share[1] - a.r.share[1] || b.r.share[2] - a.r.share[2]);
+  quiet.sort((a, b) => (a.r.class === 'C' ? 1 : 0) - (b.r.class === 'C' ? 1 : 0));
+  return { rows, quiet };
+}
+---
+<Base
+  title="The Regulated Trade Index | hredd.org"
+  description="How each country's exports pass through the tracked regimes: share of value in scope, published bands, statutory dates, and open methodology."
+  active="trade"
+>
+
+{data.sample_data && (
+  <div class="sample-banner">
+    <div class="wrap mono">Illustrative sample data, pending the first live pipeline run · not real trade statistics · <a href="/methodology/">methodology</a></div>
+  </div>
+)}
+
+<section class="law-head">
+  <div class="wrap">
+    <p class="kicker reveal">Trade data meets the tracker</p>
+    <h1 class="display reveal" data-delay="1" style="font-size:clamp(40px,5.4vw,78px)">The Regulated<br><em>Trade Index</em></h1>
+    <p class="standfirst reveal" data-delay="2">How a country's exports pass through the human rights and environmental regimes of its buyer markets. Every share is computed from observed flows against statutory scope, every estimate carries its class and its band, and every number links to its working.</p>
+  </div>
+</section>
+
+<section class="section" style="padding-top:clamp(36px,4vw,56px)">
+  <div class="wrap">
+
+    <div class="cchips reveal" role="tablist" aria-label="Country">
+      {countries.map(c => (
+        <button class={`cchip${c.slug === DEFAULT ? ' on' : ''}`} data-c={c.slug} role="tab" aria-selected={c.slug === DEFAULT ? 'true' : 'false'}>{c.name}</button>
+      ))}
+    </div>
+
+    {countries.map(c => { const { rows, quiet } = ledgerOf(c); const end = c.series[c.series.length - 1]; return (
+      <div class="cpane" data-c={c.slug} hidden={c.slug !== DEFAULT}>
+
+        <div class="stats" style="margin-top:34px">
+          <div class="stat"><b>{usd(c.total_exports_usd)}</b><span>Total exports per year</span></div>
+          <div class="stat"><b>{c.laws_touching}<span style="font-size:.5em; color:var(--ink-faint)"> / 18</span></b><span>Laws touch its trade</span></div>
+          <div class="stat"><b>{pct(end.union)}</b><span>Of export value in scope of at least one law by 2030</span></div>
+          <div class="stat"><b>{pct(end.border)}</b><span>Stoppable at a border by 2030</span></div>
+        </div>
+
+        <div class="destbar-wrap">
+          <div class="destbar" aria-hidden="true">
+            {c.markets.slice(0, 5).map((m, i) => (
+              <i style={`width:${(m.share*100).toFixed(2)}%; opacity:${1 - i * 0.17}`}></i>
+            ))}
+          </div>
+          <div class="destlegend mono">
+            {c.markets.slice(0, 5).map(m => (
+              <span>{MARKET_LABELS[m.key] || m.key} {Math.round(m.share*100)}%</span>
+            ))}
+            <span class="faint">Other destinations {Math.max(0, Math.round((1 - c.markets.slice(0,5).reduce((s,m)=>s+m.share,0))*100))}%</span>
+          </div>
+        </div>
+
+        <div class="ledger-head mono">
+          <span>Law</span><span class="lh-status">Status</span><span class="lh-from">From</span>
+          <span>Share of export value in scope</span><span class="lh-share">Share</span><span class="lh-val">Value</span><span class="lh-class">Class</span>
+        </div>
+
+        <div class="ledger">
+          {rows.map(({ slug, law, r }) => { const [lo, ce, hi] = r.share; const max = rows[0].r.share[2] || 1; return (
+            <a class="lrow" href={`/laws/${slug}/`}>
+              <div class="l-name">
+                <h3>{law.shortName || law.name}</h3>
+                <p>{law.name} · {MARKET_LABELS[r.market] || r.market}</p>
+              </div>
+              <span class="chip" data-g={law.statusType}>{law.status}</span>
+              <span class="mono l-from">{yearOf(r.first_date)}</span>
+              <span class="l-band" title={`Central ${pct(ce)}, band ${pct(lo)} to ${pct(hi)}`}>
+                <i class="range" style={`left:${lo/max*100}%; width:${Math.max(0.5,(hi-lo)/max*100)}%`}></i>
+                <i class="central" style={`width:${ce/max*100}%`}></i>
+              </span>
+              <span class="mono l-share">{pct(ce)}<em>{r.class === 'B' ? ` ${pct(lo)}–?` : ''}</em></span>
+              <span class="mono l-val">{usd(r.value[1])}</span>
+              <span class="cbadge" data-cl={r.class}>{r.class}</span>
+            </a>
+          );})}
+        </div>
+
+        {quiet.length > 0 && (
+          <div class="quiet">
+            <p class="kicker" style="margin:44px 0 14px">Unquantified or not yet reaching this trade</p>
+            {quiet.map(({ slug, law, r }) => (
+              <a class="lrow qrow" href={`/laws/${slug}/`}>
+                <div class="l-name"><h3>{law.shortName || law.name}</h3><p>{law.name}</p></div>
+                <span class="chip" data-g={law.statusType}>{law.status}</span>
+                <span class="mono faint l-note">{r.class === 'C' ? 'Not quantifiable in customs data' : 'No measured flows in scope'}</span>
+                <span class="cbadge" data-cl={r.class || 'B'}>{r.class || 'B'}</span>
+              </a>
+            ))}
+          </div>
+        )}
+
+      </div>
+    );})}
+
+    <p class="mono faint" style="margin-top:30px">Shares at full application of current law, central estimates with published bands · Class B figures measure demand exposure, never statutory coverage · per-law shares intentionally sum past the union figure · vintage {data.vintage} · <a href="/methodology/" style="color:var(--gold)">full methodology and open data</a></p>
+
+  </div>
+</section>
+
+<style>
+  .sample-banner{ background:var(--gold-ghost); border-bottom:1px solid var(--gold-dim); }
+  .sample-banner .wrap{ padding-top:10px; padding-bottom:10px; color:var(--gold-hi); font-size:10px; letter-spacing:.18em; }
+  .sample-banner a{ color:var(--gold-hi); text-decoration:underline; }
+
+  .cchips{ display:flex; flex-wrap:wrap; gap:9px; }
+  .cchip{ font-family:var(--mono); font-size:10.5px; letter-spacing:.14em; text-transform:uppercase;
+    border:1px solid var(--line); background:none; color:var(--ink-dim); padding:10px 16px; cursor:pointer;
+    transition:all .3s; }
+  .cchip:hover{ border-color:var(--gold-dim); color:var(--ink); }
+  .cchip.on{ border-color:var(--gold); color:var(--gold-hi); background:var(--gold-ghost); }
+
+  .destbar-wrap{ margin:34px 0 8px; }
+  .destbar{ display:flex; height:9px; border:1px solid var(--line-soft); overflow:hidden; }
+  .destbar i{ display:block; background:var(--gold); }
+  .destlegend{ display:flex; flex-wrap:wrap; gap:18px; margin-top:10px; font-size:9.5px;
+    letter-spacing:.14em; color:var(--ink-dim); }
+  .destlegend .faint{ color:var(--ink-faint); }
+
+  .ledger-head{ display:grid; grid-template-columns:minmax(0,1.5fr) 118px 52px minmax(0,1.6fr) 92px 74px 44px;
+    gap:16px; align-items:center; padding:26px 0 12px; border-bottom:1px solid var(--line);
+    font-size:9px; letter-spacing:.2em; color:var(--ink-faint); text-transform:uppercase; }
+  .lrow{ display:grid; grid-template-columns:minmax(0,1.5fr) 118px 52px minmax(0,1.6fr) 92px 74px 44px;
+    gap:16px; align-items:center; padding:15px 0; border-bottom:1px solid var(--line-soft);
+    text-decoration:none; transition:background .2s; }
+  .lrow:hover{ background:var(--gold-ghost); }
+  .l-name h3{ font:400 17px/1.25 var(--serif); color:var(--ink); margin:0; }
+  .l-name p{ margin:3px 0 0; font-size:12px; color:var(--ink-faint); }
+  .l-from{ font-size:11px; color:var(--ink-dim); }
+  .l-band{ position:relative; height:8px; background:var(--panel-2); display:block; }
+  .l-band .range{ position:absolute; top:0; bottom:0; background:var(--gold-ghost);
+    border:1px solid var(--gold-dim); }
+  .l-band .central{ position:absolute; left:0; top:1px; bottom:1px;
+    background:linear-gradient(90deg,var(--gold-dim),var(--gold)); }
+  .l-share{ font-size:12px; color:var(--gold-hi); text-align:right; }
+  .l-share em{ display:block; font-style:normal; font-size:8.5px; color:var(--ink-faint); letter-spacing:.08em; }
+  .l-val{ font-size:11px; color:var(--ink-dim); text-align:right; }
+  .cbadge{ font-family:var(--mono); font-size:9.5px; letter-spacing:.1em; text-align:center;
+    border:1px solid var(--line); color:var(--ink-dim); padding:5px 0; }
+  .cbadge[data-cl="A"]{ border-color:var(--gold-dim); color:var(--gold-hi); }
+  .cbadge[data-cl="C"]{ color:var(--ink-faint); border-style:dashed; }
+  .qrow{ grid-template-columns:minmax(0,1.5fr) 118px minmax(0,1fr) 44px; opacity:.72; }
+  .l-note{ font-size:10px; letter-spacing:.1em; }
+
+  @media (max-width:880px){
+    .ledger-head{ display:none; }
+    .lrow{ grid-template-columns:minmax(0,1fr) auto; grid-template-areas:"name status" "band band" "share val"; }
+    .l-name{ grid-area:name; } .lrow .chip{ grid-area:status; justify-self:end; }
+    .l-band{ grid-area:band; } .l-share{ grid-area:share; text-align:left; }
+    .l-val{ grid-area:val; } .l-from,.cbadge{ display:none; }
+    .qrow{ grid-template-areas:"name status" "note note"; }
+    .l-note{ grid-area:note; }
+  }
+</style>
+
+<script>
+  const chips = document.querySelectorAll('.cchip');
+  const panes = document.querySelectorAll('.cpane');
+  function show(slug){
+    chips.forEach(ch => { const on = ch.dataset.c === slug; ch.classList.toggle('on', on); ch.setAttribute('aria-selected', String(on)); });
+    panes.forEach(p => { p.hidden = p.dataset.c !== slug; });
+    history.replaceState(null, '', '#' + slug);
+  }
+  chips.forEach(ch => ch.addEventListener('click', () => show(ch.dataset.c)));
+  const h = location.hash.slice(1);
+  if(h && document.querySelector(`.cpane[data-c="${h}"]`)) show(h);
+</script>
+
+</Base>

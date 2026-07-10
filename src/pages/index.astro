@@ -21,7 +21,11 @@ const quoteBy = settings?.editorialQuoteAttribution || 'hredd·org · editorial 
 const blurb = settings?.newsletterBlurb ||
   'What moved, what it means for your trade relationships, and what to prepare before your buyers ask. No noise.';
 ---
-<Base active="">
+<Base
+  title="hredd.org | HREDD Legislation Tracked From the Global South"
+  description="An independent tracker of human rights and environmental due diligence law, read from the supplier side of the chain. Eighteen laws, updated monthly."
+  active=""
+>
 
 <section class="hero">
   <div class="wrap">
@@ -68,6 +72,28 @@ const blurb = settings?.newsletterBlurb ||
   </div>
 </section>
 
+<section class="section" style="padding-top:0">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div>
+        <p class="kicker">The tracker</p>
+        <h2 class="h2">{laws.length} laws, <em>one ledger</em></h2>
+      </div>
+      <a class="textlink" href="/tracker/">Full tracker: {laws.length} laws <i>→</i></a>
+    </div>
+    <div class="law-rows reveal" data-delay="1">
+      {previewLaws.map((l) => (
+        <a class="law-row" href={`/laws/${l.slug}/`}>
+          <div><h3>{l.name}</h3><p class="sub">{l.tableUpdateText}</p></div>
+          <span class="jur">{l.jurisdiction}</span>
+          <span class="chip" data-g={l.statusType}>{l.status}</span>
+        </a>
+      ))}
+    </div>
+    <p class="mono faint reveal" style="margin-top:26px">Updated monthly with a changelog on every entry</p>
+  </div>
+</section>
+
 {lead && (
   <section class="section" style="padding-top:0">
     <div class="wrap">
@@ -94,28 +120,6 @@ const blurb = settings?.newsletterBlurb ||
     </div>
   </section>
 )}
-
-<section class="section" style="padding-top:0">
-  <div class="wrap">
-    <div class="section-head reveal">
-      <div>
-        <p class="kicker">The tracker</p>
-        <h2 class="h2">{laws.length} laws, <em>one ledger</em></h2>
-      </div>
-      <a class="textlink" href="/tracker/">Full tracker: {laws.length} laws <i>→</i></a>
-    </div>
-    <div class="law-rows reveal" data-delay="1">
-      {previewLaws.map((l) => (
-        <a class="law-row" href={`/laws/${l.slug}/`}>
-          <div><h3>{l.name}</h3><p class="sub">{l.tableUpdateText}</p></div>
-          <span class="jur">{l.jurisdiction}</span>
-          <span class="chip" data-g={l.statusType}>{l.status}</span>
-        </a>
-      ))}
-    </div>
-    <p class="mono faint reveal" style="margin-top:26px">Updated monthly with a changelog on every entry</p>
-  </div>
-</section>
 
 <section class="quote-band">
   <div class="wrap">
