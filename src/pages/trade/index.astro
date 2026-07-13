@@ -117,7 +117,7 @@ function ledgerOf(c){
               <a class="lrow qrow" href={`/laws/${slug}/`}>
                 <div class="l-name"><h3>{law.shortName || law.name}</h3><p>{law.name}</p></div>
                 <span class="chip" data-g={law.statusType}>{law.status}</span>
-                <span class="mono faint l-note">{r.class === 'C' ? 'Not quantifiable in customs data' : 'No measured flows in scope'}</span>
+                <span class="mono faint l-note">{r.class === 'C' ? 'Not quantifiable in customs data' : (!r.first_date ? 'Awaiting entry into force, no fixed date' : 'No measured flows in scope')}</span>
                 <span class="cbadge" data-cl={r.class || 'B'}>{r.class || 'B'}</span>
               </a>
             ))}

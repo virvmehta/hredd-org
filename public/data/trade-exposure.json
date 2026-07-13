@@ -1,18 +1,18 @@
 {
- "dataset_version": "sample-2026.07b",
- "generated": "2026-07-10",
+ "dataset_version": "sample-2026.07c",
+ "generated": "2026-07-13",
  "sample_data": true,
  "vintage": "SAMPLE FLOWS, ILLUSTRATIVE ONLY, pending first live pipeline run",
  "sources": [
-  "Structure mirrors Eurostat Comext DS-045409, member state detail included",
+  "Structure mirrors Eurostat Comext DS-045409 with member-state detail",
   "Non-EU markets mirror UN Comtrade importer-reported flows",
   "Denominators mirror UN Comtrade total exports"
  ],
  "input_checksums": {
-  "flows": "0c5a54761e4b3fbbc9ef86ae315fe9e031325e8c2b7a8f77893335135b5a3b78",
-  "law_scope": "fc83a3ce01717a9eda5e7a3b16e3cd67354505660ef786e8c95d46f17293ae48"
+  "flows": "075b0d6e6e0b83c30d46057ed37abcd2bad5b0686004e3983e9b0bf0cedb7623",
+  "law_scope": "0c111c8e79b6d8dfebdf34bff77262d96a6fdc8d8ad0474b81dcd951af6e804c"
  },
- "mapping_version": "2026.2",
+ "mapping_version": "2026.4",
  "assumptions": [
   {
    "id": "A1",
@@ -49,7 +49,7 @@
   "bangladesh": {
    "name": "Bangladesh",
    "total_exports_usd": 55000000000.0,
-   "laws_touching": 12,
+   "laws_touching": 11,
    "markets": [
     {
      "key": "EU27",
@@ -105,51 +105,51 @@
    "series": [
     {
      "year": 2024,
-     "union": 0.4954,
-     "border": 0.1275,
+     "union": 0.4971,
+     "border": 0.1292,
      "diligence": 0.2722,
      "disclosure": 0.0957
     },
     {
      "year": 2025,
-     "union": 0.4954,
-     "border": 0.1293,
+     "union": 0.4971,
+     "border": 0.1292,
      "diligence": 0.2722,
      "disclosure": 0.2307
     },
     {
      "year": 2026,
-     "union": 0.4968,
-     "border": 0.1311,
+     "union": 0.4971,
+     "border": 0.1305,
      "diligence": 0.2722,
      "disclosure": 0.2307
     },
     {
      "year": 2027,
-     "union": 0.6754,
-     "border": 0.5775,
-     "diligence": 0.3847,
-     "disclosure": 0.2307
+     "union": 0.6771,
+     "border": 0.5792,
+     "diligence": 0.2722,
+     "disclosure": 0.3657
     },
     {
      "year": 2028,
-     "union": 0.6754,
-     "border": 0.5775,
-     "diligence": 0.3847,
+     "union": 0.6771,
+     "border": 0.5792,
+     "diligence": 0.2722,
      "disclosure": 0.3657
     },
     {
      "year": 2029,
-     "union": 0.6754,
-     "border": 0.5775,
-     "diligence": 0.3847,
+     "union": 0.6771,
+     "border": 0.5792,
+     "diligence": 0.2722,
      "disclosure": 0.3657
     },
     {
      "year": 2030,
-     "union": 0.6754,
-     "border": 0.5775,
-     "diligence": 0.3847,
+     "union": 0.6771,
+     "border": 0.5792,
+     "diligence": 0.2722,
      "disclosure": 0.3657
     }
    ],
@@ -158,16 +158,16 @@
      "class": "A",
      "mechanism": "border",
      "market": "EU27",
-     "first_date": "2025-12-30",
+     "first_date": "2026-12-30",
      "share": [
-      0.0036,
-      0.0036,
-      0.0036
+      0.0027,
+      0.0027,
+      0.0027
      ],
      "value": [
-      198000000.0,
-      198000000.0,
-      198000000.0
+      148500000.0,
+      148500000.0,
+      148500000.0
      ],
      "assumption": null,
      "indicator": null
@@ -284,16 +284,16 @@
      "class": "B",
      "mechanism": "diligence",
      "market": "NLD",
-     "first_date": "2027-01-01",
+     "first_date": null,
      "share": [
-      0.0405,
-      0.0459,
-      0.0486
+      0.0,
+      0.0,
+      0.0
      ],
      "value": [
-      2227500000.0,
-      2524500000.0,
-      2673000000.0
+      0.0,
+      0.0,
+      0.0
      ],
      "assumption": "A6",
      "indicator": "exposure to buyer diligence demand"
@@ -376,13 +376,13 @@
      "market": "USA",
      "first_date": "2022-06-21",
      "share": [
-      0.1275,
-      0.1275,
+      0.1292,
+      0.1292,
       0.17
      ],
      "value": [
-      7012500000.0,
-      7012500000.0,
+      7106000000.0,
+      7106000000.0,
       9350000000.0
      ],
      "assumption": "A5",
@@ -423,7 +423,7 @@
   "india": {
    "name": "India",
    "total_exports_usd": 770000000000.0,
-   "laws_touching": 13,
+   "laws_touching": 12,
    "markets": [
     {
      "key": "USA",
@@ -487,14 +487,14 @@
     {
      "year": 2025,
      "union": 0.165,
-     "border": 0.0257,
+     "border": 0.0234,
      "diligence": 0.1031,
      "disclosure": 0.0895
     },
     {
      "year": 2026,
-     "union": 0.1668,
-     "border": 0.028,
+     "union": 0.165,
+     "border": 0.0252,
      "diligence": 0.1031,
      "disclosure": 0.0895
     },
@@ -502,28 +502,28 @@
      "year": 2027,
      "union": 0.233,
      "border": 0.1934,
-     "diligence": 0.1457,
-     "disclosure": 0.0895
+     "diligence": 0.1034,
+     "disclosure": 0.1405
     },
     {
      "year": 2028,
      "union": 0.233,
      "border": 0.1934,
-     "diligence": 0.1457,
+     "diligence": 0.1034,
      "disclosure": 0.1405
     },
     {
      "year": 2029,
      "union": 0.233,
      "border": 0.1934,
-     "diligence": 0.1457,
+     "diligence": 0.1034,
      "disclosure": 0.1405
     },
     {
      "year": 2030,
      "union": 0.233,
      "border": 0.1934,
-     "diligence": 0.1457,
+     "diligence": 0.1034,
      "disclosure": 0.1405
     }
    ],
@@ -532,16 +532,16 @@
      "class": "A",
      "mechanism": "border",
      "market": "EU27",
-     "first_date": "2025-12-30",
+     "first_date": "2026-12-30",
      "share": [
-      0.0046,
-      0.0046,
-      0.0046
+      0.0036,
+      0.0036,
+      0.0036
      ],
      "value": [
-      3534300000.0,
-      3534300000.0,
-      3534300000.0
+      2748900000.0,
+      2748900000.0,
+      2748900000.0
      ],
      "assumption": null,
      "indicator": null
@@ -658,16 +658,16 @@
      "class": "B",
      "mechanism": "diligence",
      "market": "NLD",
-     "first_date": "2027-01-01",
+     "first_date": null,
      "share": [
-      0.0179,
-      0.0202,
-      0.0214
+      0.0,
+      0.0,
+      0.0
      ],
      "value": [
-      13744500000.0,
-      15577100000.0,
-      16493400000.0
+      0.0,
+      0.0,
+      0.0
      ],
      "assumption": "A6",
      "indicator": "exposure to buyer diligence demand"
@@ -797,7 +797,7 @@
   "vietnam": {
    "name": "Vietnam",
    "total_exports_usd": 390000000000.0,
-   "laws_touching": 13,
+   "laws_touching": 12,
    "markets": [
     {
      "key": "USA",
@@ -853,51 +853,51 @@
    "series": [
     {
      "year": 2024,
-     "union": 0.1939,
-     "border": 0.0683,
+     "union": 0.1967,
+     "border": 0.0711,
      "diligence": 0.0911,
      "disclosure": 0.0345
     },
     {
      "year": 2025,
-     "union": 0.1939,
-     "border": 0.0814,
+     "union": 0.1967,
+     "border": 0.0711,
      "diligence": 0.0911,
      "disclosure": 0.0795
     },
     {
      "year": 2026,
-     "union": 0.2044,
-     "border": 0.0946,
+     "union": 0.1967,
+     "border": 0.0842,
      "diligence": 0.0911,
      "disclosure": 0.0795
     },
     {
      "year": 2027,
-     "union": 0.2539,
-     "border": 0.2183,
-     "diligence": 0.1289,
-     "disclosure": 0.0795
+     "union": 0.2567,
+     "border": 0.2211,
+     "diligence": 0.093,
+     "disclosure": 0.1245
     },
     {
      "year": 2028,
-     "union": 0.2539,
-     "border": 0.2183,
-     "diligence": 0.1289,
+     "union": 0.2567,
+     "border": 0.2211,
+     "diligence": 0.093,
      "disclosure": 0.1245
     },
     {
      "year": 2029,
-     "union": 0.2539,
-     "border": 0.2183,
-     "diligence": 0.1289,
+     "union": 0.2567,
+     "border": 0.2211,
+     "diligence": 0.093,
      "disclosure": 0.1245
     },
     {
      "year": 2030,
-     "union": 0.2539,
-     "border": 0.2183,
-     "diligence": 0.1289,
+     "union": 0.2567,
+     "border": 0.2211,
+     "diligence": 0.093,
      "disclosure": 0.1245
     }
    ],
@@ -906,7 +906,7 @@
      "class": "A",
      "mechanism": "border",
      "market": "EU27",
-     "first_date": "2025-12-30",
+     "first_date": "2026-12-30",
      "share": [
       0.0262,
       0.0262,
@@ -944,14 +944,14 @@
      "market": "EU27",
      "first_date": "2027-08-18",
      "share": [
-      0.0018,
-      0.0018,
-      0.0018
+      0.0048,
+      0.0048,
+      0.0048
      ],
      "value": [
-      702000000.0,
-      702000000.0,
-      702000000.0
+      1872000000.0,
+      1872000000.0,
+      1872000000.0
      ],
      "assumption": null,
      "indicator": null
@@ -1032,16 +1032,16 @@
      "class": "B",
      "mechanism": "diligence",
      "market": "NLD",
-     "first_date": "2027-01-01",
+     "first_date": null,
      "share": [
-      0.018,
-      0.0204,
-      0.0216
+      0.0,
+      0.0,
+      0.0
      ],
      "value": [
-      7020000000.0,
-      7956000000.0,
-      8424000000.0
+      0.0,
+      0.0,
+      0.0
      ],
      "assumption": "A6",
      "indicator": "exposure to buyer diligence demand"
@@ -1124,13 +1124,13 @@
      "market": "USA",
      "first_date": "2022-06-21",
      "share": [
-      0.0683,
-      0.0683,
+      0.0711,
+      0.0711,
       0.28
      ],
      "value": [
-      26644800000.0,
-      26644800000.0,
+      27736800000.0,
+      27736800000.0,
       109200000000.0
      ],
      "assumption": "A5",
@@ -1171,7 +1171,7 @@
   "indonesia": {
    "name": "Indonesia",
    "total_exports_usd": 260000000000.0,
-   "laws_touching": 13,
+   "laws_touching": 12,
    "markets": [
     {
      "key": "USA",
@@ -1235,14 +1235,14 @@
     {
      "year": 2025,
      "union": 0.0873,
-     "border": 0.0201,
+     "border": 0.01,
      "diligence": 0.0551,
      "disclosure": 0.0492
     },
     {
      "year": 2026,
-     "union": 0.0954,
-     "border": 0.0302,
+     "union": 0.0873,
+     "border": 0.0201,
      "diligence": 0.0551,
      "disclosure": 0.0492
     },
@@ -1250,28 +1250,28 @@
      "year": 2027,
      "union": 0.1233,
      "border": 0.1,
-     "diligence": 0.0778,
-     "disclosure": 0.0492
+     "diligence": 0.0556,
+     "disclosure": 0.0762
     },
     {
      "year": 2028,
      "union": 0.1233,
      "border": 0.1,
-     "diligence": 0.0778,
+     "diligence": 0.0556,
      "disclosure": 0.0762
     },
     {
      "year": 2029,
      "union": 0.1233,
      "border": 0.1,
-     "diligence": 0.0778,
+     "diligence": 0.0556,
      "disclosure": 0.0762
     },
     {
      "year": 2030,
      "union": 0.1233,
      "border": 0.1,
-     "diligence": 0.0778,
+     "diligence": 0.0556,
      "disclosure": 0.0762
     }
    ],
@@ -1280,7 +1280,7 @@
      "class": "A",
      "mechanism": "border",
      "market": "EU27",
-     "first_date": "2025-12-30",
+     "first_date": "2026-12-30",
      "share": [
       0.0203,
       0.0203,
@@ -1406,16 +1406,16 @@
      "class": "B",
      "mechanism": "diligence",
      "market": "NLD",
-     "first_date": "2027-01-01",
+     "first_date": null,
      "share": [
-      0.0142,
-      0.0161,
-      0.017
+      0.0,
+      0.0,
+      0.0
      ],
      "value": [
-      3685500000.0,
-      4176900000.0,
-      4422600000.0
+      0.0,
+      0.0,
+      0.0
      ],
      "assumption": "A6",
      "indicator": "exposure to buyer diligence demand"
@@ -1545,7 +1545,7 @@
   "brazil": {
    "name": "Brazil",
    "total_exports_usd": 340000000000.0,
-   "laws_touching": 12,
+   "laws_touching": 11,
    "markets": [
     {
      "key": "EU27",
@@ -1601,51 +1601,51 @@
    "series": [
     {
      "year": 2024,
-     "union": 0.1032,
-     "border": 0.0,
+     "union": 0.1054,
+     "border": 0.0022,
      "diligence": 0.0862,
      "disclosure": 0.017
     },
     {
      "year": 2025,
-     "union": 0.1032,
-     "border": 0.0266,
+     "union": 0.1054,
+     "border": 0.0022,
      "diligence": 0.0862,
      "disclosure": 0.059
     },
     {
      "year": 2026,
-     "union": 0.1245,
-     "border": 0.0532,
+     "union": 0.1054,
+     "border": 0.0239,
      "diligence": 0.0862,
      "disclosure": 0.059
     },
     {
      "year": 2027,
-     "union": 0.1592,
-     "border": 0.14,
-     "diligence": 0.1212,
-     "disclosure": 0.059
+     "union": 0.1614,
+     "border": 0.1422,
+     "diligence": 0.0862,
+     "disclosure": 0.101
     },
     {
      "year": 2028,
-     "union": 0.1592,
-     "border": 0.14,
-     "diligence": 0.1212,
+     "union": 0.1614,
+     "border": 0.1422,
+     "diligence": 0.0862,
      "disclosure": 0.101
     },
     {
      "year": 2029,
-     "union": 0.1592,
-     "border": 0.14,
-     "diligence": 0.1212,
+     "union": 0.1614,
+     "border": 0.1422,
+     "diligence": 0.0862,
      "disclosure": 0.101
     },
     {
      "year": 2030,
-     "union": 0.1592,
-     "border": 0.14,
-     "diligence": 0.1212,
+     "union": 0.1614,
+     "border": 0.1422,
+     "diligence": 0.0862,
      "disclosure": 0.101
     }
    ],
@@ -1654,16 +1654,16 @@
      "class": "A",
      "mechanism": "border",
      "market": "EU27",
-     "first_date": "2025-12-30",
+     "first_date": "2026-12-30",
      "share": [
-      0.0532,
-      0.0532,
-      0.0532
+      0.0434,
+      0.0434,
+      0.0434
      ],
      "value": [
-      18088000000.0,
-      18088000000.0,
-      18088000000.0
+      14756000000.0,
+      14756000000.0,
+      14756000000.0
      ],
      "assumption": null,
      "indicator": null
@@ -1780,16 +1780,16 @@
      "class": "B",
      "mechanism": "diligence",
      "market": "NLD",
-     "first_date": "2027-01-01",
+     "first_date": null,
      "share": [
-      0.0199,
-      0.0226,
-      0.0239
+      0.0,
+      0.0,
+      0.0
      ],
      "value": [
-      6783000000.0,
-      7687400000.0,
-      8139600000.0
+      0.0,
+      0.0,
+      0.0
      ],
      "assumption": "A6",
      "indicator": "exposure to buyer diligence demand"
@@ -1872,13 +1872,13 @@
      "market": "USA",
      "first_date": "2022-06-21",
      "share": [
-      0.0,
-      0.0,
+      0.0022,
+      0.0022,
       0.11
      ],
      "value": [
-      0.0,
-      0.0,
+      748000000.0,
+      748000000.0,
       37400000000.0
      ],
      "assumption": "A5",
@@ -1919,7 +1919,7 @@
   "thailand": {
    "name": "Thailand",
    "total_exports_usd": 290000000000.0,
-   "laws_touching": 13,
+   "laws_touching": 12,
    "markets": [
     {
      "key": "USA",
@@ -1975,51 +1975,51 @@
    "series": [
     {
      "year": 2024,
-     "union": 0.1019,
-     "border": 0.0068,
+     "union": 0.1087,
+     "border": 0.0136,
      "diligence": 0.0551,
      "disclosure": 0.04
     },
     {
      "year": 2025,
-     "union": 0.1019,
-     "border": 0.0122,
+     "union": 0.1087,
+     "border": 0.0136,
      "diligence": 0.0551,
      "disclosure": 0.067
     },
     {
      "year": 2026,
-     "union": 0.1062,
-     "border": 0.0176,
+     "union": 0.1087,
+     "border": 0.0183,
      "diligence": 0.0551,
      "disclosure": 0.067
     },
     {
      "year": 2027,
-     "union": 0.1379,
-     "border": 0.0968,
-     "diligence": 0.0777,
-     "disclosure": 0.067
+     "union": 0.1447,
+     "border": 0.1036,
+     "diligence": 0.0555,
+     "disclosure": 0.094
     },
     {
      "year": 2028,
-     "union": 0.1379,
-     "border": 0.0968,
-     "diligence": 0.0777,
+     "union": 0.1447,
+     "border": 0.1036,
+     "diligence": 0.0555,
      "disclosure": 0.094
     },
     {
      "year": 2029,
-     "union": 0.1379,
-     "border": 0.0968,
-     "diligence": 0.0777,
+     "union": 0.1447,
+     "border": 0.1036,
+     "diligence": 0.0555,
      "disclosure": 0.094
     },
     {
      "year": 2030,
-     "union": 0.1379,
-     "border": 0.0968,
-     "diligence": 0.0777,
+     "union": 0.1447,
+     "border": 0.1036,
+     "diligence": 0.0555,
      "disclosure": 0.094
     }
    ],
@@ -2028,16 +2028,16 @@
      "class": "A",
      "mechanism": "border",
      "market": "EU27",
-     "first_date": "2025-12-30",
+     "first_date": "2026-12-30",
      "share": [
-      0.0108,
-      0.0108,
-      0.0108
+      0.0095,
+      0.0095,
+      0.0095
      ],
      "value": [
-      3132000000.0,
-      3132000000.0,
-      3132000000.0
+      2740500000.0,
+      2740500000.0,
+      2740500000.0
      ],
      "assumption": null,
      "indicator": null
@@ -2154,16 +2154,16 @@
      "class": "B",
      "mechanism": "diligence",
      "market": "NLD",
-     "first_date": "2027-01-01",
+     "first_date": null,
      "share": [
-      0.0101,
-      0.0115,
-      0.0121
+      0.0,
+      0.0,
+      0.0
      ],
      "value": [
-      2936250000.0,
-      3327750000.0,
-      3523500000.0
+      0.0,
+      0.0,
+      0.0
      ],
      "assumption": "A6",
      "indicator": "exposure to buyer diligence demand"
@@ -2246,13 +2246,13 @@
      "market": "USA",
      "first_date": "2022-06-21",
      "share": [
-      0.0068,
-      0.0068,
+      0.0136,
+      0.0136,
       0.17
      ],
      "value": [
-      1972000000.0,
-      1972000000.0,
+      3944000000.0,
+      3944000000.0,
       49300000000.0
      ],
      "assumption": "A5",
@@ -2293,7 +2293,7 @@
   "ethiopia": {
    "name": "Ethiopia",
    "total_exports_usd": 11000000000.0,
-   "laws_touching": 13,
+   "laws_touching": 12,
    "markets": [
     {
      "key": "EU27",
@@ -2357,14 +2357,14 @@
     {
      "year": 2025,
      "union": 0.1917,
-     "border": 0.062,
+     "border": 0.008,
      "diligence": 0.1593,
      "disclosure": 0.0964
     },
     {
      "year": 2026,
-     "union": 0.2349,
-     "border": 0.116,
+     "union": 0.1917,
+     "border": 0.0596,
      "diligence": 0.1593,
      "disclosure": 0.0964
     },
@@ -2372,28 +2372,28 @@
      "year": 2027,
      "union": 0.2877,
      "border": 0.248,
-     "diligence": 0.2193,
-     "disclosure": 0.0964
+     "diligence": 0.1593,
+     "disclosure": 0.1684
     },
     {
      "year": 2028,
      "union": 0.2877,
      "border": 0.248,
-     "diligence": 0.2193,
+     "diligence": 0.1593,
      "disclosure": 0.1684
     },
     {
      "year": 2029,
      "union": 0.2877,
      "border": 0.248,
-     "diligence": 0.2193,
+     "diligence": 0.1593,
      "disclosure": 0.1684
     },
     {
      "year": 2030,
      "union": 0.2877,
      "border": 0.248,
-     "diligence": 0.2193,
+     "diligence": 0.1593,
      "disclosure": 0.1684
     }
    ],
@@ -2402,16 +2402,16 @@
      "class": "A",
      "mechanism": "border",
      "market": "EU27",
-     "first_date": "2025-12-30",
+     "first_date": "2026-12-30",
      "share": [
-      0.108,
-      0.108,
-      0.108
+      0.1032,
+      0.1032,
+      0.1032
      ],
      "value": [
-      1188000000.0,
-      1188000000.0,
-      1188000000.0
+      1135200000.0,
+      1135200000.0,
+      1135200000.0
      ],
      "assumption": null,
      "indicator": null
@@ -2528,16 +2528,16 @@
      "class": "B",
      "mechanism": "diligence",
      "market": "NLD",
-     "first_date": "2027-01-01",
+     "first_date": null,
      "share": [
-      0.0216,
-      0.0245,
-      0.0259
+      0.0,
+      0.0,
+      0.0
      ],
      "value": [
-      237600000.0,
-      269280000.0,
-      285120000.0
+      0.0,
+      0.0,
+      0.0
      ],
      "assumption": "A6",
      "indicator": "exposure to buyer diligence demand"
@@ -2667,7 +2667,7 @@
   "kenya": {
    "name": "Kenya",
    "total_exports_usd": 13000000000.0,
-   "laws_touching": 12,
+   "laws_touching": 11,
    "markets": [
     {
      "key": "EU27",
@@ -2731,14 +2731,14 @@
     {
      "year": 2025,
      "union": 0.2197,
-     "border": 0.0409,
+     "border": 0.0344,
      "diligence": 0.1282,
      "disclosure": 0.1201
     },
     {
      "year": 2026,
-     "union": 0.2249,
-     "border": 0.0474,
+     "union": 0.2197,
+     "border": 0.0409,
      "diligence": 0.1282,
      "disclosure": 0.1201
     },
@@ -2746,28 +2746,28 @@
      "year": 2027,
      "union": 0.3037,
      "border": 0.2444,
-     "diligence": 0.1807,
-     "disclosure": 0.1201
+     "diligence": 0.1282,
+     "disclosure": 0.1831
     },
     {
      "year": 2028,
      "union": 0.3037,
      "border": 0.2444,
-     "diligence": 0.1807,
+     "diligence": 0.1282,
      "disclosure": 0.1831
     },
     {
      "year": 2029,
      "union": 0.3037,
      "border": 0.2444,
-     "diligence": 0.1807,
+     "diligence": 0.1282,
      "disclosure": 0.1831
     },
     {
      "year": 2030,
      "union": 0.3037,
      "border": 0.2444,
-     "diligence": 0.1807,
+     "diligence": 0.1282,
      "disclosure": 0.1831
     }
    ],
@@ -2776,7 +2776,7 @@
      "class": "A",
      "mechanism": "border",
      "market": "EU27",
-     "first_date": "2025-12-30",
+     "first_date": "2026-12-30",
      "share": [
       0.013,
       0.013,
@@ -2902,16 +2902,16 @@
      "class": "B",
      "mechanism": "diligence",
      "market": "NLD",
-     "first_date": "2027-01-01",
+     "first_date": null,
      "share": [
-      0.0441,
-      0.05,
-      0.0529
+      0.0,
+      0.0,
+      0.0
      ],
      "value": [
-      573300000.0,
-      649740000.0,
-      687960000.0
+      0.0,
+      0.0,
+      0.0
      ],
      "assumption": "A6",
      "indicator": "exposure to buyer diligence demand"
@@ -3041,7 +3041,7 @@
   "ghana": {
    "name": "Ghana",
    "total_exports_usd": 25000000000.0,
-   "laws_touching": 13,
+   "laws_touching": 12,
    "markets": [
     {
      "key": "EU27",
@@ -3105,14 +3105,14 @@
     {
      "year": 2025,
      "union": 0.2604,
-     "border": 0.0618,
+     "border": 0.0,
      "diligence": 0.2423,
      "disclosure": 0.108
     },
     {
      "year": 2026,
-     "union": 0.3098,
-     "border": 0.1236,
+     "union": 0.2604,
+     "border": 0.0618,
      "diligence": 0.2423,
      "disclosure": 0.108
     },
@@ -3120,28 +3120,28 @@
      "year": 2027,
      "union": 0.3804,
      "border": 0.3,
-     "diligence": 0.3173,
-     "disclosure": 0.108
+     "diligence": 0.2423,
+     "disclosure": 0.1981
     },
     {
      "year": 2028,
      "union": 0.3804,
      "border": 0.3,
-     "diligence": 0.3173,
+     "diligence": 0.2423,
      "disclosure": 0.1981
     },
     {
      "year": 2029,
      "union": 0.3804,
      "border": 0.3,
-     "diligence": 0.3173,
+     "diligence": 0.2423,
      "disclosure": 0.1981
     },
     {
      "year": 2030,
      "union": 0.3804,
      "border": 0.3,
-     "diligence": 0.3173,
+     "diligence": 0.2423,
      "disclosure": 0.1981
     }
    ],
@@ -3150,7 +3150,7 @@
      "class": "A",
      "mechanism": "border",
      "market": "EU27",
-     "first_date": "2025-12-30",
+     "first_date": "2026-12-30",
      "share": [
       0.1236,
       0.1236,
@@ -3276,16 +3276,16 @@
      "class": "B",
      "mechanism": "diligence",
      "market": "NLD",
-     "first_date": "2027-01-01",
+     "first_date": null,
      "share": [
-      0.0675,
-      0.0765,
-      0.081
+      0.0,
+      0.0,
+      0.0
      ],
      "value": [
-      1687500000.0,
-      1912500000.0,
-      2025000000.0
+      0.0,
+      0.0,
+      0.0
      ],
      "assumption": "A6",
      "indicator": "exposure to buyer diligence demand"
@@ -3415,7 +3415,7 @@
   "cote-divoire": {
    "name": "Côte d'Ivoire",
    "total_exports_usd": 17000000000.0,
-   "laws_touching": 13,
+   "laws_touching": 12,
    "markets": [
     {
      "key": "EU27",
@@ -3479,14 +3479,14 @@
     {
      "year": 2025,
      "union": 0.2549,
-     "border": 0.1168,
+     "border": 0.0,
      "diligence": 0.2411,
      "disclosure": 0.1278
     },
     {
      "year": 2026,
-     "union": 0.3484,
-     "border": 0.2337,
+     "union": 0.2549,
+     "border": 0.1168,
      "diligence": 0.2411,
      "disclosure": 0.1278
     },
@@ -3494,28 +3494,28 @@
      "year": 2027,
      "union": 0.4069,
      "border": 0.38,
-     "diligence": 0.3361,
-     "disclosure": 0.1278
+     "diligence": 0.2411,
+     "disclosure": 0.2418
     },
     {
      "year": 2028,
      "union": 0.4069,
      "border": 0.38,
-     "diligence": 0.3361,
+     "diligence": 0.2411,
      "disclosure": 0.2418
     },
     {
      "year": 2029,
      "union": 0.4069,
      "border": 0.38,
-     "diligence": 0.3361,
+     "diligence": 0.2411,
      "disclosure": 0.2418
     },
     {
      "year": 2030,
      "union": 0.4069,
      "border": 0.38,
-     "diligence": 0.3361,
+     "diligence": 0.2411,
      "disclosure": 0.2418
     }
    ],
@@ -3524,7 +3524,7 @@
      "class": "A",
      "mechanism": "border",
      "market": "EU27",
-     "first_date": "2025-12-30",
+     "first_date": "2026-12-30",
      "share": [
       0.2337,
       0.2337,
@@ -3650,16 +3650,16 @@
      "class": "B",
      "mechanism": "diligence",
      "market": "NLD",
-     "first_date": "2027-01-01",
+     "first_date": null,
      "share": [
-      0.0798,
-      0.0904,
-      0.0958
+      0.0,
+      0.0,
+      0.0
      ],
      "value": [
-      1356600000.0,
-      1537480000.0,
-      1627920000.0
+      0.0,
+      0.0,
+      0.0
      ],
      "assumption": "A6",
      "indicator": "exposure to buyer diligence demand"

@@ -125,6 +125,7 @@ const clampDesc = s => s.length <= 158 ? s : s.slice(0, 155).replace(/\s+\S*$/, 
     <div class="wrap">
       <div class="section-head reveal">
         <div><p class="kicker">Timeline</p><h2 class="h2">How it got here</h2></div>
+      <a class="textlink" href={`/timeline/${law.slug}/`}>Full timeline with what comes next <i>→</i></a>
       </div>
       <div class="timeline">
         {law.timeline.map((t, i) => (

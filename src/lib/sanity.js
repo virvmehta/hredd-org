@@ -8,7 +8,10 @@ const dataset = import.meta.env.SANITY_DATASET || 'production';
 export const client = createClient({
   projectId,
   dataset,
-  useCdn: true,
+  // useCdn:false so every build reads the live dataset directly rather than
+  // a cached CDN copy. Builds are infrequent, so freshness matters far more
+  // than shaving CDN latency, and a stale read here means a stale deploy.
+  useCdn: false,
   apiVersion: '2024-01-01'
 });
 
@@ -40,9 +43,17 @@ let _laws, _articles, _settings;
 
 export function getAllLaws() {
   if (!_laws) {
-    _laws = fetchWithFallback(queries.allLaws, staticLaws, 'laws').then((laws) =>
-      [...laws].sort((a, b) => (a.order ?? 999) - (b.order ?? 999))
-    );
+    _laws = fetchWithFallback(queries.allLaws, [], 'laws').then((sanityLaws) => {
+      // Merge by slug rather than swap wholesale. This lets laws be migrated
+      // into Sanity one at a time: any law with a published Sanity document
+      // uses that document, and every law without one still falls back to
+      // the static data, so the site is never missing pages mid-migration.
+      const bySlug = new Map(staticLaws.map((l) => [l.slug, l]));
+      for (const law of sanityLaws) {
+        if (law?.slug) bySlug.set(law.slug, law);
+      }
+      return [...bySlug.values()].sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
+    });
   }
   return _laws;
 }

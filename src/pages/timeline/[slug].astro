@@ -1,0 +1,299 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getAllLaws, formatDate } from '../../lib/sanity.js';
+import scope from '../../../pipeline/law_scope.json';
+
+export async function getStaticPaths(){
+  const laws = await getAllLaws();
+  return laws.map(law => ({ params: { slug: law.slug }, props: { law } }));
+}
+
+const { law } = Astro.props;
+const sn = law.shortName || law.name;
+
+// ---- merge past events with statutory future steps from the pipeline mapping ----
+const regime = scope.regimes.find(r => r.slug === law.slug);
+const todayISO = new Date().toISOString().slice(0, 10);
+const MONTHS = { January:'01', February:'02', March:'03', April:'04', May:'05', June:'06',
+  July:'07', August:'08', September:'09', October:'10', November:'11', December:'12' };
+
+// tracker timeline dates arrive as "July 2024" style strings; make them sortable
+function sortableDate(s){
+  const dmy = String(s).match(/(\d{1,2})\s+([A-Z][a-z]+)\s+(\d{4})/);
+  if(dmy && MONTHS[dmy[2]]) return `${dmy[3]}-${MONTHS[dmy[2]]}-${dmy[1].padStart(2, '0')}`;
+  const my = String(s).match(/([A-Z][a-z]+)\s+(\d{4})/);
+  if(my && MONTHS[my[1]]) return `${my[2]}-${MONTHS[my[1]]}-15`;
+  const y = String(s).match(/(\d{4})/);
+  return y ? `${y[1]}-06-15` : '2099-01-01';
+}
+
+const past = (law.timeline || []).map(t => {
+  const iso = sortableDate(t.date);
+  return { when: t.date, iso, text: t.event, future: iso > todayISO };
+});
+
+const future = (regime?.steps || [])
+  .filter(s => s.date > todayISO)
+  .map(s => ({
+    when: new Date(s.date + 'T00:00:00').toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' }),
+    iso: s.date, text: s.label + '.', future: true }));
+
+const merged = [...past];
+for(const f of future){
+  const dup = merged.some(e => Math.abs(new Date(e.iso) - new Date(f.iso)) < 40 * 86400000);
+  if(!dup) merged.push(f);
+}
+const spine = merged.sort((a, b) => a.iso.localeCompare(b.iso));
+const nextStep = future[0] || null;
+
+// ---- horizontal track geometry, computed at build ----
+const t0 = new Date(spine[0].iso).getTime();
+const t1 = new Date(spine[spine.length - 1].iso).getTime();
+const span = Math.max(t1 - t0, 86400000);
+const nowPos = Math.min(98, Math.max(2, 4 + 92 * (Date.now() - t0) / span));
+let lastX = -99, tier = 0;
+const nodes = spine.map((e, i) => {
+  const x = 4 + 92 * (new Date(e.iso).getTime() - t0) / span;
+  tier = (x - lastX < 9) ? (tier + 1) % 3 : 0;
+  lastX = x;
+  return { ...e, x: +x.toFixed(2), tier, i };
+});
+const defaultActive = Math.max(0, nodes.filter(n => !n.future).length - 1);
+const yearTicks = [];
+for(let y = new Date(t0).getFullYear() + 1; y <= new Date(t1).getFullYear(); y++){
+  const xx = 4 + 92 * (new Date(y + '-01-01').getTime() - t0) / span;
+  if(xx > 5 && xx < 97) yearTicks.push({ y, x: +xx.toFixed(2) });
+}
+const threadD = nodes.map((n, i) => `${i === 0 ? 'M' : 'L'}${n.x},${50 - (n.tier - 1) * 0}`).join(' ');
+
+
+// ---- page copy generated from data, unique per law ----
+const title = `${sn} Timeline: Key Dates and What Comes Next | hredd.org`.length <= 70
+  ? `${sn} Timeline: Key Dates and What Comes Next | hredd.org`
+  : `${sn} Timeline: Key Dates | hredd.org`;
+
+const clamp = s => s.length <= 158 ? s : s.slice(0, 155).replace(/\s+\S*$/, '') + '.';
+const description = clamp(`Every key date for the ${law.name}: enactment, amendments, and application deadlines on one verified timeline, updated monthly from primary sources.`);
+
+const standfirst = `${law.name} (${law.jurisdiction}) is currently ${law.status.toLowerCase()}. ` +
+  (nextStep
+    ? `The next statutory date is ${nextStep.when}, when ${nextStep.text.replace(/\.$/, '').toLowerCase()} takes effect, and every date below is verified against primary sources.`
+    : `Every date below is verified against primary sources, with tracker revisions logged openly at the foot of the page.`);
+
+// ---- FAQ, generated from tracker fields, unique per law ----
+const faqs = [
+  { q: `When does the ${sn} apply?`,
+    a: law.firstComplianceDeadline && !/not applicable/i.test(law.firstComplianceDeadline)
+      ? `The first compliance date for the ${law.name} is ${law.firstComplianceDeadline}. ${nextStep ? 'The next statutory step on the calendar is ' + nextStep.when + '.' : 'All statutory application dates have now passed.'}`
+      : `The ${law.name} currently has no fixed statutory application date, so no compliance deadline can be stated with confidence yet.` },
+  { q: `Is the ${sn} in force today?`,
+    a: `As of ${formatDate(law.lastUpdated)}, the ${law.name} is ${law.status.toLowerCase()} in ${law.jurisdiction}. ${law.oneLineSummary}` },
+  { q: `What changed most recently on the ${sn}?`,
+    a: (law.changelog && law.changelog[0])
+      ? `${law.changelog[0].text} That revision was logged in ${law.changelog[0].date} on the hredd.org tracker.`
+      : `The tracker entry was last verified on ${formatDate(law.lastUpdated)} with no substantive change recorded since.` },
+];
+
+const faqJson = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": faqs.map(f => ({
+    "@type": "Question", "name": f.q,
+    "acceptedAnswer": { "@type": "Answer", "text": f.a }
+  }))
+};
+const crumbJson = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "hredd.org", "item": "https://hredd.org/" },
+    { "@type": "ListItem", "position": 2, "name": "Timelines", "item": "https://hredd.org/timeline/" },
+    { "@type": "ListItem", "position": 3, "name": `${sn} timeline`, "item": `https://hredd.org/timeline/${law.slug}/` }
+  ]
+};
+---
+<Base title={title} description={description} active="tracker">
+
+<script type="application/ld+json" set:html={JSON.stringify(faqJson)} />
+<script type="application/ld+json" set:html={JSON.stringify(crumbJson)} />
+
+<section class="law-head">
+  <div class="wrap">
+    <p class="crumb reveal"><a href="/">hredd.org</a> <span>/</span> <a href="/timeline/">Timelines</a> <span>/</span> {sn}</p>
+    <p class="kicker reveal" style="margin-top:26px">Verified {formatDate(law.lastUpdated)} · updated monthly</p>
+    <h1 class="display reveal" data-delay="1" style="font-size:clamp(38px,5vw,70px)">The {sn}<br>timeline</h1>
+    <p class="standfirst reveal" data-delay="2">{standfirst}</p>
+    <div class="law-meta reveal" data-delay="3">
+      <span class="chip" data-g={law.statusType}>{law.status}</span>
+      <span class="mono faint">{law.jurisdiction}</span>
+      <a class="textlink" href={`/laws/${law.slug}/`}>Full tracker entry <i>→</i></a>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap" style="max-width:860px">
+    <div class="htl reveal" id="htl" data-active={defaultActive}>
+      <div class="htl-scroll" id="htl-scroll" tabindex="0" aria-label={`${sn} timeline, use arrow keys to move between events`}>
+        <div class="htl-track">
+          <div class="htl-rail" aria-hidden="true"></div>
+          <div class="htl-rail-future" aria-hidden="true" style={`left:${nowPos}%`}></div>
+          {yearTicks.map(tk => (
+            <span class="htl-year" style={`left:${tk.x}%`} aria-hidden="true">{tk.y}</span>
+          ))}
+          <div class="htl-now" style={`left:${nowPos}%`} aria-hidden="true"><i></i><span>Today</span></div>
+          {nodes.map(n => (
+            <button class={`htl-node t${n.tier}${n.future ? ' future' : ''}`} style={`left:${n.x}%`}
+              data-i={n.i} aria-label={`${n.when}: ${n.text}`}>
+              <span class="htl-stem" aria-hidden="true"></span>
+              <span class="htl-diamond" aria-hidden="true"></span>
+              <span class="htl-date"><time datetime={n.iso}>{n.when}</time></span>
+            </button>
+          ))}
+        </div>
+      </div>
+      <div class="htl-card">
+        <button class="htl-arrow" id="htl-prev" aria-label="Previous event">←</button>
+        <div class="htl-detail" aria-live="polite">
+          {nodes.map(n => (
+            <div class="htl-event" data-i={n.i} hidden={n.i !== defaultActive}>
+              <p class="mono htl-ev-date"><time datetime={n.iso}>{n.when}</time>{n.future && <span class="tl-ahead">Ahead</span>}</p>
+              <p class="htl-ev-text">{n.text}</p>
+            </div>
+          ))}
+        </div>
+        <button class="htl-arrow" id="htl-next" aria-label="Next event">→</button>
+      </div>
+    </div>
+
+    <div class="panel reveal" style="margin-top:clamp(40px,6vw,64px)">
+      <h4>Common questions</h4>
+      {faqs.map(f => (
+        <div class="faq-item">
+          <h3>{f.q}</h3>
+          <p>{f.a}</p>
+        </div>
+      ))}
+    </div>
+
+    {law.changelog && law.changelog.length > 0 && (
+      <div class="reveal" style="margin-top:clamp(36px,5vw,56px)">
+        <p class="kicker" style="margin-bottom:20px">Tracker revisions, logged openly</p>
+        {law.changelog.map(c => (
+          <p style="margin:0 0 14px; padding-left:20px; border-left:2px solid var(--line); font-size:14.5px; color:var(--ink-faint)"><span class="mono" style="color:var(--gold)">{c.date}</span> &nbsp; {c.text}</p>
+        ))}
+      </div>
+    )}
+
+    <p class="mono faint reveal" style="margin-top:44px">Sources for every date live on the <a href={`/laws/${law.slug}/`} style="color:var(--gold)">full tracker entry</a> · movement lands in the <a href="/subscribe/" style="color:var(--gold)">monthly digest</a> first</p>
+  </div>
+</section>
+
+<style>
+  .htl{ margin-top:clamp(10px,2vw,24px); }
+  .htl-scroll{ overflow-x:auto; overflow-y:hidden; touch-action:pan-y; scrollbar-width:thin;
+    scrollbar-color:var(--gold-dim) transparent; cursor:grab; }
+  .htl-scroll.dragging{ cursor:grabbing; user-select:none; }
+  .htl-scroll:focus-visible{ outline:1px solid var(--gold); outline-offset:4px; }
+  .htl-track{ position:relative; height:190px; min-width:900px; width:max(100%, 1080px); }
+  .htl-rail{ position:absolute; left:1%; right:1%; top:50%; height:1px; background:var(--line); }
+  .htl-rail-future{ position:absolute; right:1%; top:50%; height:1px;
+    background:repeating-linear-gradient(90deg, var(--gold-dim) 0 5px, transparent 5px 11px); }
+  .htl-year{ position:absolute; top:calc(50% + 14px); transform:translateX(-50%);
+    font-family:var(--mono); font-weight:500; font-size:9px; letter-spacing:.12em; color:var(--ink-faint); }
+  .htl-year::before{ content:""; position:absolute; left:50%; top:-12px; height:8px; width:1px;
+    background:var(--line-soft); }
+  .htl-now{ position:absolute; top:14%; bottom:14%; width:1px; transform:translateX(-50%);
+    background:linear-gradient(180deg, transparent, var(--gold-dim), transparent); }
+  .htl-now i{ position:absolute; top:-4px; left:50%; width:7px; height:7px; border-radius:50%;
+    background:var(--gold); transform:translateX(-50%); animation:htl-pulse 2.6s infinite; }
+  .htl-now span{ position:absolute; top:-22px; left:50%; transform:translateX(-50%);
+    font-family:var(--mono); font-weight:500; font-size:8px; letter-spacing:.16em;
+    text-transform:uppercase; color:var(--gold-hi); white-space:nowrap; }
+  @keyframes htl-pulse{ 0%{ box-shadow:0 0 0 0 rgba(201,163,95,.35); }
+    70%{ box-shadow:0 0 0 12px rgba(201,163,95,0); } 100%{ box-shadow:0 0 0 0 rgba(201,163,95,0); } }
+  .htl-node{ position:absolute; top:50%; transform:translate(-50%,-50%); background:none;
+    border:0; padding:26px 10px; cursor:pointer; }
+  .htl-stem{ position:absolute; left:50%; width:1px; background:var(--gold-dim); }
+  .htl-diamond{ display:block; width:9px; height:9px; transform:rotate(45deg);
+    background:var(--gold); border:1px solid var(--gold); transition:all .3s; }
+  .htl-node.future .htl-diamond{ background:transparent; border-style:dashed; border-color:var(--gold-dim); }
+  .htl-date{ position:absolute; left:50%; transform:translateX(-50%); white-space:nowrap;
+    font-family:var(--mono); font-weight:500; font-size:9px; letter-spacing:.1em;
+    text-transform:uppercase; color:var(--ink-faint); transition:color .3s; }
+  .htl-node.t0 .htl-date{ top:-6px; }
+  .htl-node.t1 .htl-date{ top:-26px; } .htl-node.t1 .htl-stem{ height:20px; bottom:calc(50% + 6px); }
+  .htl-node.t2 .htl-date{ top:auto; bottom:-6px; }
+  .htl-node:hover .htl-diamond{ box-shadow:0 0 10px var(--gold-ghost); }
+  .htl-node.on .htl-diamond{ width:12px; height:12px; background:var(--gold-hi);
+    border-color:var(--gold-hi); box-shadow:0 0 14px rgba(201,163,95,.5); }
+  .htl-node.on .htl-date{ color:var(--gold-hi); }
+  .htl-node:focus-visible{ outline:1px solid var(--gold); outline-offset:2px; }
+  .htl-card{ display:grid; grid-template-columns:auto 1fr auto; gap:clamp(14px,3vw,30px);
+    align-items:center; border:1px solid var(--line); border-left:2px solid var(--gold);
+    background:radial-gradient(120% 180% at 0% 0%, var(--panel-2), var(--bg) 70%);
+    padding:clamp(18px,3vw,30px) clamp(18px,3.5vw,36px); margin-top:6px; min-height:118px; }
+  .htl-arrow{ background:none; border:1px solid var(--line); color:var(--ink-dim);
+    font-size:16px; width:40px; height:40px; cursor:pointer; transition:all .3s; }
+  .htl-arrow:hover{ border-color:var(--gold); color:var(--gold-hi); }
+  .htl-arrow:disabled{ opacity:.25; cursor:default; }
+  .htl-ev-date{ margin:0 0 8px; color:var(--gold); font-size:10px; letter-spacing:.14em; }
+  .htl-ev-text{ margin:0; font:400 clamp(16.5px,1.5vw,19px)/1.6 var(--serif); color:var(--ink); max-width:70ch; }
+  @media (max-width:640px){ .htl-track{ height:160px; min-width:760px; } }
+  .tl-ahead{ font-family:var(--mono); font-weight:500; font-size:8.5px; letter-spacing:.12em;
+    text-transform:uppercase; color:var(--gold-hi); border:1px solid var(--gold-dim);
+    padding:3px 8px; margin-left:12px; vertical-align:1px; }
+  .faq-item{ padding:18px 0; border-bottom:1px solid var(--line-soft); }
+  .faq-item:last-child{ border-bottom:0; padding-bottom:0; }
+  .faq-item h3{ font:400 19px/1.4 var(--serif); margin:0 0 8px; color:var(--ink); }
+  .faq-item p{ margin:0; font-size:15px; line-height:1.65; color:var(--ink-dim); }
+</style>
+
+
+<script>
+  const root = document.getElementById('htl');
+  const scroller = document.getElementById('htl-scroll');
+  if(root && scroller){
+    const nodes = [...root.querySelectorAll('.htl-node')];
+    const events = [...root.querySelectorAll('.htl-event')];
+    const prev = document.getElementById('htl-prev');
+    const next = document.getElementById('htl-next');
+    let active = parseInt(root.dataset.active, 10) || 0;
+
+    function show(i, scroll = true){
+      active = Math.max(0, Math.min(nodes.length - 1, i));
+      nodes.forEach((n, k) => n.classList.toggle('on', k === active));
+      events.forEach((e, k) => { e.hidden = k !== active; });
+      prev.disabled = active === 0;
+      next.disabled = active === nodes.length - 1;
+      if(scroll){
+        const n = nodes[active];
+        scroller.scrollTo({ left: n.offsetLeft - scroller.clientWidth / 2, behavior: 'smooth' });
+      }
+    }
+    nodes.forEach(n => n.addEventListener('click', () => show(parseInt(n.dataset.i, 10))));
+    prev.addEventListener('click', () => show(active - 1));
+    next.addEventListener('click', () => show(active + 1));
+    scroller.addEventListener('keydown', e => {
+      if(e.key === 'ArrowRight'){ e.preventDefault(); show(active + 1); }
+      if(e.key === 'ArrowLeft'){ e.preventDefault(); show(active - 1); }
+    });
+
+    let down = false, sx = 0, sl = 0, moved = 0;
+    scroller.addEventListener('pointerdown', e => {
+      down = true; moved = 0; sx = e.clientX; sl = scroller.scrollLeft;
+      scroller.classList.add('dragging');
+    });
+    window.addEventListener('pointermove', e => {
+      if(!down) return;
+      const dx = e.clientX - sx; moved = Math.max(moved, Math.abs(dx));
+      scroller.scrollLeft = sl - dx;
+    });
+    window.addEventListener('pointerup', () => { down = false; scroller.classList.remove('dragging'); });
+    scroller.addEventListener('click', e => { if(moved > 6){ e.stopPropagation(); e.preventDefault(); } }, true);
+
+    show(active, true);
+  }
+</script>
+
+</Base>

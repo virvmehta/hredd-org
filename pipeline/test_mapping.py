@@ -27,15 +27,26 @@ for r in scope["regimes"]:
     if r["class"] == "C":
         check(f"{s}: C has no scope", r["scope"] == "none")
     if r.get("scope") == "product":
-        check(f"{s}: product scope has hs4", len(r.get("hs4", [])) > 0)
+        check(f"{s}: product scope has chapters", len(r.get("chapters", [])) > 0)
     for st in r.get("steps", []):
         check(f"{s}: step date ISO", len(st["date"]) == 10)
 
 eudr = next(r for r in scope["regimes"] if r["slug"]=="eu-deforestation-regulation")
-for fam, codes in {"cattle":["0102","0201"],"cocoa":["1801"],"coffee":["0901"],"palm":["1511"],
-                   "rubber":["4001"],"soya":["1201"],"wood":["4403","4407","9403"]}.items():
-    check(f"EUDR covers {fam}", all(c in eudr["hs4"] for c in codes))
+for fam, chap in {"cattle":"01","coffee":"09","palm":"15","cocoa":"18",
+                  "rubber":"40","wood":"44","pulp":"47","furniture":"94"}.items():
+    check(f"EUDR chapter covers {fam}", chap in eudr["chapters"])
+uflpa = next(r for r in scope["regimes"] if r["slug"]=="us-uflpa")
+for sec, chap in {"cotton":"52","apparel":"61","tomatoes":"20","polysilicon":"28",
+                  "electronics-solar":"85","pvc":"39","aluminium":"76","seafood":"03"}.items():
+    check(f"UFLPA priority chapter covers {sec}", chap in uflpa["priority_chapters"])
 check("18 regimes mapped", len(scope["regimes"]) == 18)
+for r in scope["regimes"]:
+    if r.get("scope") == "product":
+        check(f"{r['slug']}: chapters are 2-digit", all(len(c)==2 for c in r["chapters"]))
+    if r.get("scope") == "priority":
+        check(f"{r['slug']}: priority chapters 2-digit", all(len(c)==2 for c in r["priority_chapters"]))
+    if r.get("scope") in ("product","priority"):
+        check(f"{r['slug']}: has scope_note", bool(r.get("scope_note")))
 
 subprocess.run([sys.executable, os.path.join(HERE,"compute.py"), "--sample"], check=True, capture_output=True)
 out = json.load(open(os.path.join(HERE,"..","public","data","trade-exposure.json"), encoding="utf-8"))

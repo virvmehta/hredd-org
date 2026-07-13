@@ -1,6 +1,6 @@
 {
- "mapping_version": "2026.2",
- "notes": "Phase two mapping. Every regime declares market, mechanism, estimation class, product scope, statutory steps, and, for Class B, the numbered assumption behind its coverage band. Class C regimes never receive values. Regimes without statutory dates carry no steps and are excluded from projection.",
+ "mapping_version": "2026.4",
+ "notes": "Phase two mapping, chapter-level. Product scope is expressed as whole HS2 chapters rather than selected HS4 lines, which is coarser but honest and over-inclusive within each chapter, the defensible choice given that enforcement follows embedded inputs across finished goods. Full CN8 enumeration is a later mapping version. Class B bands and Class C exclusions unchanged.",
  "assumptions": [
   {
    "id": "A1",
@@ -40,99 +40,39 @@
    "market": "EU27",
    "mechanism": "border",
    "class": "A",
-   "granularity": "HS4 approximation of CN8 Annex I",
+   "granularity": "HS2 chapter-level approximation",
    "legal_source": "Regulation (EU) 2023/1115, Annex I",
    "legal_source_url": "https://eur-lex.europa.eu/eli/reg/2023/1115/oj",
    "steps": [
     {
-     "date": "2025-12-30",
+     "date": "2026-12-30",
      "label": "Large operators"
     },
     {
-     "date": "2026-06-30",
-     "label": "SMEs"
+     "date": "2027-06-30",
+     "label": "Micro and small enterprises"
     }
    ],
    "scope": "product",
-   "hs4": [
-    "0102",
-    "0201",
-    "0202",
-    "0206",
-    "1602",
-    "4101",
-    "4104",
-    "4107",
-    "1801",
-    "1802",
-    "1803",
-    "1804",
-    "1805",
-    "1806",
-    "0901",
-    "1207",
-    "1511",
-    "1513",
-    "2306",
-    "3823",
-    "4001",
-    "4005",
-    "4006",
-    "4007",
-    "4008",
-    "4011",
-    "4012",
-    "4013",
-    "1201",
-    "1208",
-    "1507",
-    "2304",
-    "4401",
-    "4402",
-    "4403",
-    "4406",
-    "4407",
-    "4408",
-    "4409",
-    "4410",
-    "4411",
-    "4412",
-    "4413",
-    "4414",
-    "4415",
-    "4416",
-    "4417",
-    "4418",
-    "4419",
-    "4420",
-    "4421",
-    "4701",
-    "4702",
-    "4703",
-    "4704",
-    "4705",
-    "4801",
-    "4802",
-    "4803",
-    "4804",
-    "4805",
-    "4806",
-    "4807",
-    "4808",
-    "4809",
-    "4810",
-    "4811",
-    "4817",
-    "4818",
-    "4819",
-    "4820",
-    "4821",
-    "4822",
-    "4823",
-    "9401",
-    "9403",
-    "9406"
-   ]
+   "hs2": [
+    "44",
+    "47",
+    "48"
+   ],
+   "chapters": [
+    "01",
+    "02",
+    "09",
+    "12",
+    "15",
+    "18",
+    "40",
+    "44",
+    "47",
+    "48",
+    "94"
+   ],
+   "scope_note": "Chapters covering cattle, coffee, oil palm and soya derivatives, cocoa, rubber, wood, pulp and paper, and wooden furniture. Chapter-level approximation of the CN8 Annex I; over-inclusive within these chapters."
   },
   {
    "slug": "eu-forced-labour-regulation",
@@ -157,7 +97,7 @@
    "market": "EU27",
    "mechanism": "diligence",
    "class": "A",
-   "granularity": "HS4 battery headings",
+   "granularity": "HS2 chapter-level approximation",
    "legal_source": "Regulation (EU) 2023/1542",
    "legal_source_url": "https://eur-lex.europa.eu/eli/reg/2023/1542/oj",
    "steps": [
@@ -167,10 +107,10 @@
     }
    ],
    "scope": "product",
-   "hs4": [
-    "8506",
-    "8507"
-   ]
+   "chapters": [
+    "85"
+   ],
+   "scope_note": "Chapter 85 covers batteries, accumulators and their cells. Over-inclusive, since it also captures non-battery electricals; refined to HS6 in a later mapping version."
   },
   {
    "slug": "eu-csddd",
@@ -210,11 +150,11 @@
    "steps": [
     {
      "date": "2025-01-01",
-     "label": "First wave"
+     "label": "First wave reporting"
     },
     {
-     "date": "2028-01-01",
-     "label": "Later waves"
+     "date": "2027-01-01",
+     "label": "Revised scope applies"
     }
    ],
    "scope": "all",
@@ -287,18 +227,14 @@
    "indicator": "exposure to buyer diligence demand",
    "legal_source": "Wet zorgplicht kinderarbeid",
    "legal_source_url": "https://zoek.officielebekendmakingen.nl/stb-2019-401.html",
-   "steps": [
-    {
-     "date": "2027-01-01",
-     "label": "Expected application"
-    }
-   ],
+   "steps": [],
    "scope": "all",
    "band": [
     0.75,
     0.85,
     0.9
-   ]
+   ],
+   "scope_note": "Adopted in 2019 but never brought into operation; no entry-into-force date exists, so the regime is excluded from all projections until one does."
   },
   {
    "slug": "norway-transparency-act",
@@ -403,7 +339,7 @@
    "mechanism": "border",
    "class": "B",
    "assumption": "A5",
-   "granularity": "Priority sectors central, all imports ceiling",
+   "granularity": "HS2 chapter-level approximation",
    "indicator": "border enforcement exposure",
    "legal_source": "Uyghur Forced Labor Prevention Act",
    "legal_source_url": "https://www.congress.gov/bill/117th-congress/house-bill/6256",
@@ -414,24 +350,48 @@
     }
    ],
    "scope": "priority",
-   "priority_hs4": [
-    "5201",
-    "5204",
-    "5205",
-    "5208",
-    "5209",
-    "6109",
-    "6110",
-    "6203",
-    "6204",
-    "6205",
-    "6206",
-    "8541",
-    "2804",
-    "0702",
-    "2002"
+   "band_mode": "priority_to_all",
+   "priority_hs2": [
+    "50",
+    "51",
+    "52",
+    "53",
+    "54",
+    "55",
+    "56",
+    "57",
+    "58",
+    "59",
+    "60",
+    "61",
+    "62",
+    "63"
    ],
-   "band_mode": "priority_to_all"
+   "priority_chapters": [
+    "52",
+    "50",
+    "51",
+    "53",
+    "54",
+    "55",
+    "56",
+    "57",
+    "58",
+    "59",
+    "60",
+    "61",
+    "62",
+    "63",
+    "20",
+    "28",
+    "38",
+    "85",
+    "39",
+    "76",
+    "03",
+    "16"
+   ],
+   "scope_note": "Statutory UFLPA priority sectors mapped to whole HS chapters: cotton and all textile/apparel chapters, tomatoes, silica and chemical precursors, electronics and solar, PVC, aluminium, and seafood. Chapter-level and deliberately over-inclusive, since CBP enforcement follows embedded inputs across finished goods rather than single tariff lines."
   },
   {
    "slug": "switzerland-due-diligence-ordinance",
@@ -440,7 +400,7 @@
    "mechanism": "diligence",
    "class": "B",
    "assumption": "A3",
-   "granularity": "Minerals headings only; the child labour limb is not quantifiable",
+   "granularity": "HS2 chapter-level approximation",
    "indicator": "exposure to buyer diligence demand",
    "legal_source": "Ordinance on Due Diligence and Transparency",
    "legal_source_url": "https://www.fedlex.admin.ch/eli/cc/2021/847/en",
@@ -451,18 +411,20 @@
     }
    ],
    "scope": "product",
-   "hs4": [
-    "2609",
-    "2611",
-    "2615",
-    "2825",
-    "7108"
-   ],
    "band": [
     0.3,
     0.4,
     0.5
-   ]
+   ],
+   "hs2": [
+    "26"
+   ],
+   "chapters": [
+    "26",
+    "28",
+    "71"
+   ],
+   "scope_note": "Tin, tantalum, tungsten, gold ores and refined metals. The child labour limb of the ordinance is not quantifiable in customs data and is excluded, as stated."
   },
   {
    "slug": "us-dodd-frank-1502",

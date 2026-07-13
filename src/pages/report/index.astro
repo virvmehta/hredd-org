@@ -154,13 +154,11 @@ import Base from '../../layouts/Base.astro';
           <span>Regimes <b>EUDR · CSDDD</b></span>
           <span>Status <b>verified against tracker</b></span>
         </div>
-        <svg class="dh-seal" viewBox="0 0 104 104" aria-hidden="true">
-          <circle cx="52" cy="52" r="49" fill="none" stroke="var(--gold)" stroke-width="1.5"/>
-          <circle cx="52" cy="52" r="40" fill="none" stroke="var(--gold-dim)" stroke-width=".6" opacity=".5"/>
-          <circle cx="52" cy="52" r="28" fill="none" stroke="var(--gold-dim)" stroke-width=".6" opacity=".35"/>
-          <text x="52" y="59" text-anchor="middle" font-family="Newsreader, Georgia, serif" font-size="26"
-            fill="var(--ink)">h<tspan fill="var(--gold)">·</tspan>o</text>
-        </svg>
+        <div class="dh-mark" aria-hidden="true">
+          <span class="dh-word">hredd<em>.org</em></span>
+          <span class="dh-rule"></span>
+          <span class="dh-sub">supplier exposure report</span>
+        </div>
       </div>
       <div class="result-bar">
         <p class="kicker">Your report is ready</p>
@@ -240,9 +238,15 @@ import Base from '../../layouts/Base.astro';
   .dh-meta{ margin-top:22px; display:flex; gap:26px; flex-wrap:wrap;
     font-family:var(--mono); font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-faint); }
   .dh-meta b{ color:var(--ink-dim); font-weight:400; }
-  .dh-seal{ position:absolute; right:clamp(20px,4vw,44px); top:50%; transform:translateY(-50%);
-    width:clamp(70px,9vw,104px); opacity:.9; }
-  @media (max-width:640px){ .dh-seal{ display:none; } }
+  .dh-mark{ position:absolute; right:clamp(24px,4vw,48px); top:50%; transform:translateY(-50%);
+    text-align:right; }
+  .dh-word{ display:block; font:400 clamp(22px,2.6vw,30px)/1 var(--serif); color:var(--ink);
+    letter-spacing:-.01em; }
+  .dh-word em{ font-style:normal; font-size:.62em; color:var(--ink-faint); }
+  .dh-rule{ display:block; height:1.5px; background:var(--gold); margin:7px 0 9px auto; width:100%; }
+  .dh-sub{ display:block; font-family:var(--mono); font-weight:500; font-size:8.5px;
+    letter-spacing:.14em; text-transform:uppercase; color:var(--ink-faint); }
+  @media (max-width:640px){ .dh-mark{ display:none; } }
   .result-bar{ display:flex; justify-content:space-between; align-items:center; gap:20px; flex-wrap:wrap;
     padding:0 0 34px; margin:0 0 34px; border-bottom:1px solid var(--line); }
   #preview h2{ font:400 30px/1.25 var(--serif); margin:2em 0 .6em; color:var(--gold-hi);
@@ -315,151 +319,77 @@ function buildReport(a){
   const S = [];
   const add = (h, ps, level=2) => S.push({ h, ps, level });
 
-  const hasCommodity = a.commodities.length > 0 && !a.commodities.includes('None of these');
-  const eudrDirect = hasCommodity && a.eu === 'direct';
-  const eudrCascade = hasCommodity && (a.eu === 'via' || a.eu === 'unsure');
-  const eudrNoEU = hasCommodity && a.eu === 'no';
-  const csdddCascade = ['yes','probably','unsure'].includes(a.bigbuyer);
-  const intermediaries = ['yes','seasonal'].includes(a.contractors);
-  const experienced = ['freq','occ'].includes(a.questionnaires);
+  const hasCom = a.commodities.length > 0 && !a.commodities.includes('None of these');
+  const coms = a.commodities.filter(c => c !== 'None of these');
+  const eudr = hasCom && ['direct','via','unsure'].includes(a.eu);
+  const eudrDirect = hasCom && a.eu === 'direct';
+  const csddd = ['yes','probably','unsure'].includes(a.bigbuyer);
+  const inter = ['yes','seasonal'].includes(a.contractors);
   const certs = a.certs.filter(c => c !== 'None currently');
   const hasCerts = certs.length > 0;
+  const asked = ['freq','occ'].includes(a.questionnaires);
 
-  /* cover */
-  add('Your HREDD exposure report', [
-    `This report was prepared by hredd.org on ${TODAY}. Based on your answers, it explains which of the European Union's supply chain laws are likely to touch your trade, what those laws entitle your buyers to ask of you, and what preparation is worth making before the questions arrive. This report is general information rather than legal advice, and nothing in it should be read as an assessment of your compliance with any law. Laws move monthly, and this report reflects the tracker at hredd.org as of the date above.`
-  ], 1);
-
-  add('Your answers, in summary', [
-    `You described a business located in ${a.country}, with ${a.size.toLowerCase()}, whose trade ${hasCommodity ? 'involves ' + a.commodities.join(', ').toLowerCase() : 'involves none of the seven EUDR commodities'}, and which ${{direct:'exports directly to the European Union', via:'reaches the European Union through intermediaries', unsure:'may reach the European Union through routes you cannot fully see', no:'has no known connection to the European Union'}[a.eu]}. You told us that large in-scope buyers are ${{yes:'part of your customer base', probably:'probably part of your customer base', unsure:'possibly part of your customer base', no:'not part of your customer base'}[a.bigbuyer]}, that buyer questionnaires have ${{freq:'arrived frequently', occ:'arrived occasionally', none:'not yet arrived'}[a.questionnaires]}, that labour intermediaries are ${{yes:'part of how you engage workers', no:'not part of how you engage workers', seasonal:'part of how you engage workers seasonally'}[a.contractors]}, and that you currently hold ${hasCerts ? certs.join(', ') : 'no certifications'}.`
-  ]);
-
-  /* ---------------- EUDR ---------------- */
-  if(eudrDirect || eudrCascade){
-    add('Part one: the EU Deforestation Regulation', [], 1);
-
-    if(eudrDirect){
-      add('The EUDR and your trade', [
-        'The EUDR prohibits placing on the EU market, or exporting from it, seven commodities and their derived products unless they are deforestation-free and legally produced. Your answers indicate you work with at least one covered commodity and that your goods reach the EU. Although the legal duties sit on the EU operator or trader rather than on you, those duties cannot be discharged without information that only you and your upstream chain hold. In practice, this makes you part of the traceability chain the regulation creates, and your buyers will require specific data from you as a condition of trade.'
-      ]);
-    } else {
-      add('The EUDR and your trade', [
-        'The EUDR prohibits placing on the EU market, or exporting from it, seven commodities and their derived products unless they are deforestation-free and legally produced. Your answers indicate you work with at least one covered commodity, and that your goods may reach the EU through buyers or intermediaries rather than through your own direct exports. The regulation never names businesses in your position, yet its obligations travel down the chain contractually, because the EU operator at the top cannot file its due diligence statement without information gathered from every link below it. Uncertainty about whether your goods reach the EU is itself a reason to prepare, since the request usually arrives before the visibility does.'
-      ]);
-    }
-
-    add('What geolocation means in practice', [
-      'The central EUDR requirement is that every consignment traces back to the plot of land where the commodity was produced, expressed as geolocation coordinates, with production after 31 December 2020 shown to be deforestation-free. For a single farm this means at least one coordinate point, and for plots above four hectares it means polygon boundaries. Buyers will ask you for these coordinates, and where you aggregate from many farms, they will ask for all of them. Collecting coordinates requires farmer consent and effort, so beginning before the request arrives is materially easier than beginning after.'
-    ]);
-
-    add('The dates that matter under the EUDR', [
-      'Application began for large operators and traders on 30 December 2025. Micro and small enterprises established before 31 December 2020 follow from 30 June 2026. Country benchmarking classifies producing countries as low, standard, or high risk, and the classification of your country shapes how much scrutiny consignments from it receive. Buyer information requests typically arrive one to two seasons before the buyer\u2019s own filing obligations, so demand tends to run ahead of the legal calendar rather than behind it.'
-    ]);
-
-    const eudrEntitled = ['What your buyers are entitled to ask under the EUDR', [
-      'Under the EUDR, buyers filing due diligence statements legitimately need from you the geolocation coordinates of production plots, the date or time range of production, evidence of legal production under the laws of your country, covering land use rights, environmental rules, labour and human rights law, and tax and anti-corruption law, and documentation of your own suppliers where you aggregate. Requests of this kind are proportionate to the regulation and worth answering well, since they recur every season.'
-    ]];
-    const eudrNot = ['What the EUDR does not require of you', [
-      'The EUDR does not require certification under any voluntary scheme, and no buyer can lawfully claim that a specific certificate is an EUDR requirement, although certificates may support their risk assessment. The regulation does not require you to bear the cost of the buyer\u2019s due diligence system, does not give buyers rights to unannounced facility access, and does not require disclosure of commercially sensitive information unrelated to traceability, such as your pricing or your full customer list. Where a request goes beyond traceability and legality evidence, you are entitled to ask which provision of the regulation the request rests on.'
-    ]];
-    const eudrPair = experienced ? [eudrNot, eudrEntitled] : [eudrEntitled, eudrNot];
-    eudrPair.forEach(([h, ps]) => add(h, ps));
-
-    add('Country risk classification', [
-      'The Commission classifies producing countries into three risk tiers, and the tier determines the intensity of checks EU authorities apply to consignments. A standard or high risk classification for your country does not restrict your trade by itself, but it raises the documentation quality your buyers will need, and it makes complete geolocation data more valuable rather than less. The current classification for your country is maintained on the tracker at hredd.org.'
-    ]);
-  } else if (eudrNoEU) {
-    add('Part one: the EU Deforestation Regulation', [], 1);
-    add('The EUDR and your trade', [
-      'You work with at least one commodity the EUDR covers, but you report no known connection to the EU market. On those facts, the regulation is unlikely to touch your trade directly today. Two cautions are still worth carrying anyway. Visibility past your first buyer is rarely complete, and goods frequently reach the EU through routes their producers never see, so a buyer request citing the EUDR should not surprise you. And traceability infrastructure built once serves every market that later demands it, since the direction of travel in commodity regulation is the same worldwide.'
-    ]);
+  /* ---- 1. The verdict, stated in three lines ---- */
+  const verdict = [];
+  if(eudr){
+    verdict.push(`Because you trade ${coms.join(' and ').toLowerCase()} and your goods reach the European Union, the EU Deforestation Regulation reaches your consignments directly. Your buyers cannot file their due diligence statements without plot coordinates from you, so the demand is unavoidable rather than negotiable.`);
+  } else if(hasCom){
+    verdict.push(`You trade ${coms.join(' and ').toLowerCase()}, which the EUDR covers, but you report no EU connection, so the regulation is unlikely to reach you today. Visibility past a first buyer is rarely complete, and the request can still arrive.`);
   } else {
-    add('Part one: the EU Deforestation Regulation', [], 1);
-    add('The EUDR and your trade', [
-      'The EUDR covers seven commodities and their derived products: cattle, cocoa, coffee, oil palm, rubber, soya, and wood. Your answers indicate your trade involves none of them, which places you outside the regulation\u2019s scope entirely. Buyers occasionally send EUDR-style questionnaires across their whole supplier base regardless of commodity, usually because their systems make no distinction, and you are entitled to respond that the regulation does not apply to your products.'
-    ]);
+    verdict.push('None of your products fall inside the EUDR\u2019s seven commodities, so that regulation does not apply to your trade at all. Buyers occasionally send EUDR questionnaires across their whole supplier base regardless, and you are entitled to say so.');
   }
-
-  /* ---------------- CSDDD ---------------- */
-  add('Part two: the Corporate Sustainability Due Diligence Directive', [], 1);
-
-  if(csdddCascade){
-    add('The CSDDD and how it reaches you', [
-      'The Corporate Sustainability Due Diligence Directive obliges the largest companies operating in the EU, those above 5,000 employees and 1.5 billion euro in worldwide turnover after the 2026 omnibus amendments, to identify and address human rights and environmental risks in their chains of activities. Your answers indicate at least one of your buyers likely sits in scope, or that you cannot rule it out, which for practical purposes amounts to the same preparation. The directive reaches you through contract rather than through law: in-scope buyers will seek contractual assurances from suppliers, will request information to map risk, and will expect cooperation with prevention and corrective measures where risks are found.'
-    ]);
-
-    const csdddLimits = ['Two limits on what can be asked of you', [
-      'The amended framework contains two distinct protections worth knowing by name. First, under Article 8(4) of the amended CSDDD, buyers must conduct their risk scoping using information that is already reasonably available, and may seek additional information from business partners with fewer than 5,000 employees only as a last resort, where the information is necessary and cannot reasonably be obtained by other means, with every request required to be targeted, reasonable and proportionate. Second, under the amended CSRD reporting rules, companies preparing sustainability reports may not request information from partners with fewer than 1,000 employees beyond what the voluntary VSME standard specifies, and smaller partners can generally establish their protected status by self-declaration. Where a buyer\u2019s questionnaire runs far beyond these boundaries, you are entitled to raise the relevant provision by name and ask which requirement the request rests on. Familiarity with the VSME data points is therefore worth more to you than familiarity with any single buyer\u2019s format.'
-    ]];
-
-    const csdddEntitled = ['What your buyers are entitled to ask under the CSDDD', [
-      'In-scope buyers legitimately need information proportionate to risk mapping, covering your workforce arrangements, wages and working time records, health and safety systems, environmental permits and practices, grievance channels, and your own significant suppliers. They may seek contractual assurances that you observe their code of conduct, and cooperation where prevention or correction measures are needed. Requests within this territory reflect the directive rather than overreach.'
-    ]];
-    const csdddNot = ['What the directive does not require of you', [
-      'The directive does not oblige you to obtain any certification, and after the omnibus the information that should be sought from smaller chain partners is bounded in the ways described above. It does not require you to absorb the cost of the buyer\u2019s compliance programme, and its own provisions on responsible purchasing recognise that buyer pricing and payment practices are part of the risk picture rather than outside it. It does not apply to you directly at all, which means no authority can sanction you under it, and every obligation you take on arises from your contract rather than from the directive itself. Contracts, unlike directives, are always open to negotiation.'
-    ]];
-
-    if(experienced){
-      add(...csdddNot); add(...csdddLimits); add(...csdddEntitled);
-    } else {
-      add(...csdddLimits); add(...csdddEntitled); add(...csdddNot);
-    }
-
-    add('Why termination is now the buyer\u2019s last resort in fact', [
-      'The amended directive removed the earlier obligation on buyers to terminate relationships where risks could not be resolved, and added protection for buyers who stay engaged with a supplier under a credible corrective action plan. The practical meaning for you is significant: a buyer who finds a problem in your operations is now legally safer working with you on an improvement plan than walking away from you. Where a risk is raised, proposing a concrete corrective plan with milestones is not merely cooperative, it actively gives your buyer the legal cover the directive now rewards.'
-    ]);
-
-    add('The dates that matter under the CSDDD', [
-      'The amending directive entered into force on 18 March 2026. Member states must transpose it into national law by 26 July 2028, and the obligations apply to in-scope companies from 26 July 2029. Commission guidance and model contractual clauses are due by 26 July 2027, and those model clauses will likely become the template your buyers put in front of you. As with the EUDR, buyer requests run ahead of legal deadlines, and most large companies are building their programmes now rather than waiting for 2029.'
-    ]);
+  if(csddd){
+    verdict.push('Your buyers are large enough that the CSDDD reaches you through their contracts rather than through law. No authority can sanction you under it, which means every obligation you take on arrives as a contract term, and contract terms are negotiable.');
   } else {
-    add('The CSDDD and your trade', [
-      'The directive applies only to the largest companies, those above 5,000 employees and 1.5 billion euro in worldwide turnover, and your answers indicate your buyers sit below that line. Direct contractual cascade from the CSDDD is therefore unlikely for you today. Market practice nonetheless follows the direction of regulation rather than its precise perimeter, and mid-sized buyers increasingly mirror the requests their own larger customers make of them. The dates remain worth knowing: national transposition runs to 26 July 2028, and obligations on in-scope companies apply from 26 July 2029.'
-    ]);
+    verdict.push('Your buyers sit below the CSDDD thresholds, so direct contractual cascade is unlikely today. Mid-sized buyers increasingly mirror the demands their own larger customers make of them, so the questions still travel.');
   }
+  add('Where you stand', verdict, 1);
 
-  if(intermediaries){
-    add('Contract labour and recruitment channels', [
-      'Your answers indicate you engage workers through contractors or intermediaries for at least part of your workforce. In every buyer due diligence framework, recruitment channels and contract labour receive the closest scrutiny of any topic, because recruitment fees, wage deductions, and opaque intermediary arrangements are where the severest risks concentrate. Three records are worth maintaining regardless of which buyer asks: written agreements with each contractor covering wages and deductions, evidence that wages reach workers rather than stopping with the intermediary, and attestations that workers paid no recruitment fees. Holding these before the question arrives converts your most examined topic into your best documented one.'
-    ]);
+  /* ---- 2. What to do, the whole point of the report ---- */
+  const actions = [];
+  if(eudr){
+    actions.push('Start collecting plot geolocation for every farm you source from, with farmer consent, before a buyer asks. Single plots need one coordinate, anything above four hectares needs polygon boundaries, and gathering this after the request is materially harder than gathering it before.');
+    actions.push('Assemble your legality file now: land use rights, environmental permits, labour compliance, and tax records under your own national law. The EUDR requires legal production as well as deforestation-free production, and the second half is where most suppliers are caught unprepared.');
   }
-
-  if(hasCerts && csdddCascade){
-    add('Your certifications now carry procedural weight', [
-      `Your answers indicate you currently hold ${certs.join(', ')}. Under the amended directive, this changes the sequence a buyer must follow before questioning you. Article 8(4) requires in-scope companies to conduct their risk scoping using information that is already reasonably available, and to seek additional information from smaller partners only as a last resort, where it cannot reasonably be obtained from existing or secondary sources. Your current certifications, audit reports, and scheme memberships are precisely such sources. When a questionnaire arrives that duplicates ground your certification already covers, you are entitled to respond by presenting the certification first and asking specifically which necessary information it fails to provide, since the burden of that gap now sits with the buyer rather than with you.`,
-      'Two honest limits apply to this position. Certifications do not exempt your buyer from its own legal responsibility, and Article 29(4) states this expressly, so a buyer facing a specific reported risk, whether through its complaints channel, media coverage, or an authority, may still make targeted requests that no certificate can deflect. And certification carries this procedural weight under the CSDDD without carrying it under every regime: the EUDR, for instance, accepts certificates only as supporting information and never as a substitute for geolocation and legality evidence. Within those limits, a current, credible certification has quietly become one of the few instruments that reduces your questionnaire burden as a matter of law rather than goodwill.'
-    ]);
+  if(csddd){
+    actions.push('Read the VSME standard, because it is the boundary of what a buyer should reasonably ask a smaller partner, and knowing its data points by name is worth more than knowing any single buyer\u2019s questionnaire format.');
+    actions.push('Write a one-page description of your grievance mechanism. It is the single most requested item across every framework, and almost no supplier has one ready.');
   }
-
-  /* ---------------- preparedness ---------------- */
-  const prep = [];
-  if(eudrDirect || eudrCascade){
-    prep.push('For the EUDR: begin collecting plot geolocation data with farmer consent, assemble legality documentation under your national law, and map which of your own suppliers you would need data from.');
-  }
-  if(csdddCascade){
-    prep.push('For the CSDDD: obtain and read the VSME standard so you know the boundary of reasonable requests, document your workforce arrangements including any contractors, and prepare a one-page description of your grievance channel, since it is the single most requested item in every framework.');
+  if(inter){
+    actions.push('Document your labour contractors now: written agreements covering wages and deductions, evidence that wages reach workers rather than stopping with the intermediary, and attestations that no worker paid a recruitment fee. Recruitment channels attract the closest scrutiny of any topic in due diligence, so this converts your most examined subject into your best documented one.');
   }
   if(!hasCerts){
-    prep.push('On certification: a recognised scheme, whatever its limits, now carries procedural weight under the amended CSDDD, because buyers must consult available information before questioning you, and a certification is exactly such information.');
+    actions.push('Consider a recognised certification. Whatever its limits, it now carries procedural weight under the amended CSDDD, because buyers must use information already reasonably available before questioning you further, and a live certification is exactly such information.');
   }
-  if(prep.length){
-    add('Preparations worth making now', prep, 1);
-  }
+  if(actions.length) add('What to do before they ask', actions, 1);
 
+  /* ---- 3. What you can push back on ---- */
+  const pushback = [];
+  if(eudr){
+    pushback.push('No certificate is an EUDR requirement. Buyers may use one to support their risk assessment, but no scheme discharges the regulation, and a buyer claiming otherwise is mistaken. The EUDR also gives no right to unannounced access, and no right to pricing or customer information unrelated to traceability.');
+  }
+  if(csddd){
+    pushback.push('Under Article 8(4) of the amended CSDDD, a buyer must scope risk from information already reasonably available, and may seek more from a partner under 5,000 employees only as a last resort, where it is necessary and cannot be obtained otherwise, with each request targeted, reasonable and proportionate. Separately, CSRD reporters may not ask partners under 1,000 employees for more than the VSME standard specifies.');
+    if(hasCerts){
+      pushback.push(`You hold ${certs.join(', ')}. When a questionnaire duplicates ground your certification already covers, present the certification first and ask which specific necessary information it fails to provide. The burden of naming that gap now sits with the buyer. Two limits are honest: a buyer facing a specifically reported risk can still make targeted requests, and the EUDR accepts certificates as supporting information only, never as a substitute for coordinates.`);
+    }
+    pushback.push('The directive does not require you to absorb the cost of the buyer\u2019s compliance programme, and its own provisions recognise that buyer pricing and payment practices are part of the risk picture rather than outside it.');
+  }
+  if(pushback.length) add(asked ? 'What you can push back on, and you have been asked already' : 'What you can push back on', pushback, 1);
+
+  /* ---- 4. Dates ---- */
+  const dates = [];
+  if(eudr) dates.push('EUDR: application was postponed a second time one week before it began, so large operators now start on 30 December 2026 and micro and small enterprises on 30 June 2027. Buyer requests typically run one to two seasons ahead of the buyer\u2019s own filing deadline, so the demands arrive regardless.');
+  if(csddd) dates.push('CSDDD: entered into force 18 March 2026, national transposition by 26 July 2028, obligations apply from 26 July 2029. Commission model contract clauses are due by 26 July 2027 and will likely become the template your buyers put in front of you.');
+  if(dates.length) add('The dates that matter', dates, 1);
+
+  /* ---- 5. Close ---- */
   add('Keeping this current', [
-    `The laws in this report moved repeatedly in the last year, and they will move again. This report reflects the hredd.org tracker as of ${TODAY}, and regenerating it each quarter takes two minutes. The monthly digest at hredd.org covers every movement as it happens, written from the supplier side of the chain.`
+    `This report reflects the hredd.org tracker on ${TODAY}. These laws moved repeatedly in the last year and will move again, and regenerating this takes two minutes. The monthly digest covers every movement as it happens, from the supplier side of the chain.`
   ], 1);
 
-  add('Disclaimer', [
-    'This report is general information prepared from publicly available legal texts, and it is not legal advice, a compliance assessment, or a substitute for professional counsel. hredd.org is an independent publication with no affiliation to any organisation, and accepts no liability for decisions taken on the basis of this document. Verify current requirements against the primary sources listed below.'
-  ], 1);
-
-  add('Primary sources', [
-    'Regulation (EU) 2023/1115 on deforestation-free products (EUDR): https://eur-lex.europa.eu/eli/reg/2023/1115/oj',
-    'Directive (EU) 2024/1760 on corporate sustainability due diligence (CSDDD): https://eur-lex.europa.eu/eli/dir/2024/1760/oj',
-    'Directive (EU) 2026/470 amending the CSDDD and the CSRD (the omnibus): https://eur-lex.europa.eu/eli/dir/2026/470/oj',
-    'European Commission, EUDR implementation page: https://green-business.ec.europa.eu/deforestation-regulation-implementation_en',
-    'The full tracker, updated monthly: https://hredd.org/tracker/'
+  add('Sources and standing', [
+    'General information prepared from public legal texts, not legal advice, and not an assessment of your compliance. Verify against the primary sources: EUDR, Regulation (EU) 2023/1115, at eur-lex.europa.eu/eli/reg/2023/1115/oj. CSDDD, Directive (EU) 2024/1760 as amended by Directive (EU) 2026/470, at eur-lex.europa.eu/eli/dir/2024/1760/oj. The full tracker is at hredd.org/tracker.'
   ], 1);
 
   return S;

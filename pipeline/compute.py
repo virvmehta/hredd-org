@@ -60,13 +60,13 @@ def regime_cells(regime, flows):
         return {"cells": base, "factors": (lo, c, hi)}
     if regime.get("band_mode") == "priority_to_all":
         all_cells = cells_of(mk, flows)
-        prio = set(regime["priority_hs4"])
-        prio_cells = {k: v for k, v in all_cells.items() if k.split(":")[1] in prio}
+        chaps = set(regime["priority_chapters"])
+        prio_cells = {k: v for k, v in all_cells.items() if k.split(":")[1][:2] in chaps}
         return {"cells": all_cells, "priority_cells": prio_cells, "factors": "priority_to_all"}
     all_cells = cells_of(mk, flows)
     if regime["scope"] == "product":
-        hs = set(regime["hs4"])
-        all_cells = {k: v for k, v in all_cells.items() if k.split(":")[1] in hs}
+        chaps = set(regime["chapters"])
+        all_cells = {k: v for k, v in all_cells.items() if k.split(":")[1][:2] in chaps}
     lo, c, hi = band_of(regime)
     return {"cells": all_cells, "factors": (lo, c, hi)}
 
