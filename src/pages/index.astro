@@ -79,7 +79,10 @@ const blurb = settings?.newsletterBlurb ||
         <p class="kicker">The tracker</p>
         <h2 class="h2">{laws.length} laws, <em>one ledger</em></h2>
       </div>
-      <a class="textlink" href="/tracker/">Full tracker: {laws.length} laws <i>→</i></a>
+      <div class="section-head-links">
+        <a class="textlink" href="/tracker/">Full tracker: {laws.length} laws <i>→</i></a>
+        <a class="textlink" href="/timeline/">Every timeline <i>→</i></a>
+      </div>
     </div>
     <div class="law-rows reveal" data-delay="1">
       {previewLaws.map((l) => (

@@ -127,6 +127,9 @@ p{ text-wrap:pretty; }
 .section-head{ display:flex; justify-content:space-between; align-items:flex-end; gap:24px;
   margin-bottom:clamp(32px,4vw,56px); flex-wrap:wrap; }
 .section-head .kicker{ margin-bottom:14px; }
+.section-head-links{ display:flex; align-items:center; gap:22px; flex-wrap:wrap; }
+.section-head-links .textlink::before{ content:""; }
+.section-head-links .textlink + .textlink{ padding-left:22px; border-left:1px solid var(--line); }
 
 /* --------------------------------------------------------------
    buttons
