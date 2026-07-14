@@ -173,35 +173,31 @@ def comtrade_get(params, key, retries=4):
     raise SystemExit("Comtrade API exhausted retries without a response")
 
 def latest_available_year(origin_m49, key):
-    """Several tracked origin countries, Bangladesh among them, report their
-    own export data to Comtrade irregularly or not at all (a documented gap,
-    not specific to this pipeline). Rather than ask the origin country for
-    its own exports, this asks the rest of the world what it imported FROM
-    the origin country, i.e. mirror statistics, which UN Comtrade itself
-    documents as the standard substitute for missing reporter data.
-    reporterCode=0 aggregates every country that reported importing from
-    the given partner, so it stands in for a self-reported world total."""
+    """Find the most recent year with data, probing with the USA as reporter.
+    Verified against the live API on 2026-07-14: reporterCode=842 with
+    partnerCode set to the origin returns the destination's own reported
+    imports, which is the mirror figure this pipeline relies on.
+
+    Note that reporterCode=0 does NOT work as an all-reporters wildcard on
+    this endpoint, even though partnerCode=0 does work as an all-partners
+    wildcard. An earlier version assumed the symmetry held and silently
+    returned zero rows for every origin country."""
     this_year = date.today().year
     for y in range(this_year - 1, this_year - 5, -1):
         data = comtrade_get({
-            "reporterCode": "0", "period": str(y), "partnerCode": origin_m49,
-            "cmdCode": "TOTAL", "flowCode": "M", "breakdownMode": "classic",
+            "reporterCode": MARKET_M49["USA"], "period": str(y),
+            "partnerCode": origin_m49, "cmdCode": "TOTAL", "flowCode": "M",
+            "breakdownMode": "classic",
         }, key)
-        rows = data.get("data", [])
-        if rows:
-            return y, float(rows[0]["primaryValue"])
-    raise SystemExit(f"No mirror data found for partner {origin_m49} in the last 4 years")
+        if data.get("data"):
+            return y
+    raise SystemExit(f"No mirror data found for origin {origin_m49} in the last 4 years")
 
-def fetch_country_flows(slug, origin_m49, key, year, total):
+def fetch_country_flows(slug, origin_m49, key, year):
     """Build one country's flows entry using mirror statistics throughout:
     every figure is the destination market's own reported imports from the
     origin country, not the origin country's self-reported exports, since
-    several tracked origins report to Comtrade irregularly or not at all.
-    The world-export total arrives from the year-discovery call rather than
-    being refetched."""
-    if total <= 0:
-        raise SystemExit(f"No mirror data found for {origin_m49} in {year}, cannot proceed")
-
+    several tracked origins report to Comtrade irregularly or not at all."""
     markets = {}
 
     # non-EU markets: each market reports its own imports from the origin country
@@ -258,6 +254,16 @@ def fetch_country_flows(slug, origin_m49, key, year, total):
     if eu_by_chapter:
         markets["EU27"]["by_hs4"] = eu_by_chapter
 
+    # The denominator is the sum of the nine tracked destination markets rather
+    # than a true world export total, because no single reliable world figure
+    # exists for origins that under-report to Comtrade. Every share on the site
+    # is therefore "share of exports to tracked regulated markets", not "share
+    # of all exports", which is the more meaningful denominator for this tracker
+    # in any case. Stated in the dataset vintage rather than left implicit.
+    total = sum(m["total"] for m in markets.values())
+    if total <= 0:
+        raise SystemExit(f"All tracked markets returned zero imports from {origin_m49} in {year}")
+
     return {
         "name": slug.replace("-", " ").title(),
         "total_exports_usd": total,
@@ -268,8 +274,8 @@ def fetch_country_flows(slug, origin_m49, key, year, total):
 def build_live(key):
     country_flows = {}
     for slug, m49 in ORIGIN_M49.items():
-        year, world_total = latest_available_year(m49, key)
-        country_flows[slug] = fetch_country_flows(slug, m49, key, year, world_total)
+        year = latest_available_year(m49, key)
+        country_flows[slug] = fetch_country_flows(slug, m49, key, year)
         print(f"fetched {slug}: {year}, total=${country_flows[slug]['total_exports_usd']:,.0f}")
     return {
         "sample": False,
@@ -277,9 +283,11 @@ def build_live(key):
         "vintage": ("UN Comtrade mirror statistics: figures are destination markets' own "
             "reported imports from each origin country, not the origin country's self-reported "
             "exports, since several tracked origins report to Comtrade irregularly or not at all. "
-            "EU27 totals sum all 27 member states; EU chapter-level product mix is approximated "
-            "from Germany, France, Netherlands and Italy, the four largest EU importers, rather "
-            "than all 27 members, to stay within the free-tier daily call limit."),
+            "Shares are expressed against exports to the nine tracked regulated markets, not "
+            "against total world exports, because no reliable world figure exists for origins "
+            "that under-report. EU27 totals sum all 27 member states; EU chapter-level product "
+            "mix is approximated from Germany, France, Netherlands and Italy, the four largest "
+            "EU importers, to stay within the free-tier daily call limit."),
         "sources": ["UN Comtrade Database, https://comtradeplus.un.org, mirror (partner-reported) statistics"],
         "countries": country_flows,
     }
