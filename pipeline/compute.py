@@ -108,8 +108,8 @@ COMTRADE_BASE = "https://comtradeapi.un.org/data/v1/get/C/A/HS"
 
 # M49 codes for the ten tracked origin countries (reporters)
 ORIGIN_M49 = {
-    "bangladesh": "050", "india": "356", "vietnam": "704", "indonesia": "360",
-    "brazil": "076", "thailand": "764", "ethiopia": "231", "kenya": "404",
+    "bangladesh": "50", "india": "356", "vietnam": "704", "indonesia": "360",
+    "brazil": "76", "thailand": "764", "ethiopia": "231", "kenya": "404",
     "ghana": "288", "cote-divoire": "384",
 }
 
@@ -117,11 +117,11 @@ ORIGIN_M49 = {
 # partner code across all reporters in Comtrade, so it is queried as the sum
 # of its 27 member states rather than one aggregate call.
 MARKET_M49 = {
-    "USA": "842", "GBR": "826", "CAN": "124", "AUS": "036",
+    "USA": "842", "GBR": "826", "CAN": "124", "AUS": "36",
     "NOR": "578", "CHE": "756", "JPN": "392", "KOR": "410",
 }
 EU27_M49 = {
-    "AUT": "040", "BEL": "056", "BGR": "100", "HRV": "191", "CYP": "196",
+    "AUT": "40", "BEL": "56", "BGR": "100", "HRV": "191", "CYP": "196",
     "CZE": "203", "DNK": "208", "EST": "233", "FIN": "246", "FRA": "251",
     "DEU": "276", "GRC": "300", "HUN": "348", "IRL": "372", "ITA": "380",
     "LVA": "428", "LTU": "440", "LUX": "442", "MLT": "470", "NLD": "528",
@@ -133,10 +133,23 @@ CHAPTERS = ['01','02','03','09','12','15','16','18','20','26','28','38','39',
     '40','44','47','48','50','51','52','53','54','55','56','57','58','59',
     '60','61','62','63','71','76','85','94']
 
+def _normalize_codes(params):
+    """The Comtrade API expects reporterCode/partnerCode without the leading
+    zeros that the official M49 standard pads onto codes under 100 (e.g.
+    Bangladesh is M49 050 but the API wants "50"). Strip them here so any
+    future zero-padded code is corrected automatically instead of silently
+    returning zero rows."""
+    out = dict(params)
+    for field in ("reporterCode", "partnerCode"):
+        if field in out and str(out[field]).isdigit():
+            out[field] = str(int(out[field]))
+    return out
+
 def comtrade_get(params, key, retries=4):
     """Single GET against the Comtrade v1 data API, with the subscription key
     header and exponential backoff on transient failures. Raises on the final
     attempt so a real error surfaces rather than being silently swallowed."""
+    params = _normalize_codes(params)
     url = COMTRADE_BASE + "?" + urllib.parse.urlencode(params)
     req = urllib.request.Request(url, headers={
         "Ocp-Apim-Subscription-Key": key, "Accept": "application/json"})
