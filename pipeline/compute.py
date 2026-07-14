@@ -172,46 +172,51 @@ def comtrade_get(params, key, retries=4):
             raise SystemExit(f"Comtrade network error: {e}")
     raise SystemExit("Comtrade API exhausted retries without a response")
 
-def latest_available_year(reporter_m49, key):
-    """Comtrade's final annual data lags by roughly 12-18 months. Walk back
-    from the current year until the reporter has a World-partner export total,
-    and return both the year and that total so the caller does not need to
-    repeat the same call. This also keeps the run inside the free-tier
-    daily call limit, which the full pull approaches."""
+def latest_available_year(origin_m49, key):
+    """Several tracked origin countries, Bangladesh among them, report their
+    own export data to Comtrade irregularly or not at all (a documented gap,
+    not specific to this pipeline). Rather than ask the origin country for
+    its own exports, this asks the rest of the world what it imported FROM
+    the origin country, i.e. mirror statistics, which UN Comtrade itself
+    documents as the standard substitute for missing reporter data.
+    reporterCode=0 aggregates every country that reported importing from
+    the given partner, so it stands in for a self-reported world total."""
     this_year = date.today().year
     for y in range(this_year - 1, this_year - 5, -1):
         data = comtrade_get({
-            "reporterCode": reporter_m49, "period": str(y), "partnerCode": "0",
-            "cmdCode": "TOTAL", "flowCode": "X", "breakdownMode": "classic",
+            "reporterCode": "0", "period": str(y), "partnerCode": origin_m49,
+            "cmdCode": "TOTAL", "flowCode": "M", "breakdownMode": "classic",
         }, key)
         rows = data.get("data", [])
         if rows:
             return y, float(rows[0]["primaryValue"])
-    raise SystemExit(f"No recent annual data found for reporter {reporter_m49} in the last 4 years")
+    raise SystemExit(f"No mirror data found for partner {origin_m49} in the last 4 years")
 
-def fetch_country_flows(slug, reporter_m49, key, year, total):
-    """Build one country's flows entry: per-market totals and per-market
-    HS2-chapter breakdown for EU27 and USA (the two markets with
-    product-level regime scope in law_scope.json). The world-export total
-    arrives from the year-discovery call rather than being refetched."""
+def fetch_country_flows(slug, origin_m49, key, year, total):
+    """Build one country's flows entry using mirror statistics throughout:
+    every figure is the destination market's own reported imports from the
+    origin country, not the origin country's self-reported exports, since
+    several tracked origins report to Comtrade irregularly or not at all.
+    The world-export total arrives from the year-discovery call rather than
+    being refetched."""
     if total <= 0:
-        raise SystemExit(f"Reporter {reporter_m49} returned zero world exports for {year}, cannot proceed")
+        raise SystemExit(f"No mirror data found for {origin_m49} in {year}, cannot proceed")
 
     markets = {}
 
-    # non-EU markets: total value, no HS breakdown needed except USA
+    # non-EU markets: each market reports its own imports from the origin country
     for mkey, m49 in MARKET_M49.items():
         data = comtrade_get({
-            "reporterCode": reporter_m49, "period": str(year), "partnerCode": m49,
-            "cmdCode": "TOTAL", "flowCode": "X", "breakdownMode": "classic",
+            "reporterCode": m49, "period": str(year), "partnerCode": origin_m49,
+            "cmdCode": "TOTAL", "flowCode": "M", "breakdownMode": "classic",
         }, key)
         rows = data.get("data", [])
         markets[mkey] = {"total": float(rows[0]["primaryValue"]) if rows else 0.0}
 
     # USA by_hs4: needed because UFLPA scope is chapter-level within the US market
     us_chap = comtrade_get({
-        "reporterCode": reporter_m49, "period": str(year), "partnerCode": MARKET_M49["USA"],
-        "cmdCode": "AG2", "flowCode": "X", "breakdownMode": "classic",
+        "reporterCode": MARKET_M49["USA"], "period": str(year), "partnerCode": origin_m49,
+        "cmdCode": "AG2", "flowCode": "M", "breakdownMode": "classic",
     }, key)
     us_by_chapter = {}
     for row in us_chap.get("data", []):
@@ -221,28 +226,35 @@ def fetch_country_flows(slug, reporter_m49, key, year, total):
     if us_by_chapter:
         markets["USA"]["by_hs4"] = us_by_chapter
 
-    # EU27: sum member totals, and sum member HS2 chapter breakdowns for EUDR/Batteries scope
+    # EU27: sum each member's own reported imports from the origin country.
     eu_total = 0.0
-    eu_by_chapter = {}
     for member_iso, member_m49 in EU27_M49.items():
         mdata = comtrade_get({
-            "reporterCode": reporter_m49, "period": str(year), "partnerCode": member_m49,
-            "cmdCode": "TOTAL", "flowCode": "X", "breakdownMode": "classic",
+            "reporterCode": member_m49, "period": str(year), "partnerCode": origin_m49,
+            "cmdCode": "TOTAL", "flowCode": "M", "breakdownMode": "classic",
         }, key)
         rows = mdata.get("data", [])
-        mtotal = float(rows[0]["primaryValue"]) if rows else 0.0
-        eu_total += mtotal
+        eu_total += float(rows[0]["primaryValue"]) if rows else 0.0
         time.sleep(0.3)  # stay well under free-tier rate limits across 27 sequential calls
     markets["EU27"] = {"total": eu_total}
 
-    eu_chap = comtrade_get({
-        "reporterCode": reporter_m49, "period": str(year), "partnerCode": "97",  # EU aggregate, chapter-level only
-        "cmdCode": "AG2", "flowCode": "X", "breakdownMode": "classic",
-    }, key)
-    for row in eu_chap.get("data", []):
-        code = str(row.get("cmdCode", "")).zfill(2)
-        if code in CHAPTERS:
-            eu_by_chapter[code + "00"] = float(row["primaryValue"])
+    # EU chapter mix: a full 27-member chapter breakdown would nearly double the
+    # per-country call count and risk the free-tier daily limit, so this uses
+    # the four largest EU importers as a representative proxy for product mix
+    # while the total above still reflects all 27 members. Documented in the
+    # dataset vintage as an approximation, consistent with the site's practice
+    # of stating simplifications rather than hiding them.
+    eu_by_chapter = {}
+    for proxy_m49 in ("276", "251", "528", "380"):  # Germany, France, Netherlands, Italy
+        pdata = comtrade_get({
+            "reporterCode": proxy_m49, "period": str(year), "partnerCode": origin_m49,
+            "cmdCode": "AG2", "flowCode": "M", "breakdownMode": "classic",
+        }, key)
+        for row in pdata.get("data", []):
+            code = str(row.get("cmdCode", "")).zfill(2)
+            if code in CHAPTERS:
+                eu_by_chapter[code + "00"] = eu_by_chapter.get(code + "00", 0.0) + float(row["primaryValue"])
+        time.sleep(0.3)
     if eu_by_chapter:
         markets["EU27"]["by_hs4"] = eu_by_chapter
 
@@ -250,7 +262,7 @@ def fetch_country_flows(slug, reporter_m49, key, year, total):
         "name": slug.replace("-", " ").title(),
         "total_exports_usd": total,
         "markets": markets,
-        "member_shares": {},  # not computable from chapter-level pull; left for a future refinement
+        "member_shares": {},  # not computable from a four-member proxy; left for a future refinement
     }
 
 def build_live(key):
@@ -262,11 +274,13 @@ def build_live(key):
     return {
         "sample": False,
         "dataset_version": f"comtrade-live-{date.today().isoformat()}",
-        "vintage": "UN Comtrade final annual data, most recent available year per reporter",
-        "sources": [
-            "UN Comtrade Database, https://comtradeplus.un.org",
-            "EU27 members summed bilaterally; EU aggregate (partner 97) used for chapter-level breakdown only",
-        ],
+        "vintage": ("UN Comtrade mirror statistics: figures are destination markets' own "
+            "reported imports from each origin country, not the origin country's self-reported "
+            "exports, since several tracked origins report to Comtrade irregularly or not at all. "
+            "EU27 totals sum all 27 member states; EU chapter-level product mix is approximated "
+            "from Germany, France, Netherlands and Italy, the four largest EU importers, rather "
+            "than all 27 members, to stay within the free-tier daily call limit."),
+        "sources": ["UN Comtrade Database, https://comtradeplus.un.org, mirror (partner-reported) statistics"],
         "countries": country_flows,
     }
 
