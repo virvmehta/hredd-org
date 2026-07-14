@@ -108,7 +108,12 @@ COMTRADE_BASE = "https://comtradeapi.un.org/data/v1/get/C/A/HS"
 
 # M49 codes for the ten tracked origin countries (reporters)
 ORIGIN_M49 = {
-    "bangladesh": "50", "india": "356", "vietnam": "704", "indonesia": "360",
+    # India is 699, not the M49 statistical standard 356, which Comtrade labels
+    # "India (...1974)" and retired after Sikkim's 1975 merger. Comtrade's own
+    # codes mostly track M49 but diverge for a handful of historical splits like
+    # this one, confirmed against comtradeapi.un.org/files/v1/app/reference/
+    # partnerAreas.json on 2026-07-14 rather than assumed from the M49 standard.
+    "bangladesh": "50", "india": "699", "vietnam": "704", "indonesia": "360",
     "brazil": "76", "thailand": "764", "ethiopia": "231", "kenya": "404",
     "ghana": "288", "cote-divoire": "384",
 }
@@ -145,10 +150,17 @@ def _normalize_codes(params):
             out[field] = str(int(out[field]))
     return out
 
-def comtrade_get(params, key, retries=4):
+def comtrade_get(params, key, retries=4, pace=1.0):
     """Single GET against the Comtrade v1 data API, with the subscription key
     header and exponential backoff on transient failures. Raises on the final
-    attempt so a real error surfaces rather than being silently swallowed."""
+    attempt so a real error surfaces rather than being silently swallowed.
+
+    A fixed pause runs before every call, not only inside the EU loop, since
+    the free tier appears to enforce a per-minute cap that returns a 200 with
+    an empty data array rather than a 429 when exceeded. That is
+    indistinguishable from "no data exists" unless calls are paced
+    defensively regardless of how many succeeded just before."""
+    time.sleep(pace)
     params = _normalize_codes(params)
     url = COMTRADE_BASE + "?" + urllib.parse.urlencode(params)
     req = urllib.request.Request(url, headers={
@@ -160,14 +172,14 @@ def comtrade_get(params, key, retries=4):
         except urllib.error.HTTPError as e:
             body = e.read().decode("utf-8", errors="replace")[:500]
             if e.code == 429 and attempt < retries - 1:
-                time.sleep(2 ** attempt * 3)
+                time.sleep(2 ** attempt * 5)
                 continue
             raise SystemExit(
                 f"Comtrade API error {e.code} on reporter={params.get('reporterCode')} "
                 f"partner={params.get('partnerCode')}: {body}")
         except urllib.error.URLError as e:
             if attempt < retries - 1:
-                time.sleep(2 ** attempt * 3)
+                time.sleep(2 ** attempt * 5)
                 continue
             raise SystemExit(f"Comtrade network error: {e}")
     raise SystemExit("Comtrade API exhausted retries without a response")
@@ -231,7 +243,6 @@ def fetch_country_flows(slug, origin_m49, key, year):
         }, key)
         rows = mdata.get("data", [])
         eu_total += float(rows[0]["primaryValue"]) if rows else 0.0
-        time.sleep(0.3)  # stay well under free-tier rate limits across 27 sequential calls
     markets["EU27"] = {"total": eu_total}
 
     # EU chapter mix: a full 27-member chapter breakdown would nearly double the
@@ -250,7 +261,6 @@ def fetch_country_flows(slug, origin_m49, key, year):
             code = str(row.get("cmdCode", "")).zfill(2)
             if code in CHAPTERS:
                 eu_by_chapter[code + "00"] = eu_by_chapter.get(code + "00", 0.0) + float(row["primaryValue"])
-        time.sleep(0.3)
     if eu_by_chapter:
         markets["EU27"]["by_hs4"] = eu_by_chapter
 
