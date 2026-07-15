@@ -81,6 +81,7 @@ function ledgerOf(c){
           <div class="stat"><b>{pct(end.union)}</b><span>Of export value in scope of at least one law by 2030</span></div>
           <div class="stat"><b>{pct(end.border)}</b><span>Stoppable at a border by 2030</span></div>
         </div>
+        <p class="scope-note mono">Figures cover only the nine markets where tracked HREDD laws apply: the EU, US, UK, Canada, Australia, Japan, South Korea, Norway and Switzerland. This is not {c.name}'s total exports to the world.</p>
 
         <div class="destbar-wrap">
           <div class="destbar" role="img" aria-label="Share of exports by destination market">
@@ -103,11 +104,12 @@ function ledgerOf(c){
 
         <div class="ledger-head mono">
           <span>Law</span><span class="lh-status">Status</span><span class="lh-from">From</span>
-          <span>Share of export value in scope</span><span class="lh-share">Share</span><span class="lh-val">Value</span><span class="lh-class">Class</span>
+          <span>Share of export value in scope</span><span class="lh-share">Central</span><span class="lh-val">Value</span><span class="lh-class">Class</span>
         </div>
 
         <div class="ledger">
-          {rows.map(({ slug, law, r }) => { const [lo, ce, hi] = r.share; const max = rows[0].r.share[2] || 1; return (
+          {rows.map(({ slug, law, r }) => { const [lo, ce, hi] = r.share; const max = rows[0].r.share[2] || 1;
+            const rangeTitle = r.class === 'B' ? `Central estimate ${pct(ce)}. Could reach up to ${pct(hi)} depending on buyer size.` : `${pct(ce)}, measured directly.`; return (
             <a class="lrow" href={`/laws/${slug}/`}>
               <div class="l-name">
                 <h3>{law.shortName || law.name}</h3>
@@ -115,11 +117,10 @@ function ledgerOf(c){
               </div>
               <span class="chip" data-g={law.statusType}>{law.status}</span>
               <span class="mono l-from">{yearOf(r.first_date)}</span>
-              <span class="l-band" title={`Central ${pct(ce)}, band ${pct(lo)} to ${pct(hi)}`}>
-                <i class="range" style={`left:${lo/max*100}%; width:${Math.max(0.5,(hi-lo)/max*100)}%`}></i>
+              <span class="l-band" title={rangeTitle}>
                 <i class="central" style={`width:${ce/max*100}%`}></i>
               </span>
-              <span class="mono l-share">{pct(ce)}<em>{r.class === 'B' ? ` ${pct(lo)}–?` : ''}</em></span>
+              <span class="mono l-share" title={rangeTitle}>{pct(ce)}</span>
               <span class="mono l-val">{usd(r.value[1])}</span>
               <span class="cbadge" data-cl={r.class}>{r.class}</span>
             </a>
@@ -163,6 +164,9 @@ function ledgerOf(c){
   .takeaway{ font:400 clamp(20px,2.2vw,26px)/1.5 var(--serif); color:var(--ink);
     max-width:56ch; margin:38px 0 0; }
 
+  .scope-note{ margin:14px 0 0; font-size:11px; letter-spacing:.06em; line-height:1.7;
+    color:var(--ink-dim); text-transform:none; max-width:62ch; }
+
   .class-legend{ margin-top:44px; padding:16px 18px; border:1px solid var(--line-soft);
     background:var(--bg-raise); }
   .class-legend p{ margin:0; font-size:11px; letter-spacing:.08em; line-height:1.9;
@@ -191,20 +195,23 @@ function ledgerOf(c){
   .l-name h3{ font:400 17px/1.25 var(--serif); color:var(--ink); margin:0; }
   .l-name p{ margin:3px 0 0; font-size:12px; color:var(--ink-faint); }
   .l-from{ font-size:11px; color:var(--ink-dim); }
+  /* Single bar, single number: the class badge already explains that a B
+     figure is a central estimate with an upper ceiling (see the legend and
+     the tooltip on hover), so the row itself no longer overlays a second
+     band or stacks a second percentage under the first. */
   .l-band{ position:relative; height:8px; background:var(--panel-2); display:block; }
-  .l-band .range{ position:absolute; top:0; bottom:0; background:var(--gold-ghost);
-    border:1px solid var(--gold-dim); }
   .l-band .central{ position:absolute; left:0; top:1px; bottom:1px;
     background:linear-gradient(90deg,var(--gold-dim),var(--gold)); }
-  .l-share{ font-size:12px; color:var(--gold-hi); text-align:right; }
-  .l-share em{ display:block; font-style:normal; font-size:10px; color:var(--ink-dim); letter-spacing:.08em; }
-  .l-val{ font-size:11px; color:var(--ink-dim); text-align:right; }
+  .l-share{ font-size:14px; font-weight:500; color:var(--gold-hi); text-align:right;
+    white-space:nowrap; }
+  .l-val{ font-size:11px; color:var(--ink-dim); text-align:right; white-space:nowrap; }
   .cbadge{ font-family:var(--mono); font-size:9.5px; letter-spacing:.1em; text-align:center;
     border:1px solid var(--line); color:var(--ink-dim); padding:5px 0; }
   .cbadge[data-cl="A"]{ border-color:var(--gold-dim); color:var(--gold-hi); }
   .cbadge[data-cl="C"]{ color:var(--ink-faint); border-style:dashed; }
-  .qrow{ grid-template-columns:minmax(0,1.5fr) 118px minmax(0,1fr) 44px; opacity:.72; }
-  .l-note{ font-size:10px; letter-spacing:.1em; }
+  .qrow{ grid-template-columns:minmax(0,1.5fr) 130px minmax(0,1fr) 44px; opacity:.72; }
+  .qrow .chip{ justify-self:start; }
+  .l-note{ font-size:11px; letter-spacing:.08em; padding-left:4px; }
 
   @media (max-width:880px){
     .ledger-head{ display:none; }
