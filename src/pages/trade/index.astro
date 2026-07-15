@@ -46,9 +46,9 @@ function ledgerOf(c){
 
 <section class="law-head">
   <div class="wrap">
-    <p class="kicker reveal">Trade data meets the tracker</p>
+    <p class="kicker reveal">Exposure by country, measured from customs data</p>
     <h1 class="display reveal" data-delay="1" style="font-size:clamp(40px,5.4vw,78px)">The Regulated<br><em>Trade Index</em></h1>
-    <p class="standfirst reveal" data-delay="2">How a country's exports pass through the human rights and environmental regimes of its buyer markets. Every share is computed from observed flows against statutory scope, every estimate carries its class and its band, and every number links to its working.</p>
+    <p class="standfirst reveal" data-delay="2">Choose a country to see how much of its export trade each law reaches, from today out to 2030. Every figure is computed from public customs data and links to its working.</p>
   </div>
 </section>
 
@@ -63,6 +63,8 @@ function ledgerOf(c){
 
     {countries.map(c => { const { rows, quiet } = ledgerOf(c); const end = c.series[c.series.length - 1]; return (
       <div class="cpane" data-c={c.slug} hidden={c.slug !== DEFAULT}>
+
+        <p class="takeaway reveal">By 2030, {pct(end.union)} of {c.name}'s exports to these tracked markets fall in scope of at least one law.</p>
 
         <div class="stats" style="margin-top:34px">
           <div class="stat"><b>{usd(c.total_exports_usd)}</b><span>Total exports per year</span></div>
@@ -83,6 +85,10 @@ function ledgerOf(c){
             ))}
             <span class="faint">Other destinations {Math.max(0, Math.round((1 - c.markets.slice(0,5).reduce((s,m)=>s+m.share,0))*100))}%</span>
           </div>
+        </div>
+
+        <div class="class-legend mono">
+          <p>Every figure below carries a class that says how much guesswork sits behind it. <b>Class A</b> means the law lists exactly which products and markets it covers, so we measured the trade directly. <b>Class B</b> means the law's reach depends on who the buyer is, so we estimated it from a published assumption and show a range. <b>Class C</b> means customs data cannot produce an honest number, so we refuse to show one.</p>
         </div>
 
         <div class="ledger-head mono">
@@ -127,7 +133,7 @@ function ledgerOf(c){
       </div>
     );})}
 
-    <p class="mono faint" style="margin-top:30px">Shares at full application of current law, central estimates with published bands · Class B figures measure demand exposure, never statutory coverage · per-law shares intentionally sum past the union figure · vintage {data.vintage} · <a href="/methodology/" style="color:var(--gold)">full methodology and open data</a></p>
+    <p class="mono faint" style="margin-top:30px">Shares at full application of current law · Per-law shares intentionally sum past the union figure · Dataset {data.dataset_version} · <a href="/methodology/" style="color:var(--gold)">full methodology and open data</a></p>
 
   </div>
 </section>
@@ -144,16 +150,25 @@ function ledgerOf(c){
   .cchip:hover{ border-color:var(--gold-dim); color:var(--ink); }
   .cchip.on{ border-color:var(--gold); color:var(--gold-hi); background:var(--gold-ghost); }
 
+  .takeaway{ font:400 clamp(20px,2.2vw,26px)/1.5 var(--serif); color:var(--ink);
+    max-width:56ch; margin:38px 0 0; }
+
+  .class-legend{ margin-top:44px; padding:16px 18px; border:1px solid var(--line-soft);
+    background:var(--bg-raise); }
+  .class-legend p{ margin:0; font-size:11px; letter-spacing:.08em; line-height:1.9;
+    color:var(--ink-dim); text-transform:none; }
+  .class-legend b{ color:var(--gold-hi); font-weight:500; }
+
   .destbar-wrap{ margin:34px 0 8px; }
   .destbar{ display:flex; height:9px; border:1px solid var(--line-soft); overflow:hidden; }
   .destbar i{ display:block; background:var(--gold); }
-  .destlegend{ display:flex; flex-wrap:wrap; gap:18px; margin-top:10px; font-size:9.5px;
+  .destlegend{ display:flex; flex-wrap:wrap; gap:18px; margin-top:10px; font-size:11px;
     letter-spacing:.14em; color:var(--ink-dim); }
   .destlegend .faint{ color:var(--ink-faint); }
 
   .ledger-head{ display:grid; grid-template-columns:minmax(0,1.5fr) 118px 52px minmax(0,1.6fr) 92px 74px 44px;
     gap:16px; align-items:center; padding:26px 0 12px; border-bottom:1px solid var(--line);
-    font-size:9px; letter-spacing:.2em; color:var(--ink-faint); text-transform:uppercase; }
+    font-size:10.5px; letter-spacing:.14em; color:var(--ink-dim); text-transform:uppercase; }
   .lrow{ display:grid; grid-template-columns:minmax(0,1.5fr) 118px 52px minmax(0,1.6fr) 92px 74px 44px;
     gap:16px; align-items:center; padding:15px 0; border-bottom:1px solid var(--line-soft);
     text-decoration:none; transition:background .2s; }
@@ -167,7 +182,7 @@ function ledgerOf(c){
   .l-band .central{ position:absolute; left:0; top:1px; bottom:1px;
     background:linear-gradient(90deg,var(--gold-dim),var(--gold)); }
   .l-share{ font-size:12px; color:var(--gold-hi); text-align:right; }
-  .l-share em{ display:block; font-style:normal; font-size:8.5px; color:var(--ink-faint); letter-spacing:.08em; }
+  .l-share em{ display:block; font-style:normal; font-size:10px; color:var(--ink-dim); letter-spacing:.08em; }
   .l-val{ font-size:11px; color:var(--ink-dim); text-align:right; }
   .cbadge{ font-family:var(--mono); font-size:9.5px; letter-spacing:.1em; text-align:center;
     border:1px solid var(--line); color:var(--ink-dim); padding:5px 0; }

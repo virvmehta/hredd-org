@@ -11,7 +11,8 @@
   --panel-2:   #1c1913;
   --ink:       #eae4d5;
   --ink-dim:   #b1a892;
-  --ink-faint: #7c7462;
+  /* lightened from #7c7462 so the faintest text still passes WCAG AA (>= 4.5:1) */
+  --ink-faint: #8a8170;
   --line:      rgba(234,228,213,.14);
   --line-soft: rgba(234,228,213,.07);
   --gold:      #c9a35f;
@@ -45,7 +46,7 @@ p{ text-wrap:pretty; }
    utilities
 -------------------------------------------------------------- */
 .wrap{ max-width:var(--max); margin:0 auto; padding:0 clamp(20px,4vw,48px); }
-.mono{ font-family:var(--mono); font-weight:500; font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; }
+.mono{ font-family:var(--mono); font-weight:500; font-size:11.5px; letter-spacing:.1em; text-transform:uppercase; }
 .dim{ color:var(--ink-dim); }
 .faint{ color:var(--ink-faint); }
 .gold{ color:var(--gold); }
@@ -55,14 +56,17 @@ p{ text-wrap:pretty; }
   background:linear-gradient(90deg,var(--gold-dim),var(--gold-hi));
   z-index:200; transition:width .1s linear; }
 
-.reveal{ opacity:0; transform:translateY(22px);
+/* Reveal animations only activate when JavaScript has confirmed itself by
+   stamping .js on <html>. Without that gate, a failed or stripped script
+   left every .reveal element permanently invisible. */
+.js .reveal{ opacity:0; transform:translateY(22px);
   transition:opacity .9s cubic-bezier(.16,1,.3,1), transform .9s cubic-bezier(.16,1,.3,1); }
-.reveal.in{ opacity:1; transform:none; }
-.reveal[data-delay="1"]{ transition-delay:.12s; }
-.reveal[data-delay="2"]{ transition-delay:.24s; }
-.reveal[data-delay="3"]{ transition-delay:.36s; }
+.js .reveal.in{ opacity:1; transform:none; }
+.js .reveal[data-delay="1"]{ transition-delay:.12s; }
+.js .reveal[data-delay="2"]{ transition-delay:.24s; }
+.js .reveal[data-delay="3"]{ transition-delay:.36s; }
 @media (prefers-reduced-motion:reduce){
-  .reveal{ opacity:1; transform:none; transition:none; }
+  .js .reveal{ opacity:1; transform:none; transition:none; }
   html{ scroll-behavior:auto; }
 }
 
@@ -72,10 +76,6 @@ p{ text-wrap:pretty; }
 .masthead{ position:sticky; top:0; z-index:100;
   background:rgba(14,13,10,.86); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
   border-bottom:1px solid var(--line); }
-.mast-top{ border-bottom:1px solid var(--line-soft); }
-.mast-top .wrap{ display:flex; justify-content:space-between; align-items:center; height:34px; }
-.mast-top a{ color:var(--ink-faint); margin-left:22px; transition:color .25s; }
-.mast-top a:hover{ color:var(--gold); }
 .mast-main .wrap{ display:grid; grid-template-columns:1fr auto 1fr; align-items:center; height:64px; }
 .wordmark{ font:400 25px/1 var(--serif); letter-spacing:-.005em; white-space:nowrap; padding:0 28px;
   display:inline-flex; align-items:baseline; gap:0; }
@@ -102,13 +102,14 @@ p{ text-wrap:pretty; }
   font-size:12px; letter-spacing:.11em; text-transform:uppercase; color:var(--ink-dim);
   border-bottom:1px solid var(--line-soft); }
 .mobile-menu a:hover{ color:var(--gold); }
-@media (max-width:900px){
+/* Eight items in one row need more room than the old six did, so the
+   hamburger takes over earlier than the previous 900px breakpoint. */
+@media (max-width:1100px){
   .mast-nav{ display:none; }
   .nav-toggle{ display:block; }
   .mast-main .wrap{ grid-template-columns:auto 1fr auto; }
   .wordmark{ padding:0; grid-column:1; justify-self:start; }
   .mobile-menu.open{ display:block; }
-  .mast-top .mast-top-links{ display:none; }
 }
 
 /* --------------------------------------------------------------
@@ -170,24 +171,34 @@ p{ text-wrap:pretty; }
 .stat{ background:var(--bg); padding:26px 30px; }
 .stat b{ display:block; font:400 clamp(38px,4vw,58px)/1 var(--serif);
   color:var(--ink); font-variant-numeric:tabular-nums; }
-.stat span{ display:block; margin-top:10px; font-family:var(--mono); font-size:10px;
-  letter-spacing:.12em; text-transform:uppercase; color:var(--ink-faint); }
+.stat span{ display:block; margin-top:10px; font-family:var(--mono); font-size:11px;
+  letter-spacing:.12em; text-transform:uppercase; color:var(--ink-dim); }
 @media (max-width:720px){ .stats{ grid-auto-flow:row; grid-template-columns:1fr 1fr; } }
 
 /* --------------------------------------------------------------
-   ticker
+   start-here steps (homepage journey)
 -------------------------------------------------------------- */
-.ticker{ border-top:1px solid var(--line); border-bottom:1px solid var(--line);
-  overflow:hidden; background:var(--bg-raise); }
-.ticker-inner{ display:flex; width:max-content; animation:tick 55s linear infinite; }
-.ticker:hover .ticker-inner{ animation-play-state:paused; }
-.ticker-item{ display:inline-flex; align-items:center; gap:14px; padding:14px 34px;
-  font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase;
-  color:var(--ink-dim); white-space:nowrap; }
-.ticker-item b{ color:var(--gold); font-weight:500; }
-.ticker-item::after{ content:"◆"; color:var(--gold-dim); font-size:7px; margin-left:34px; }
-@keyframes tick{ to{ transform:translateX(-50%); } }
-@media (prefers-reduced-motion:reduce){ .ticker-inner{ animation:none; flex-wrap:wrap; width:auto; } }
+.steps{ display:grid; grid-template-columns:repeat(4,1fr); gap:1px;
+  background:var(--line); border:1px solid var(--line); counter-reset:step; }
+.step{ background:var(--bg); padding:30px 28px 26px; display:flex; flex-direction:column;
+  gap:12px; position:relative; transition:background .35s; counter-increment:step; }
+.step:hover{ background:var(--panel); }
+.step::before{ content:counter(step,decimal-leading-zero); font-family:var(--mono);
+  font-weight:500; font-size:12px; letter-spacing:.16em; color:var(--gold); }
+.step h3{ font:400 22px/1.25 var(--serif); margin:0; letter-spacing:-.005em; }
+.step p{ margin:0; font-size:15px; line-height:1.6; color:var(--ink-dim); flex:1; }
+.step .textlink{ font-size:10.5px; }
+@media (max-width:980px){ .steps{ grid-template-columns:1fr 1fr; } }
+@media (max-width:560px){ .steps{ grid-template-columns:1fr; } }
+
+/* --------------------------------------------------------------
+   statement band (plain editorial position, no quotation costume)
+-------------------------------------------------------------- */
+.statement-band{ background:var(--panel); border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line); padding:clamp(60px,8vw,110px) 0; }
+.statement-band p{ margin:0 auto; max-width:880px; text-align:center;
+  font:400 clamp(22px,2.8vw,32px)/1.5 var(--serif); color:var(--ink); }
+.statement-band em{ font-style:italic; color:var(--gold-hi); }
 
 /* --------------------------------------------------------------
    law cards
@@ -262,7 +273,7 @@ p{ text-wrap:pretty; }
 .map-panel path.cty[data-code]{ cursor:pointer; }
 .map-legend{ display:flex; gap:26px; flex-wrap:wrap; align-items:center; padding:16px 22px;
   border-top:1px solid var(--line-soft);
-  font-family:var(--mono); font-size:10px; letter-spacing:.11em; text-transform:uppercase; color:var(--ink-faint); }
+  font-family:var(--mono); font-size:11px; letter-spacing:.11em; text-transform:uppercase; color:var(--ink-dim); }
 .map-legend i{ display:inline-block; width:12px; height:12px; margin-right:8px;
   vertical-align:-2px; font-style:normal; }
 .tooltip{ position:fixed; z-index:150; pointer-events:none; opacity:0; transform:translateY(6px);
@@ -330,7 +341,8 @@ p{ text-wrap:pretty; }
 .crumb a:hover{ color:var(--gold); }
 
 .prose{ max-width:680px; margin:0 auto; font-size:18.5px; line-height:1.75; }
-.prose p, .prose li{ text-align:justify; text-justify:inter-word; hyphens:auto; -webkit-hyphens:auto; }
+/* Left-aligned deliberately: justified text opens rivers and breaks words at
+   narrow widths, which costs second-language readers the most. */
 .prose p{ margin:0 0 1.4em; }
 .prose > p:first-of-type::first-letter, .prose > div > p:first-of-type::first-letter{
   font-size:3.4em; line-height:.85; float:left; padding:6px 12px 0 0; color:var(--gold); }
@@ -408,5 +420,7 @@ p{ text-wrap:pretty; }
 .hero .kicker{ margin-bottom:26px; }
 @media (max-width:900px){
   .hero .wrap{ grid-template-columns:1fr; min-height:0; }
-  .hero-globe{ max-width:380px; justify-self:center; order:-1; margin-top:10px; }
+  /* The globe is desktop garnish. On mobile it pushed the headline below the
+     fold and burned battery, so the words take the screen instead. */
+  .hero-globe{ display:none; }
 }

@@ -5,3 +5,4 @@ dist/
 .DS_Store
 studio/node_modules/
 studio/dist/
+pipeline/__pycache__/

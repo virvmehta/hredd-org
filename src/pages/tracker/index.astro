@@ -27,9 +27,9 @@ const counts = {
 <section class="section" style="padding-bottom:clamp(40px,5vw,64px)">
   <div class="wrap">
     <p class="kicker reveal">The tracker</p>
-    <h1 class="display reveal" data-delay="1" style="font-size:clamp(40px,5.6vw,80px)">Every regime that reaches<br /><em>your</em> supply chain</h1>
-    <p class="standfirst reveal" data-delay="2" style="margin-top:26px">Every mandatory HREDD regime that reaches
-      Global South supply chains, tracked monthly with a changelog on every entry.</p>
+    <h1 class="display reveal" data-delay="1" style="font-size:clamp(40px,5.6vw,80px)">Every law that reaches<br />your supply chain</h1>
+    <p class="standfirst reveal" data-delay="2" style="margin-top:26px">We track every mandatory due diligence law that reaches
+      Global South supply chains. Each entry is reviewed monthly against primary sources and keeps an open changelog.</p>
     <div class="stats reveal" data-delay="3" style="margin-top:48px">
       <div class="stat"><b data-count={counts.all}>{counts.all}</b><span>Laws tracked</span></div>
       <div class="stat"><b data-count={counts.force}>{counts.force}</b><span>In force</span></div>
@@ -44,10 +44,10 @@ const counts = {
   <div class="wrap">
     <div class="section-head reveal">
       <div>
-        <p class="kicker">The atlas</p>
-        <h2 class="h2">Where the rules are written</h2>
+        <p class="kicker">The map</p>
+        <h2 class="h2">Where these laws are made</h2>
       </div>
-      <span class="mono faint">Hover a gold jurisdiction · click to filter the ledger</span>
+      <span class="mono faint">Tap or click a gold country to filter the list below</span>
     </div>
     <div class="map-panel reveal" data-delay="1">
       <svg id="worldmap" viewBox={`0 0 ${map.width} ${map.height}`} role="img" aria-label="World map of jurisdictions with tracked HREDD laws">
@@ -78,7 +78,7 @@ const counts = {
     <div class="section-head reveal">
       <div>
         <p class="kicker">Changelog</p>
-        <h2 class="h2">This month's <em>movements</em></h2>
+        <h2 class="h2">What changed <em>this month</em></h2>
       </div>
       <span class="mono faint">Updated {latestMonth}</span>
     </div>
@@ -98,7 +98,7 @@ const counts = {
   <div class="wrap">
     <div class="section-head reveal">
       <div>
-        <p class="kicker">The ledger</p>
+        <p class="kicker">The full list</p>
         <h2 class="h2">All tracked laws</h2>
       </div>
       <div class="tabs" id="tabs">

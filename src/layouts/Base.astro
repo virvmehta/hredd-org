@@ -46,6 +46,7 @@ const tagline = settings?.tagline || 'Tracking global HREDD legislation and its 
 <link rel="icon" type="image/png" href="/favicon-96.png" sizes="96x96" />
 <link rel="icon" href="/favicon.ico" sizes="any" />
 <link rel="apple-touch-icon" href="/favicon.png" />
+<script is:inline>document.documentElement.classList.add('js');</script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,300;1,6..72,400&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
@@ -64,11 +65,13 @@ const tagline = settings?.tagline || 'Tracking global HREDD legislation and its 
     <div class="wrap">
       <nav class="mast-nav left">
         <a href="/tracker/" aria-current={active === 'tracker' ? 'page' : undefined}>Tracker</a>
-        <a href="/buyer-mapping/" aria-current={active === 'buyer-mapping' ? 'page' : undefined}>Buyer Mapping</a>
-        <a href="/report/" aria-current={active === 'report' ? 'page' : undefined}>Your Report</a>
+        <a href="/timeline/" aria-current={active === 'timeline' ? 'page' : undefined}>Timelines</a>
+        <a href="/trade/" aria-current={active === 'trade' ? 'page' : undefined}>Trade</a>
+        <a href="/buyer-mapping/" aria-current={active === 'buyer-mapping' ? 'page' : undefined}>Your buyers</a>
       </nav>
       <a class="wordmark" href="/"><b>hredd</b><i>.org</i></a>
       <nav class="mast-nav right">
+        <a href="/report/" aria-current={active === 'report' ? 'page' : undefined}>Your report</a>
         <a href="/articles/" aria-current={active === 'articles' ? 'page' : undefined}>Articles</a>
         <a href="/about/" aria-current={active === 'about' ? 'page' : undefined}>About</a>
         <a href="/subscribe/" aria-current={active === 'subscribe' ? 'page' : undefined}>Subscribe</a>
@@ -77,8 +80,9 @@ const tagline = settings?.tagline || 'Tracking global HREDD legislation and its 
     </div>
   </div>
   <nav class="mobile-menu">
-    <a href="/tracker/">Tracker</a><a href="/buyer-mapping/">Buyer Mapping</a>
-    <a href="/report/">Your Report</a><a href="/timeline/">Timelines</a><a href="/articles/">Articles</a><a href="/about/">About</a><a href="/subscribe/">Subscribe</a>
+    <a href="/tracker/">Tracker</a><a href="/timeline/">Timelines</a><a href="/trade/">Trade</a>
+    <a href="/buyer-mapping/">Your buyers</a><a href="/report/">Your report</a>
+    <a href="/articles/">Articles</a><a href="/about/">About</a><a href="/subscribe/">Subscribe</a>
   </nav>
 </header>
 
@@ -93,11 +97,11 @@ const tagline = settings?.tagline || 'Tracking global HREDD legislation and its 
       </div>
       <div class="foot-col">
         <h4>Sections</h4>
-        <a href="/tracker/">Tracker</a><a href="/buyer-mapping/">Buyer Mapping</a><a href="/report/">Your Report</a><a href="/articles/">Articles</a>
+        <a href="/tracker/">Tracker</a><a href="/timeline/">Timelines</a><a href="/trade/">Trade exposure</a><a href="/buyer-mapping/">Your buyers</a><a href="/report/">Your exposure report</a><a href="/articles/">Articles</a>
       </div>
       <div class="foot-col">
         <h4>hredd.org</h4>
-        <a href="/about/">About</a><a href="/subscribe/">Subscribe</a><a href="/about/#contact">Contact</a>
+        <a href="/about/">About</a><a href="/methodology/">Methodology</a><a href="/subscribe/">Subscribe</a><a href="/about/#contact">Contact</a>
       </div>
     </div>
     <div class="foot-base">
@@ -133,28 +137,8 @@ const tagline = settings?.tagline || 'Tracking global HREDD legislation and its 
   }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
   document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
 
-  // count-up numbers
-  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const cio = new IntersectionObserver((es) => {
-    for (const e of es) {
-      if (!e.isIntersecting) continue;
-      cio.unobserve(e.target);
-      const el = e.target;
-      const end = +(el.dataset.count || 0);
-      if (reduced) { el.textContent = String(end); continue; }
-      let t0 = null;
-      const step = (t) => {
-        if (!t0) t0 = t;
-        const p = Math.min((t - t0) / 1400, 1);
-        el.textContent = String(Math.round(end * (1 - Math.pow(1 - p, 3))));
-        if (p < 1) requestAnimationFrame(step);
-      };
-      requestAnimationFrame(step);
-    }
-  }, { threshold: 0.5 });
-  document.querySelectorAll('[data-count]').forEach((el) => {
-    el.textContent = '0'; cio.observe(el);
-  });
+  // Numbers render statically. The count-up animation was removed deliberately:
+  // animated statistics read as marketing on a site whose brand is sobriety.
 </script>
 </body>
 </html>

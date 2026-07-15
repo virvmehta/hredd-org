@@ -1,25 +1,28 @@
 ---
 import Base from '../layouts/Base.astro';
-import { getAllLaws, getAllArticles, getSiteSettings, formatDate, formatMonthYear } from '../lib/sanity.js';
+import { getAllLaws, getAllArticles, formatDate, formatMonthYear } from '../lib/sanity.js';
 import { buildMovements, trackedGeoIds } from '../lib/redesignData.js';
 
 const laws = await getAllLaws();
 const articles = await getAllArticles();
-const settings = await getSiteSettings();
 
 const lead = articles.find((a) => a.featured) || articles[0];
-const movements = buildMovements(laws, 6);
+const movements = buildMovements(laws, 3);
 const latestMonth = movements[0]?.date || formatMonthYear();
-const movementsThisMonth = movements.filter((m) => m.date === latestMonth).length;
-const inForce = laws.filter((l) => l.statusType === 'force').length;
-const jurisdictions = new Set(laws.map((l) => l.jurisdiction)).size;
-const previewLaws = laws.slice(0, 5);
 const geoIds = trackedGeoIds(laws);
-const quote = settings?.editorialQuote ||
-  'The question is never whether supply chains will be governed. The question is who sits at the table when the rules are written, and who just receives the questionnaires.';
-const quoteBy = settings?.editorialQuoteAttribution || 'hredd·org · editorial position';
-const blurb = settings?.newsletterBlurb ||
-  'What moved, what it means for your trade relationships, and what to prepare before your buyers ask. No noise.';
+
+// The four doors, in the order a supplier actually thinks through the problem:
+// awareness, mapping, personal action, national context.
+const steps = [
+  { href: '/tracker/', title: 'Track the laws',
+    text: 'Eighteen regimes are reviewed monthly against primary sources, with a changelog on every entry.' },
+  { href: '/buyer-mapping/', title: 'Check your buyers',
+    text: 'Choose your buyer countries and see which laws reach those trade relationships.' },
+  { href: '/report/', title: 'Get your exposure report',
+    text: 'Eight questions produce a dated PDF report, and nothing leaves your device.' },
+  { href: '/trade/', title: 'See your country’s exposure',
+    text: 'See how much of your country’s trade each law will reach by 2030.' },
+];
 ---
 <Base
   title="hredd.org | HREDD Legislation Tracked From the Global South"
@@ -31,13 +34,11 @@ const blurb = settings?.newsletterBlurb ||
   <div class="wrap">
     <div>
       <p class="kicker reveal">A Global South perspective</p>
-      <h1 class="display reveal" data-delay="1">Human rights<br />&amp; environmental<br />due diligence</h1>
-      <p class="standfirst reveal" data-delay="2">{laws.length} laws now decide who sells into the
-        world's richest markets. We track every one of them, monthly, from the supplier side of the chain.</p>
+      <h1 class="display reveal" data-delay="1">The due diligence laws,<br />read from the<br /><em>supplier side</em></h1>
+      <p class="standfirst reveal" data-delay="2">Eighteen human rights and environmental due diligence laws now set the terms of trade with the world's largest markets. We track every one of them monthly and explain what each will ask of you.</p>
       <div class="hero-ctas reveal" data-delay="3">
-        <a class="btn solid" href="/tracker/"><span>Explore the tracker</span> <i>→</i></a>
-        <a class="btn" href="/buyer-mapping/"><span>Map your buyers</span></a>
-          <a class="btn" href="/report/"><span>Get your exposure report</span></a>
+        <a class="btn solid" href="/report/"><span>Get your exposure report</span> <i>→</i></a>
+        <a class="btn" href="/tracker/"><span>Explore the tracker</span></a>
       </div>
     </div>
     <div class="hero-globe reveal" data-delay="2">
@@ -46,28 +47,22 @@ const blurb = settings?.newsletterBlurb ||
   </div>
 </section>
 
-<div class="ticker" aria-label="This month's movements">
-  <div class="ticker-inner">
-    {[...movements, ...movements].map((m) => (
-      <span class="ticker-item"><b>{m.tag}</b> {m.date} · {(m.latest || '').split(';')[0]}</span>
-    ))}
-  </div>
-</div>
-
 <section class="section">
   <div class="wrap">
     <div class="section-head reveal">
       <div>
-        <p class="kicker">This month</p>
-        <h2 class="h2">The state of play</h2>
+        <p class="kicker">Start here</p>
+        <h2 class="h2">Four steps through <em>the tracker</em></h2>
       </div>
-      <span class="mono faint">Updated {latestMonth}</span>
     </div>
-    <div class="stats reveal" data-delay="1">
-      <div class="stat"><b data-count={laws.length}>{laws.length}</b><span>Laws tracked</span></div>
-      <div class="stat"><b data-count={movementsThisMonth}>{movementsThisMonth}</b><span>Movements in {latestMonth}</span></div>
-      <div class="stat"><b data-count={inForce}>{inForce}</b><span>Regimes in force</span></div>
-      <div class="stat"><b data-count={jurisdictions}>{jurisdictions}</b><span>Jurisdictions covered</span></div>
+    <div class="steps reveal" data-delay="1">
+      {steps.map((s) => (
+        <a class="step" href={s.href}>
+          <h3>{s.title}</h3>
+          <p>{s.text}</p>
+          <span class="textlink">Open <i>→</i></span>
+        </a>
+      ))}
     </div>
   </div>
 </section>
@@ -76,24 +71,22 @@ const blurb = settings?.newsletterBlurb ||
   <div class="wrap">
     <div class="section-head reveal">
       <div>
-        <p class="kicker">The tracker</p>
-        <h2 class="h2">{laws.length} laws, <em>one ledger</em></h2>
+        <p class="kicker">Changelog</p>
+        <h2 class="h2">What changed <em>this month</em></h2>
       </div>
       <div class="section-head-links">
-        <a class="textlink" href="/tracker/">Full tracker: {laws.length} laws <i>→</i></a>
-        <a class="textlink" href="/timeline/">Every timeline <i>→</i></a>
+        <a class="textlink" href="/tracker/#movements">Full changelog <i>→</i></a>
+        <span class="mono faint">Updated {latestMonth}</span>
       </div>
     </div>
     <div class="law-rows reveal" data-delay="1">
-      {previewLaws.map((l) => (
-        <a class="law-row" href={`/laws/${l.slug}/`}>
-          <div><h3>{l.name}</h3><p class="sub">{l.tableUpdateText}</p></div>
-          <span class="jur">{l.jurisdiction}</span>
-          <span class="chip" data-g={l.statusType}>{l.status}</span>
+      {movements.map((m) => (
+        <a class="law-row" href={`/laws/${m.slug}/`}>
+          <div><h3>{m.tag}</h3><p class="sub">{(m.latest || '').split(';')[0]}</p></div>
+          <span class="jur">{m.date}</span>
         </a>
       ))}
     </div>
-    <p class="mono faint reveal" style="margin-top:26px">Updated monthly with a changelog on every entry</p>
   </div>
 </section>
 
@@ -102,8 +95,8 @@ const blurb = settings?.newsletterBlurb ||
     <div class="wrap">
       <div class="section-head reveal">
         <div>
-          <p class="kicker">Latest</p>
-          <h2 class="h2">From the field</h2>
+          <p class="kicker">Articles</p>
+          <h2 class="h2">Latest <em>analysis</em></h2>
         </div>
         <a class="textlink" href="/articles/">All articles <i>→</i></a>
       </div>
@@ -124,19 +117,17 @@ const blurb = settings?.newsletterBlurb ||
   </section>
 )}
 
-<section class="quote-band">
+<section class="statement-band">
   <div class="wrap">
-    <blockquote class="reveal">{quote}
-      <cite>{quoteBy}</cite>
-    </blockquote>
+    <p class="reveal">These rules are written in Brussels, Washington and Canberra, but they are answered on factory floors in Dhaka, Hanoi and Nairobi. We publish for <em>the businesses that answer them</em>.</p>
   </div>
 </section>
 
 <section class="section sub-band">
   <div class="wrap">
     <p class="kicker reveal" style="justify-content:center">The monthly digest</p>
-    <h2 class="h2 reveal" data-delay="1">One briefing. <em>Every movement.</em></h2>
-    <p class="standfirst reveal" data-delay="2" style="margin:20px auto 0">{blurb}</p>
+    <h2 class="h2 reveal" data-delay="1">One monthly briefing on <em>everything that moved</em></h2>
+    <p class="standfirst reveal" data-delay="2" style="margin:20px auto 0">Each issue covers what changed, what it means for your orders, and what to prepare before your buyers ask.</p>
     <form class="sub-form reveal" data-delay="3" action="https://buttondown.com/api/emails/embed-subscribe/hredd" method="post" target="_blank">
       <input type="email" name="email" placeholder="you@example.org" required aria-label="Email address" />
       <button class="btn solid" type="submit"><span>Subscribe</span></button>
@@ -165,6 +156,7 @@ const blurb = settings?.newsletterBlurb ||
     const sphere = { type: 'Sphere' };
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
     let t = 0;
+    let running = false;
 
     function frame() {
       projection.rotate([-20 + t * 4, -12]);
@@ -182,20 +174,21 @@ const blurb = settings?.newsletterBlurb ||
         ctx.fill();
         ctx.strokeStyle = 'rgba(14,13,10,.9)'; ctx.lineWidth = 0.6; ctx.stroke();
       }
-      if (!reduced) { t += 0.016; requestAnimationFrame(frame); }
+      if (!reduced && running) { t += 0.016; requestAnimationFrame(frame); }
     }
-    frame();
-  }
 
-  // in-place confirmation for the subscribe band
-  document.querySelectorAll('form[data-subscribe]').forEach((f) => {
-    f.addEventListener('submit', (ev) => {
-      ev.preventDefault();
-      const note = f.parentElement?.querySelector('.form-note');
-      if (note) note.textContent = 'Thank you. You are on the list for the next issue.';
-      f.querySelector('input')?.setAttribute('disabled', 'true');
+    // Draw once immediately, then only animate while the canvas is on screen,
+    // so the loop is not burning battery under the fold on mobile devices.
+    frame();
+    const vio = new IntersectionObserver((es) => {
+      for (const e of es) {
+        const was = running;
+        running = e.isIntersecting;
+        if (running && !was && !reduced) requestAnimationFrame(frame);
+      }
     });
-  });
+    vio.observe(canvas);
+  }
 </script>
 
 </Base>
