@@ -121,9 +121,19 @@ ORIGIN_M49 = {
 # M49 codes for tracked markets. The EU27 has no single reliable bilateral
 # partner code across all reporters in Comtrade, so it is queried as the sum
 # of its 27 member states rather than one aggregate call.
+#
+# Norway and Switzerland each have a near-duplicate sibling code in Comtrade's
+# reference list, the same trap documented for India (356 vs 699) in
+# CLAUDE.md. 578 is "Norway, excluding Svalbard and Jan Mayen" and 756 is
+# "Switzerland " (trailing space) in partnerAreas.json; neither is the code
+# Comtrade actually holds reporter-side trade data under, so both silently
+# returned zero rows for every origin country rather than erroring. 579
+# ("Norway") and 757 ("Switzerland, Liechtenstein") are the reporting
+# entities with real data, confirmed against the live API on 2026-07-15
+# (reporterCode=579/757, partnerCode=842 both returned nonzero primaryValue).
 MARKET_M49 = {
     "USA": "842", "GBR": "826", "CAN": "124", "AUS": "36",
-    "NOR": "578", "CHE": "756", "JPN": "392", "KOR": "410",
+    "NOR": "579", "CHE": "757", "JPN": "392", "KOR": "410",
 }
 EU27_M49 = {
     "AUT": "40", "BEL": "56", "BGR": "100", "HRV": "191", "CYP": "196",
