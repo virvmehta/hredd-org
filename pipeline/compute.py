@@ -327,14 +327,15 @@ def build_live(key):
     return {
         "sample": False,
         "dataset_version": f"comtrade-live-{date.today().isoformat()}",
-        "vintage": ("UN Comtrade mirror statistics: figures are destination markets' own "
-            "reported imports from each origin country, not the origin country's self-reported "
-            "exports, since several tracked origins report to Comtrade irregularly or not at all. "
-            "Shares are expressed against exports to the nine tracked regulated markets, not "
-            "against total world exports, because no reliable world figure exists for origins "
-            "that under-report. EU27 totals sum all 27 member states; EU chapter-level product "
-            "mix is approximated from Germany, France, Netherlands and Italy, the four largest "
-            "EU importers, to stay within the free-tier daily call limit."),
+        "vintage": ("Figures come from UN Comtrade. For each country we use what its buyer "
+            "markets reported importing, rather than what the country itself reported exporting, "
+            "because several tracked countries report to Comtrade late or not at all. Every share "
+            "is measured against that country's exports to the nine regulated markets this index "
+            "tracks, not against its total exports to the world, because no reliable world total "
+            "exists for countries that under-report. European Union figures add up all twenty "
+            "seven member states. The European product mix is estimated from the four largest "
+            "importers, Germany, France, the Netherlands and Italy, to keep the pipeline within "
+            "its free daily data allowance."),
         "sources": ["UN Comtrade Database, https://comtradeplus.un.org, mirror (partner-reported) statistics"],
         "countries": country_flows,
     }

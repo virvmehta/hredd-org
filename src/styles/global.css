@@ -341,8 +341,15 @@ p{ text-wrap:pretty; }
 .crumb a:hover{ color:var(--gold); }
 
 .prose{ max-width:680px; margin:0 auto; font-size:18.5px; line-height:1.75; }
-/* Left-aligned deliberately: justified text opens rivers and breaks words at
-   narrow widths, which costs second-language readers the most. */
+/* Justified with hyphenation on the long-form pages (articles, methodology,
+   law summaries, the report preview) for the editorial column look. */
+.prose p{ text-align:justify; text-justify:inter-word; hyphens:auto; -webkit-hyphens:auto; }
+/* Prose lists (report law lists, article bullets) get a gold diamond marker
+   and stay left-aligned, which reads better than justified list items. */
+.prose ul{ margin:0 0 1.4em; padding:0; list-style:none; }
+.prose li{ position:relative; padding:0 0 .7em 26px; text-align:left; }
+.prose li::before{ content:"◆"; position:absolute; left:0; top:.2em;
+  color:var(--gold); font-size:10px; }
 .prose p{ margin:0 0 1.4em; }
 .prose > p:first-of-type::first-letter, .prose > div > p:first-of-type::first-letter{
   font-size:3.4em; line-height:.85; float:left; padding:6px 12px 0 0; color:var(--gold); }

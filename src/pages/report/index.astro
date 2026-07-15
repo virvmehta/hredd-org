@@ -304,6 +304,8 @@ const REPORT_LAWS = laws.map(l => {
     padding-top:1.2em; border-top:1px solid var(--line-soft); }
   #preview h2::before{ content:"◆"; color:var(--gold-dim); font-size:9px; display:block; margin-bottom:14px; }
   #preview h3{ font:400 22px/1.3 var(--serif); margin:1.7em 0 .5em; }
+  /* List styling lives in global .prose rules, not here: the ul and li are
+     created at runtime, so Astro's scoped styles would never reach them. */
 </style>
 
 <script type="application/json" id="law-data" set:html={JSON.stringify(REPORT_LAWS)}></script>
@@ -440,7 +442,7 @@ function comingLine(l){
 /* ---------------- report builder ---------------- */
 function buildReport(a){
   const S = [];
-  const add = (h, ps) => S.push({ h, ps, level: 1 });
+  const add = (h, ps, list = false) => S.push({ h, ps, list });
 
   const matched = matchLaws(a);
   const inForce = matched.filter(l => l.g === 'force');
@@ -467,13 +469,13 @@ function buildReport(a){
   }
   add('Where you stand', stand);
 
-  /* ---- 2. In force now, one line per law ---- */
+  /* ---- 2. In force now, one bullet per law ---- */
   if(inForce.length)
-    add('Laws that already apply to your trade', inForce.map(lawLine));
+    add('Laws that already apply to your trade', inForce.map(lawLine), true);
 
-  /* ---- 3. Arriving next, one dated line per law ---- */
+  /* ---- 3. Arriving next, one dated bullet per law ---- */
   if(coming.length)
-    add('Laws arriving or changing next', coming.map(comingLine));
+    add('Laws arriving or changing next', coming.map(comingLine), true);
 
   /* ---- 4. What to do first, at most five actions ---- */
   const actions = [];
@@ -551,9 +553,17 @@ document.getElementById('gen').addEventListener('click', () => {
       const h = document.createElement('h2');
       h.textContent = sec.h; pv.appendChild(h);
     }
-    sec.ps.forEach(t => {
-      const p = document.createElement('p'); p.textContent = t; pv.appendChild(p);
-    });
+    if(sec.list){
+      const ul = document.createElement('ul');
+      sec.ps.forEach(t => {
+        const li = document.createElement('li'); li.textContent = t; ul.appendChild(li);
+      });
+      pv.appendChild(ul);
+    } else {
+      sec.ps.forEach(t => {
+        const p = document.createElement('p'); p.textContent = t; pv.appendChild(p);
+      });
+    }
   });
   setTimeout(() => {
     const r = document.getElementById('result');
@@ -590,25 +600,32 @@ document.getElementById('dl').addEventListener('click', () => {
   doc.setTextColor(30);
   y += 24; foot();
 
+  // Render line by line, re-setting the body font after every ensure(). A page
+  // break inside ensure() runs foot(), which switches to courier; without this
+  // reset the remainder of a paragraph leaked out in the footer font, which is
+  // what produced the doubled monospace text in the old output.
+  const HEAD_H = 6.7, BODY_H = 4.9, BULLET = 5;
   currentReport.forEach(sec => {
     if(sec.h){
-      ensure(14);
-      doc.setFont('times','normal'); doc.setFontSize(15);
+      doc.setFontSize(15);
       const hl = doc.splitTextToSize(sec.h, maxW);
-      doc.text(hl, M, y); y += hl.length * 6.7 + 3;
-    }
-    doc.setFont('times','normal'); doc.setFontSize(10.5);
-    sec.ps.forEach(t => {
-      const lines = doc.splitTextToSize(t, maxW);
-      const lineH = 4.9;
-      let idx = 0;
-      while(idx < lines.length){
-        ensure(lineH);
-        const fit = Math.min(lines.length - idx, Math.floor((bottom - y) / lineH) || 1);
-        doc.text(lines.slice(idx, idx + fit), M, y);
-        y += fit * lineH; idx += fit;
-      }
+      hl.forEach(line => {
+        ensure(HEAD_H);
+        doc.setFont('times','normal'); doc.setFontSize(15); doc.setTextColor(30);
+        doc.text(line, M, y); y += HEAD_H;
+      });
       y += 3;
+    }
+    sec.ps.forEach(t => {
+      const indent = sec.list ? BULLET : 0;
+      const lines = doc.splitTextToSize(t, maxW - indent);
+      lines.forEach((line, k) => {
+        ensure(BODY_H);
+        doc.setFont('times','normal'); doc.setFontSize(10.5); doc.setTextColor(30);
+        if(sec.list && k === 0) doc.text('•', M, y);
+        doc.text(line, M + indent, y); y += BODY_H;
+      });
+      y += sec.list ? 1.6 : 3;
     });
     y += 4;
   });

@@ -16,6 +16,13 @@ const yearOf = d => d ? d.slice(0, 4) : '';
 const countries = Object.entries(data.countries).map(([slug, c]) => ({ slug, ...c }));
 const DEFAULT = 'bangladesh';
 
+// Distinct categorical colours for the destination bar, one per market, so the
+// segments read as separate regions rather than one gold gradient. Validated
+// for colour-vision separation and contrast on the dark surface (dataviz
+// skill), with the gaps and legend swatches below as the second cue.
+const DEST_COLOURS = ['#e0b04a', '#4fa26a', '#5f86cc', '#d9663e', '#b884c9'];
+const DEST_OTHER = '#5c574d';
+
 function ledgerOf(c){
   const rows = [], quiet = [];
   for(const [slug, r] of Object.entries(c.regimes_2030)){
@@ -61,7 +68,9 @@ function ledgerOf(c){
       ))}
     </div>
 
-    {countries.map(c => { const { rows, quiet } = ledgerOf(c); const end = c.series[c.series.length - 1]; return (
+    {countries.map(c => { const { rows, quiet } = ledgerOf(c); const end = c.series[c.series.length - 1];
+      const top5 = c.markets.slice(0, 5);
+      const otherShare = Math.max(0, 1 - top5.reduce((s, m) => s + m.share, 0)); return (
       <div class="cpane" data-c={c.slug} hidden={c.slug !== DEFAULT}>
 
         <p class="takeaway reveal">By 2030, {pct(end.union)} of {c.name}'s exports to these tracked markets fall in scope of at least one law.</p>
@@ -74,16 +83,17 @@ function ledgerOf(c){
         </div>
 
         <div class="destbar-wrap">
-          <div class="destbar" aria-hidden="true">
-            {c.markets.slice(0, 5).map((m, i) => (
-              <i style={`width:${(m.share*100).toFixed(2)}%; opacity:${1 - i * 0.17}`}></i>
+          <div class="destbar" role="img" aria-label="Share of exports by destination market">
+            {top5.map((m, i) => (
+              <i style={`width:${(m.share*100).toFixed(2)}%; background:${DEST_COLOURS[i]}`}></i>
             ))}
+            <i style={`width:${(otherShare*100).toFixed(2)}%; background:${DEST_OTHER}`}></i>
           </div>
           <div class="destlegend mono">
-            {c.markets.slice(0, 5).map(m => (
-              <span>{MARKET_LABELS[m.key] || m.key} {Math.round(m.share*100)}%</span>
+            {top5.map((m, i) => (
+              <span><em style={`background:${DEST_COLOURS[i]}`}></em>{MARKET_LABELS[m.key] || m.key} {Math.round(m.share*100)}%</span>
             ))}
-            <span class="faint">Other destinations {Math.max(0, Math.round((1 - c.markets.slice(0,5).reduce((s,m)=>s+m.share,0))*100))}%</span>
+            <span class="faint"><em style={`background:${DEST_OTHER}`}></em>Other destinations {Math.round(otherShare*100)}%</span>
           </div>
         </div>
 
@@ -160,10 +170,15 @@ function ledgerOf(c){
   .class-legend b{ color:var(--gold-hi); font-weight:500; }
 
   .destbar-wrap{ margin:34px 0 8px; }
-  .destbar{ display:flex; height:9px; border:1px solid var(--line-soft); overflow:hidden; }
-  .destbar i{ display:block; background:var(--gold); }
-  .destlegend{ display:flex; flex-wrap:wrap; gap:18px; margin-top:10px; font-size:11px;
-    letter-spacing:.14em; color:var(--ink-dim); }
+  /* 2px flex gaps let the background show between segments, so adjacent
+     markets never merge into one another. */
+  .destbar{ display:flex; gap:2px; height:13px; background:var(--bg-raise);
+    border:1px solid var(--line-soft); overflow:hidden; }
+  .destbar i{ display:block; min-width:1px; }
+  .destlegend{ display:flex; flex-wrap:wrap; gap:18px; margin-top:12px; font-size:11px;
+    letter-spacing:.14em; color:var(--ink-dim); align-items:center; }
+  .destlegend em{ display:inline-block; width:11px; height:11px; margin-right:8px;
+    vertical-align:-1px; font-style:normal; }
   .destlegend .faint{ color:var(--ink-faint); }
 
   .ledger-head{ display:grid; grid-template-columns:minmax(0,1.5fr) 118px 52px minmax(0,1.6fr) 92px 74px 44px;
