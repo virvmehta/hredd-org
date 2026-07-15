@@ -23,8 +23,10 @@ jobs:
         env:
           COMTRADE_KEY: ${{ secrets.COMTRADE_KEY }}
         run: python pipeline/compute.py --live
-      - name: Re-run invariants on live output
-        run: python pipeline/test_mapping.py
+      # Note: do NOT run test_mapping.py here. It regenerates sample data into
+      # public/data/ (see its final subprocess call), which would overwrite the
+      # live output before it is committed. Mapping invariants already ran above,
+      # before the fetch, which is the correct place for them.
       - name: Commit refreshed data
         run: |
           git config user.name "hredd-pipeline"
