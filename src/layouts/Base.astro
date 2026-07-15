@@ -75,6 +75,7 @@ const tagline = settings?.tagline || 'Tracking global HREDD legislation and its 
         <a href="/articles/" aria-current={active === 'articles' ? 'page' : undefined}>Articles</a>
         <a href="/about/" aria-current={active === 'about' ? 'page' : undefined}>About</a>
         <a href="/subscribe/" aria-current={active === 'subscribe' ? 'page' : undefined}>Subscribe</a>
+        <button class="search-toggle" id="search-open" aria-label="Search laws and articles">⌕</button>
       </nav>
       <button class="nav-toggle" aria-label="Menu">☰</button>
     </div>
@@ -83,8 +84,20 @@ const tagline = settings?.tagline || 'Tracking global HREDD legislation and its 
     <a href="/tracker/">Tracker</a><a href="/timeline/">Timelines</a><a href="/trade/">Trade</a>
     <a href="/buyer-mapping/">Your buyers</a><a href="/report/">Your report</a>
     <a href="/articles/">Articles</a><a href="/about/">About</a><a href="/subscribe/">Subscribe</a>
+    <button class="search-toggle mobile" id="search-open-mobile">⌕ Search laws and articles</button>
   </nav>
 </header>
+
+<div class="search-overlay" id="search-overlay" hidden>
+  <div class="search-box">
+    <div class="search-field">
+      <span aria-hidden="true">⌕</span>
+      <input type="text" id="search-input" placeholder="Search laws, articles, jurisdictions…" aria-label="Search hredd.org" autocomplete="off" />
+      <button id="search-close" aria-label="Close search">✕</button>
+    </div>
+    <div class="search-results" id="search-results"></div>
+  </div>
+</div>
 
 <slot />
 
@@ -127,6 +140,64 @@ const tagline = settings?.tagline || 'Tracking global HREDD legislation and its 
   if (toggle && menu) toggle.addEventListener('click', () => {
     menu.classList.toggle('open');
     toggle.textContent = menu.classList.contains('open') ? '✕' : '☰';
+  });
+
+  // site search: fetches the prebuilt index once, lazily, on first open, and
+  // matches by simple substring against title/sub/text so it works with no
+  // backend and stays instant even as the number of laws and articles grows.
+  const overlay = document.getElementById('search-overlay');
+  const input = document.getElementById('search-input');
+  const results = document.getElementById('search-results');
+  const openBtns = [document.getElementById('search-open'), document.getElementById('search-open-mobile')];
+  let index = null, indexPromise = null;
+
+  function loadIndex() {
+    if (!indexPromise) {
+      indexPromise = fetch('/search-index.json').then(r => r.json()).then(d => { index = d; return d; });
+    }
+    return indexPromise;
+  }
+
+  function openSearch() {
+    overlay.hidden = false;
+    menu?.classList.remove('open');
+    if (toggle) toggle.textContent = '☰';
+    loadIndex();
+    setTimeout(() => input?.focus(), 30);
+  }
+  function closeSearch() {
+    overlay.hidden = true;
+  }
+
+  openBtns.forEach(b => b?.addEventListener('click', openSearch));
+  document.getElementById('search-close')?.addEventListener('click', closeSearch);
+  overlay?.addEventListener('click', (e) => { if (e.target === overlay) closeSearch(); });
+  addEventListener('keydown', (e) => {
+    if (e.key === '/' && document.activeElement?.tagName !== 'INPUT' && overlay?.hidden) {
+      e.preventDefault(); openSearch();
+    }
+    if (e.key === 'Escape' && !overlay?.hidden) closeSearch();
+  });
+
+  function render(items) {
+    if (!results) return;
+    if (!items.length) {
+      results.innerHTML = '<p class="search-empty">No matches. Try a law name, jurisdiction, or topic.</p>';
+      return;
+    }
+    results.innerHTML = items.slice(0, 20).map(i => `
+      <a class="search-row" href="${i.href}">
+        <span class="search-type mono">${i.type === 'law' ? 'Law' : 'Article'}</span>
+        <span class="search-text"><b>${i.title}</b><i>${i.sub}</i></span>
+      </a>`).join('');
+  }
+
+  input?.addEventListener('input', async () => {
+    const q = input.value.trim().toLowerCase();
+    if (!q) { results.innerHTML = ''; return; }
+    const items = index || await loadIndex();
+    const matches = items.filter(i => i.text.includes(q) || i.title.toLowerCase().includes(q));
+    render(matches);
   });
 
   // reveal on scroll

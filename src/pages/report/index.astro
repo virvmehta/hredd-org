@@ -2,6 +2,7 @@
 import Base from '../../layouts/Base.astro';
 import { getAllLaws } from '../../lib/sanity.js';
 import scope from '../../../pipeline/law_scope.json';
+import { SECTOR_CHAPTERS, COMMODITY_CHAPTERS } from '../../lib/sectorChapters.js';
 
 // The report engine is data-driven rather than templatised: every law on the
 // tracker is matched against the supplier's answers using the same verified
@@ -309,6 +310,7 @@ const REPORT_LAWS = laws.map(l => {
 </style>
 
 <script type="application/json" id="law-data" set:html={JSON.stringify(REPORT_LAWS)}></script>
+<script type="application/json" id="sector-data" set:html={JSON.stringify({ SECTOR_CHAPTERS, COMMODITY_CHAPTERS })}></script>
 <script>
 import { jsPDF } from 'jspdf';
 
@@ -321,20 +323,10 @@ const MARKET_MAP = {
   eu: ['EU27', 'DEU', 'FRA', 'NLD'], uk: ['GBR'], us: ['USA'], ca: ['CAN'],
   au: ['AUS'], no: ['NOR'], ch: ['CHE'], jp: ['JPN'], kr: ['KOR'],
 };
-// HS chapters per sector answer, used against each law's verified chapter scope.
-const SECTOR_CHAPTERS = {
-  apparel: ['50','51','52','53','54','55','56','57','58','59','60','61','62','63'],
-  agrifood: ['01','02','09','12','15','16','18','20'],
-  seafood: ['03','16'],
-  timber: ['44','47','48','94'],
-  electronics: ['85','28','38'],
-  metals: ['26','76','71'],
-  chemplast: ['39','40','28'],
-};
-const COMMODITY_CHAPTERS = {
-  'Cattle or leather': '01', 'Cocoa': '18', 'Coffee': '09', 'Oil palm': '15',
-  'Rubber': '40', 'Soya': '12', 'Wood, paper, or furniture': '44',
-};
+// HS chapters per sector answer, used against each law's verified chapter
+// scope. Embedded above from src/lib/sectorChapters.js, the same source the
+// trade page's commodity filter reads, so the two can never drift apart.
+const { SECTOR_CHAPTERS, COMMODITY_CHAPTERS } = JSON.parse(document.getElementById('sector-data')?.textContent || '{}');
 const MECH_LINE = {
   border: 'customs can stop goods at the border until documentation satisfies them',
   diligence: 'buyers must vet their supply chains and will ask you for documentation',

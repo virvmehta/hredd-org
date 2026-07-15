@@ -399,6 +399,40 @@ p{ text-wrap:pretty; }
 .sources a:hover{ color:var(--gold-hi); }
 
 /* --------------------------------------------------------------
+   search
+-------------------------------------------------------------- */
+.search-toggle{ font-family:var(--serif); font-size:20px; line-height:1; background:none;
+  border:1px solid var(--line); color:var(--ink-dim); width:38px; height:38px;
+  cursor:pointer; transition:all .25s; margin-left:8px; }
+.search-toggle:hover{ border-color:var(--gold-dim); color:var(--gold); }
+.search-toggle.mobile{ display:block; width:100%; text-align:left; font-family:var(--mono);
+  font-size:12px; letter-spacing:.11em; text-transform:uppercase; padding:15px clamp(20px,4vw,48px);
+  border:0; border-bottom:1px solid var(--line-soft); color:var(--ink-dim); margin:0; }
+
+.search-overlay{ position:fixed; inset:0; z-index:300; background:rgba(14,13,10,.92);
+  backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
+  display:flex; align-items:flex-start; justify-content:center; padding:12vh 20px 20px; }
+.search-box{ width:100%; max-width:640px; }
+.search-field{ display:flex; align-items:center; gap:14px; border:1px solid var(--gold-dim);
+  background:var(--panel-2); padding:16px 20px; }
+.search-field span{ color:var(--gold); font-size:18px; }
+.search-field input{ flex:1; background:none; border:0; outline:none; color:var(--ink);
+  font:400 17px var(--serif); }
+.search-field input::placeholder{ color:var(--ink-faint); }
+.search-field button{ background:none; border:0; color:var(--ink-faint); cursor:pointer; font-size:16px; }
+.search-field button:hover{ color:var(--gold); }
+.search-results{ margin-top:2px; max-height:60vh; overflow-y:auto; background:var(--bg-raise);
+  border:1px solid var(--line-soft); border-top:0; }
+.search-row{ display:flex; align-items:center; gap:16px; padding:16px 20px;
+  border-bottom:1px solid var(--line-soft); text-decoration:none; transition:background .2s; }
+.search-row:hover{ background:var(--panel); }
+.search-type{ flex:0 0 auto; font-size:9px; color:var(--gold); }
+.search-text b{ display:block; font:400 16px/1.3 var(--serif); color:var(--ink); }
+.search-text i{ display:block; font-style:normal; font-size:12px; color:var(--ink-faint); margin-top:3px; }
+.search-empty{ padding:20px; color:var(--ink-faint); font-style:italic; font-size:14px; margin:0; }
+@media (max-width:640px){ .search-overlay{ padding-top:8vh; } }
+
+/* --------------------------------------------------------------
    footer
 -------------------------------------------------------------- */
 .site-foot{ border-top:1px solid var(--line); background:var(--bg-raise); margin-top:clamp(60px,8vw,110px); }

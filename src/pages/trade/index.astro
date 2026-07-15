@@ -2,6 +2,8 @@
 import Base from '../../layouts/Base.astro';
 import { getAllLaws } from '../../lib/sanity.js';
 import data from '../../../public/data/trade-exposure.json';
+import scope from '../../../pipeline/law_scope.json';
+import { SECTORS } from '../../lib/sectorChapters.js';
 
 const allLaws = await getAllLaws();
 const lawBySlug = Object.fromEntries(allLaws.map(l => [l.slug, l]));
@@ -37,6 +39,19 @@ function ledgerOf(c){
   rows.sort((a, b) => b.r.share[1] - a.r.share[1] || b.r.share[2] - a.r.share[2]);
   quiet.sort((a, b) => (a.r.class === 'C' ? 1 : 0) - (b.r.class === 'C' ? 1 : 0));
   return { rows, quiet };
+}
+
+// Which sectors each law's verified product scope touches, so a textile
+// supplier (for example) can filter the ledger down to the laws that
+// actually reach their trade. A law with scope "all" touches every sector,
+// since it applies regardless of product; "product" and "priority" regimes
+// are restricted to their named HS chapters.
+const regimeBySlug = Object.fromEntries(scope.regimes.map(r => [r.slug, r]));
+function sectorsOf(slug){
+  const r = regimeBySlug[slug];
+  if(!r || r.scope === 'all') return SECTORS.map(s => s.id);
+  const chapters = new Set(r.chapters || r.priority_chapters || []);
+  return SECTORS.filter(s => s.chapters.some(ch => chapters.has(ch))).map(s => s.id);
 }
 ---
 <Base
@@ -102,15 +117,25 @@ function ledgerOf(c){
           <p>Every figure below carries a class that says how much guesswork sits behind it. <b>Class A</b> means the law lists exactly which products and markets it covers, so we measured the trade directly. <b>Class B</b> means the law's reach depends on who the buyer is, so we estimated it from a published assumption and show a range. <b>Class C</b> means customs data cannot produce an honest number, so we refuse to show one.</p>
         </div>
 
+        <div class="sector-filter">
+          <p class="mono faint">Filter by what you trade</p>
+          <div class="sector-chips">
+            <button type="button" class="schip on" data-s="all">All sectors</button>
+            {SECTORS.map(s => (
+              <button type="button" class="schip" data-s={s.id}>{s.label}</button>
+            ))}
+          </div>
+        </div>
+
         <div class="ledger-head mono">
           <span>Law</span><span class="lh-status">Status</span><span class="lh-from">From</span>
           <span>Share of export value in scope</span><span class="lh-share">Central</span><span class="lh-val">Value</span><span class="lh-class">Class</span>
         </div>
 
-        <div class="ledger">
+        <div class="ledger" id={`ledger-${c.slug}`}>
           {rows.map(({ slug, law, r }) => { const [lo, ce, hi] = r.share; const max = rows[0].r.share[2] || 1;
             const rangeTitle = r.class === 'B' ? `Central estimate ${pct(ce)}. Could reach up to ${pct(hi)} depending on buyer size.` : `${pct(ce)}, measured directly.`; return (
-            <a class="lrow" href={`/laws/${slug}/`}>
+            <a class="lrow" href={`/laws/${slug}/`} data-sectors={sectorsOf(slug).join(',')}>
               <div class="l-name">
                 <h3>{law.shortName || law.name}</h3>
                 <p>{law.name} · {MARKET_LABELS[r.market] || r.market}</p>
@@ -126,6 +151,7 @@ function ledgerOf(c){
             </a>
           );})}
         </div>
+        <p class="mono faint sector-empty" hidden>No tracked laws are scoped to this sector for {c.name}.</p>
 
         {quiet.length > 0 && (
           <div class="quiet">
@@ -185,6 +211,17 @@ function ledgerOf(c){
     vertical-align:-1px; font-style:normal; }
   .destlegend .faint{ color:var(--ink-faint); }
 
+  .sector-filter{ margin-top:36px; }
+  .sector-filter p{ margin:0 0 12px; }
+  .sector-chips{ display:flex; flex-wrap:wrap; gap:9px; }
+  .schip{ font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase;
+    border:1px solid var(--line); background:none; color:var(--ink-dim); padding:9px 15px;
+    cursor:pointer; transition:all .3s; }
+  .schip:hover{ border-color:var(--gold-dim); color:var(--ink); }
+  .schip.on{ background:var(--gold); border-color:var(--gold); color:#14120d; }
+  .lrow.sector-hide{ display:none; }
+  .sector-empty{ padding:30px 0; text-align:center; }
+
   .ledger-head{ display:grid; grid-template-columns:minmax(0,1.5fr) 118px 52px minmax(0,1.6fr) 92px 74px 44px;
     gap:16px; align-items:center; padding:26px 0 12px; border-bottom:1px solid var(--line);
     font-size:10.5px; letter-spacing:.14em; color:var(--ink-dim); text-transform:uppercase; }
@@ -235,6 +272,30 @@ function ledgerOf(c){
   chips.forEach(ch => ch.addEventListener('click', () => show(ch.dataset.c)));
   const h = location.hash.slice(1);
   if(h && document.querySelector(`.cpane[data-c="${h}"]`)) show(h);
+
+  // Sector filter: each country pane has its own independent selection, so
+  // switching countries never resets a supplier's chosen sector.
+  document.querySelectorAll('.cpane').forEach(pane => {
+    const filterEl = pane.querySelector('.sector-filter');
+    const ledger = pane.querySelector('.ledger');
+    const emptyMsg = pane.querySelector('.sector-empty');
+    if(!filterEl || !ledger) return;
+    filterEl.addEventListener('click', (e) => {
+      const b = e.target instanceof Element && e.target.closest('.schip');
+      if(!b) return;
+      filterEl.querySelectorAll('.schip').forEach(c => c.classList.remove('on'));
+      b.classList.add('on');
+      const s = b.dataset.s;
+      let shown = 0;
+      ledger.querySelectorAll('.lrow').forEach(row => {
+        const sectors = (row.dataset.sectors || '').split(',');
+        const ok = s === 'all' || sectors.includes(s);
+        row.classList.toggle('sector-hide', !ok);
+        if(ok) shown++;
+      });
+      if(emptyMsg) emptyMsg.hidden = shown > 0;
+    });
+  });
 </script>
 
 </Base>
