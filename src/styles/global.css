@@ -409,9 +409,16 @@ p{ text-wrap:pretty; }
   font-size:12px; letter-spacing:.11em; text-transform:uppercase; padding:15px clamp(20px,4vw,48px);
   border:0; border-bottom:1px solid var(--line-soft); color:var(--ink-dim); margin:0; }
 
+/* [hidden] must win the display fight: a plain .search-overlay{display:flex}
+   rule has the same specificity as the browser's built-in [hidden]{display:
+   none} and, loading later in the cascade, silently overrode it, so the
+   overlay rendered open by default on every page and the close button
+   appeared to do nothing even though it was correctly toggling the
+   attribute. Scoping display:flex to :not([hidden]) fixes that permanently. */
 .search-overlay{ position:fixed; inset:0; z-index:300; background:rgba(14,13,10,.92);
   backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
-  display:flex; align-items:flex-start; justify-content:center; padding:12vh 20px 20px; }
+  align-items:flex-start; justify-content:center; padding:12vh 20px 20px; }
+.search-overlay:not([hidden]){ display:flex; }
 .search-box{ width:100%; max-width:640px; }
 .search-field{ display:flex; align-items:center; gap:14px; border:1px solid var(--gold-dim);
   background:var(--panel-2); padding:16px 20px; }
