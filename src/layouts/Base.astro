@@ -6,13 +6,20 @@ import { computeVolIssue } from '../lib/volIssue.js';
 const {
   title = 'hredd.org | Human rights and environmental due diligence, tracked from the Global South',
   description = 'Tracking global HREDD legislation and its implications for those most affected and least consulted.',
-  active = ''
+  active = '',
+  // SEO / social props, all optional so existing pages keep working unchanged:
+  ogType = 'website',        // set to 'article' on article pages
+  ogImage = 'https://hredd.org/og-default.png',
+  publishedTime = null,      // ISO date, articles only
+  modifiedTime = null,       // ISO date, articles/laws when known
+  noindex = false
 } = Astro.props;
 
 const articles = await getAllArticles();
 const settings = await getSiteSettings();
 const volIssue = computeVolIssue(articles);
 const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
+const ogImageURL = ogImage.startsWith('http') ? ogImage : new URL(ogImage, Astro.site).toString();
 const tagline = settings?.tagline || 'Tracking global HREDD legislation and its implications for those most affected and least consulted. Established 2026.';
 ---
 <!DOCTYPE html>
@@ -22,17 +29,22 @@ const tagline = settings?.tagline || 'Tracking global HREDD legislation and its 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>{title}</title>
 <meta name="description" content={description} />
+{noindex && <meta name="robots" content="noindex, follow" />}
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
-<meta property="og:type" content="website" />
+<meta property="og:type" content={ogType} />
 <link rel="canonical" href={canonicalURL} />
 <meta property="og:site_name" content="hredd.org" />
+<meta property="og:locale" content="en_GB" />
 <meta property="og:url" content={canonicalURL} />
-<meta property="og:image" content="https://hredd.org/og-default.png" />
+<meta property="og:image" content={ogImageURL} />
+<meta property="og:image:alt" content={title} />
+{publishedTime && <meta property="article:published_time" content={publishedTime} />}
+{modifiedTime && <meta property="article:modified_time" content={modifiedTime} />}
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content={title} />
 <meta name="twitter:description" content={description} />
-<meta name="twitter:image" content="https://hredd.org/og-default.png" />
+<meta name="twitter:image" content={ogImageURL} />
 <script type="application/ld+json" set:html={JSON.stringify({
   "@context": "https://schema.org",
   "@type": "WebSite",

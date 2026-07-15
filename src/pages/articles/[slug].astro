@@ -19,6 +19,9 @@ const relatedArticles = article.relatedArticles || [];
   title={`${article.title} | hredd.org`}
   description={article.excerpt || article.deck || article.title}
   active="articles"
+  ogType="article"
+  publishedTime={article.publishedAt}
+  modifiedTime={article.updatedAt || article.publishedAt}
 >
 
 <script type="application/ld+json" set:html={JSON.stringify({
@@ -26,10 +29,27 @@ const relatedArticles = article.relatedArticles || [];
   "@type": "NewsArticle",
   "headline": article.title,
   "description": article.excerpt || article.deck || article.title,
-  "author": { "@type": "Person", "name": article.authorName },
-  "publisher": { "@type": "Organization", "name": "hredd.org" },
+  "author": {
+    "@type": "Person",
+    "name": article.authorName,
+    "url": "https://hredd.org/about/",
+    ...(article.authorLocation ? { "address": article.authorLocation } : {})
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "hredd.org",
+    "url": "https://hredd.org",
+    "logo": { "@type": "ImageObject", "url": "https://hredd.org/favicon.png" }
+  },
   "datePublished": article.publishedAt,
-  "mainEntityOfPage": `https://hredd.org/articles/${article.slug}/`
+  "dateModified": article.updatedAt || article.publishedAt,
+  "articleSection": article.category || "Analysis",
+  "inLanguage": "en-GB",
+  "isAccessibleForFree": true,
+  "about": (article.relatedLaws || []).map((l) => ({
+    "@type": "Legislation", "name": l.name, "legislationJurisdiction": l.jurisdiction
+  })),
+  "mainEntityOfPage": { "@type": "WebPage", "@id": `https://hredd.org/articles/${article.slug}/` }
 })} />
 
 <section class="section" style="padding-bottom:clamp(30px,4vw,48px)">

@@ -42,21 +42,70 @@ const tradeMax = tradeRows.length ? tradeRows[0].value : 0;
 const usdBn = v => '$' + (v / 1e9).toFixed(v >= 1e10 ? 0 : 1) + 'bn';
 
 const clampDesc = s => s.length <= 158 ? s : s.slice(0, 155).replace(/\s+\S*$/, '') + '.';
+const primarySource = (law.sources || []).find(s => s.url)?.url;
+
+// A short FAQ built from the facts an answer engine actually gets asked about
+// this law. FAQPage is among the most-quoted schema types in AI overviews, and
+// these are the exact question/answer pairs a supplier types into a chatbot.
+const faq = [];
+if(law.firstComplianceDeadline)
+  faq.push({ q: `When does the ${law.shortName || law.name} apply?`,
+    a: `The first compliance deadline for the ${law.name} is ${law.firstComplianceDeadline}.` });
+if(law.companiesInScope)
+  faq.push({ q: `Who does the ${law.shortName || law.name} apply to?`,
+    a: `${law.companiesInScope}.` });
+if(law.maxPenalty)
+  faq.push({ q: `What are the penalties under the ${law.shortName || law.name}?`,
+    a: `${law.maxPenalty}.` });
+if(law.oneLineSummary)
+  faq.push({ q: `What is the ${law.shortName || law.name}?`, a: law.oneLineSummary });
+
+const jsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "Legislation",
+    "name": law.name,
+    "alternateName": law.shortName || undefined,
+    "legislationJurisdiction": law.jurisdiction,
+    "spatialCoverage": law.jurisdiction,
+    "description": law.oneLineSummary,
+    "legislationDate": law.enactedDate || undefined,
+    "dateModified": law.lastUpdated,
+    "inLanguage": "en-GB",
+    "legislationLegalForce": law.statusType === 'force' ? 'InForce' : 'PartiallyInForce',
+    "url": `https://hredd.org/laws/${law.slug}/`,
+    ...(primarySource ? { "sameAs": primarySource } : {}),
+    "isPartOf": { "@type": "WebSite", "name": "hredd.org", "url": "https://hredd.org" }
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Tracker", "item": "https://hredd.org/tracker/" },
+      { "@type": "ListItem", "position": 2, "name": law.shortName || law.name, "item": `https://hredd.org/laws/${law.slug}/` }
+    ]
+  },
+  ...(faq.length ? [{
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faq.map(f => ({
+      "@type": "Question", "name": f.q,
+      "acceptedAnswer": { "@type": "Answer", "text": f.a }
+    }))
+  }] : [])
+];
 ---
+{/* Title leads with the acronym people actually search (CSDDD, EUDR, UFLPA),
+    then the full name. Brand suffix is allowed to truncate on the longest
+    names; leading with the searched term matters more than showing "hredd.org". */}
 <Base
-  title={`${(law.name.length <= 56 ? law.name : (law.shortName || law.name)).trim()} | hredd.org`}
-  description={clampDesc(law.oneLineSummary || `Tracker entry for the ${law.name}.`)}
+  title={`${law.shortName && law.shortName !== law.name ? law.shortName + ': ' : ''}${law.name} | hredd.org`}
+  description={clampDesc(law.oneLineSummary || `${law.name}: status, deadlines, who is in scope, and what it asks of suppliers, tracked from the Global South.`)}
   active="tracker"
+  modifiedTime={law.lastUpdated}
 >
 
-<script type="application/ld+json" set:html={JSON.stringify({
-  "@context": "https://schema.org",
-  "@type": "Legislation",
-  "name": law.name,
-  "legislationJurisdiction": law.jurisdiction,
-  "description": law.oneLineSummary,
-  "dateModified": law.lastUpdated
-})} />
+<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 
 <section class="law-head">
   <div class="wrap">

@@ -5,12 +5,37 @@ import { getSiteSettings } from '../../lib/sanity.js';
 const settings = await getSiteSettings();
 const contactEmail = settings?.contactEmail || 'hello@hredd.org';
 const disclosure = 'hredd.org is an independent publication with no affiliation with any organisation, public or private. The views contained herein are personal. hredd.org is not funded by any organisation.';
+
+// Organization + founder Person: the "who stands behind this" signal that both
+// Google E-E-A-T and AI answer engines look for before trusting a source on a
+// legal topic. sameAs is intentionally omitted rather than faked; add real
+// LinkedIn/X profile URLs there when available for a further authority lift.
+const aboutSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "hredd.org",
+  "url": "https://hredd.org",
+  "email": contactEmail,
+  "foundingDate": "2026",
+  "logo": { "@type": "ImageObject", "url": "https://hredd.org/favicon.png" },
+  "description": "An independent tracker of human rights and environmental due diligence law, read from the supplier side of the chain.",
+  "knowsAbout": ["Human rights due diligence", "Environmental due diligence", "CSDDD", "EUDR", "UFLPA", "Supply chain law", "Global South suppliers"],
+  "founder": {
+    "@type": "Person",
+    "name": "Vir Mehta",
+    "jobTitle": "Decent work and supply chain sustainability practitioner",
+    "description": "Vir Mehta is a decent work and supply chain sustainability practitioner based in Noida, India.",
+    "address": { "@type": "PostalAddress", "addressLocality": "Noida", "addressCountry": "IN" }
+  }
+};
 ---
 <Base
-  title="About | hredd.org"
-  description="About hredd.org: tracking global HREDD legislation from a Global South perspective."
+  title="About hredd.org: independent HREDD law tracker from the Global South"
+  description="hredd.org is an independent monthly tracker of human rights and environmental due diligence law, read from the supplier side of the chain. Published from Noida, India."
   active="about"
 >
+
+<script type="application/ld+json" set:html={JSON.stringify(aboutSchema)} />
 
 <section class="section" style="padding-bottom:clamp(36px,4vw,56px)">
   <div class="wrap">
