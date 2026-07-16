@@ -32,5 +32,13 @@ jobs:
           git config user.name "hredd-pipeline"
           git config user.email "pipeline@hredd.org"
           git add public/data/trade-exposure.json public/data/trade-exposure.csv
-          git diff --cached --quiet || git commit -m "Data: annual trade exposure refresh [automated]"
-          git push
+          if ! git diff --cached --quiet; then
+            git commit -m "Data: annual trade exposure refresh [automated]"
+            # Rebase before pushing: the pipeline runs for minutes, and any push
+            # to main during that window otherwise makes this push rejected as
+            # non-fast-forward, discarding the freshly fetched data. The data
+            # files are only ever written by this workflow, so the rebase
+            # cannot conflict.
+            git pull --rebase origin main
+            git push
+          fi
