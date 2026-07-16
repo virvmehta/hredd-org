@@ -206,7 +206,7 @@ def comtrade_get(params, key, retries=4, pace=1.0):
 ALL_ORIGINS = ",".join(ORIGIN_M49.values())
 ORIGIN_BY_CODE = {str(int(v)): k for k, v in ORIGIN_M49.items()}
 # cmdCode also accepts comma lists (verified the same day, leading zeros
-# preserved), so chapter calls request only the 34 tracked chapters instead of
+# preserved), so chapter calls request only the 35 tracked chapters instead of
 # AG2's full ~97. That keeps every response far below any record cap: the
 # preview endpoint demonstrably truncates at its cap SILENTLY, with the count
 # field reporting only the rows returned, so small responses plus an explicit
@@ -283,22 +283,46 @@ def fetch_all_flows(key, year):
             markets_by_origin[slug]["USA"]["by_hs4"] = by
 
     # EU27: sum each member's own reported imports from each origin country.
+    # The four proxy members' own totals are captured in the same loop, since
+    # the chapter mix below has to be rescaled against them, not against the
+    # full 27-member total.
+    PROXY_MEMBERS = ("276", "251", "528", "380")  # Germany, France, Netherlands, Italy
+    # Markets that carry their own member-state regime (LkSG, France's duty of
+    # vigilance, the Dutch child-labour act). Their exposure is that one
+    # member's imports, expressed as its share of the EU27 total, which
+    # regime_cells() then applies to the EU cell. Left empty, member_shares
+    # made all three regimes read as zero exposure; captured here from the same
+    # per-member totals so they finally show real figures.
+    EU_MEMBER_M49 = {"DEU": "276", "FRA": "251", "NLD": "528"}
     eu_totals = {slug: 0.0 for slug in ORIGIN_M49}
+    proxy_totals = {slug: 0.0 for slug in ORIGIN_M49}
+    member_totals = {slug: {} for slug in ORIGIN_M49}
     for member_iso, member_m49 in EU27_M49.items():
         per = _rows_by_origin(get(member_m49, "TOTAL"))
         for slug, rows in per.items():
-            eu_totals[slug] += sum(float(r["primaryValue"]) for r in rows)
+            v = sum(float(r["primaryValue"]) for r in rows)
+            eu_totals[slug] += v
+            if member_m49 in PROXY_MEMBERS:
+                proxy_totals[slug] += v
+            for mkey, mm49 in EU_MEMBER_M49.items():
+                if member_m49 == mm49:
+                    member_totals[slug][mkey] = v
     for slug in ORIGIN_M49:
         markets_by_origin[slug]["EU27"] = {"total": eu_totals[slug]}
 
-    # EU chapter mix: a full 27-member chapter breakdown would double the call
-    # count for no material gain, so this uses the four largest EU importers as
-    # a representative proxy for product mix while the total above still
-    # reflects all 27 members. Documented in the dataset vintage as an
-    # approximation, consistent with the site's practice of stating
-    # simplifications rather than hiding them.
+    # EU chapter mix: a full 27-member chapter breakdown would nearly double the
+    # call count, so the product mix is taken from the four largest EU importers
+    # as a representative proxy. Crucially the proxy gives the SHAPE of trade
+    # (which chapters dominate), not its level: the four members are only ~55%
+    # of total EU imports, so their raw chapter values must be scaled up by
+    # eu_total/proxy_total before use, or every product-scoped EU regime (EUDR,
+    # Batteries) would be undercounted by that same ~45%. The scaling preserves
+    # each chapter's share of the proxy's trade while lifting the magnitude to
+    # the full 27-member EU total. Stated in the dataset vintage as an
+    # approximation, consistent with stating simplifications rather than hiding
+    # them.
     eu_by = {slug: {} for slug in ORIGIN_M49}
-    for proxy_m49 in ("276", "251", "528", "380"):  # Germany, France, Netherlands, Italy
+    for proxy_m49 in PROXY_MEMBERS:
         per = _rows_by_origin(get(proxy_m49, ALL_CHAPTERS))
         for slug, rows in per.items():
             for row in rows:
@@ -306,8 +330,9 @@ def fetch_all_flows(key, year):
                 if code in CHAPTERS:
                     eu_by[slug][code + "00"] = eu_by[slug].get(code + "00", 0.0) + float(row["primaryValue"])
     for slug, by in eu_by.items():
-        if by:
-            markets_by_origin[slug]["EU27"]["by_hs4"] = by
+        scale = (eu_totals[slug] / proxy_totals[slug]) if proxy_totals[slug] > 0 else 0
+        if by and scale > 0:
+            markets_by_origin[slug]["EU27"]["by_hs4"] = {ch: v * scale for ch, v in by.items()}
 
     # The denominator is the sum of the nine tracked destination markets rather
     # than a true world export total, because no single reliable world figure
@@ -321,11 +346,14 @@ def fetch_all_flows(key, year):
         total = sum(m["total"] for m in markets.values())
         if total <= 0:
             raise SystemExit(f"All tracked markets returned zero imports from {slug} in {year}")
+        eu_total = eu_totals[slug]
+        member_shares = ({mk: member_totals[slug].get(mk, 0.0) / eu_total
+                          for mk in EU_MEMBER_M49} if eu_total > 0 else {})
         country_flows[slug] = {
             "name": slug.replace("-", " ").title(),
             "total_exports_usd": total,
             "markets": markets,
-            "member_shares": {},  # not computable from a four-member proxy; left for a future refinement
+            "member_shares": member_shares,
         }
     return country_flows
 
@@ -343,9 +371,10 @@ def build_live(key):
             "is measured against that country's exports to the nine regulated markets this index "
             "tracks, not against its total exports to the world, because no reliable world total "
             "exists for countries that under-report. European Union figures add up all twenty "
-            "seven member states. The European product mix is estimated from the four largest "
-            "importers, Germany, France, the Netherlands and Italy, to keep the pipeline within "
-            "its free daily data allowance."),
+            "seven member states. The European product breakdown by chapter is estimated from the "
+            "four largest importers, Germany, France, the Netherlands and Italy, and scaled up to "
+            "the full twenty seven member total, so it captures which products dominate without "
+            "understating any single one."),
         "sources": ["UN Comtrade Database, https://comtradeplus.un.org, mirror (partner-reported) statistics"],
         "countries": country_flows,
     }
