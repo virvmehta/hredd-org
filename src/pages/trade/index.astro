@@ -25,20 +25,35 @@ const DEFAULT = 'bangladesh';
 const DEST_COLOURS = ['#e0b04a', '#4fa26a', '#5f86cc', '#d9663e', '#b884c9'];
 const DEST_OTHER = '#5c574d';
 
+// Mechanism decides which section a law belongs in. Only "border" regimes can
+// actually stop or seize goods at a market border (EUDR, EU Forced Labour
+// Regulation, UFLPA). "diligence" and "disclosure" regimes never stop a
+// shipment; they place obligations on the buyer, which reach the supplier as
+// demand-side pressure. Keeping these visually separate stops a due-diligence
+// law from reading like an import ban.
+const MECH_LABEL = { border: 'Border control', diligence: 'Buyer diligence', disclosure: 'Disclosure' };
+
 function ledgerOf(c){
-  const rows = [], quiet = [];
+  const border = [], obligation = [], quiet = [];
   for(const [slug, r] of Object.entries(c.regimes_2030)){
     const law = lawBySlug[slug];
     if(!law) continue;
     if(r.class === 'C' || !r.share || r.share[2] === 0){
       quiet.push({ slug, law, r });
+    } else if(r.mechanism === 'border'){
+      border.push({ slug, law, r });
     } else {
-      rows.push({ slug, law, r });
+      obligation.push({ slug, law, r });
     }
   }
-  rows.sort((a, b) => b.r.share[1] - a.r.share[1] || b.r.share[2] - a.r.share[2]);
+  const byShare = (a, b) => b.r.share[1] - a.r.share[1] || b.r.share[2] - a.r.share[2];
+  border.sort(byShare);
+  obligation.sort(byShare);
   quiet.sort((a, b) => (a.r.class === 'C' ? 1 : 0) - (b.r.class === 'C' ? 1 : 0));
-  return { rows, quiet };
+  // A single scale so bars are comparable across both sections, anchored to the
+  // largest share anywhere in the ledger.
+  const max = [...border, ...obligation].reduce((m, x) => Math.max(m, x.r.share[2]), 0) || 1;
+  return { border, obligation, quiet, max };
 }
 
 // Which sectors each law's verified product scope touches, so a textile
@@ -83,7 +98,7 @@ function sectorsOf(slug){
       ))}
     </div>
 
-    {countries.map(c => { const { rows, quiet } = ledgerOf(c); const end = c.series[c.series.length - 1];
+    {countries.map(c => { const { border, obligation, quiet, max } = ledgerOf(c); const end = c.series[c.series.length - 1];
       const top5 = c.markets.slice(0, 5);
       const otherShare = Math.max(0, 1 - top5.reduce((s, m) => s + m.share, 0)); return (
       <div class="cpane" data-c={c.slug} hidden={c.slug !== DEFAULT}>
@@ -127,29 +142,72 @@ function sectorsOf(slug){
           </div>
         </div>
 
-        <div class="ledger-head mono">
-          <span>Law</span><span class="lh-status">Status</span><span class="lh-from">From</span>
-          <span>Share of export value in scope</span><span class="lh-share">Central</span><span class="lh-val">Value</span><span class="lh-class">Class</span>
+        <div class="ledger-group" data-mech="border">
+          <div class="lg-head">
+            <h3 class="lg-title">Can stop your goods at the border</h3>
+            <p class="lg-sub">Customs can hold, refuse or seize a shipment that fails these. Non-compliance stops the goods themselves, not just the buyer.</p>
+          </div>
+          {border.length === 0 ? (
+            <p class="mono faint lg-empty">No border-enforced law reaches {c.name}'s tracked trade yet.</p>
+          ) : (
+            <>
+              <div class="ledger-head mono">
+                <span>Law</span><span class="lh-status">Status</span><span class="lh-from">From</span>
+                <span>Share of export value in scope</span><span class="lh-share">Central</span><span class="lh-val">Value</span><span class="lh-class">Class</span>
+              </div>
+              <div class="ledger">
+                {border.map(({ slug, law, r }) => { const [lo, ce, hi] = r.share;
+                  const rangeTitle = r.class === 'B' ? `Central estimate ${pct(ce)}. Could reach up to ${pct(hi)} depending on buyer size.` : `${pct(ce)}, measured directly.`; return (
+                  <a class="lrow" href={`/laws/${slug}/`} data-sectors={sectorsOf(slug).join(',')}>
+                    <div class="l-name">
+                      <h3>{law.shortName || law.name}</h3>
+                      <p>{law.name} · {MARKET_LABELS[r.market] || r.market}</p>
+                    </div>
+                    <span class="chip" data-g={law.statusType}>{law.status}</span>
+                    <span class="mono l-from">{yearOf(r.first_date)}</span>
+                    <span class="l-band" title={rangeTitle}><i class="central" style={`width:${ce/max*100}%`}></i></span>
+                    <span class="mono l-share" title={rangeTitle}>{pct(ce)}</span>
+                    <span class="mono l-val">{usd(r.value[1])}</span>
+                    <span class="cbadge" data-cl={r.class}>{r.class}</span>
+                  </a>
+                );})}
+              </div>
+            </>
+          )}
         </div>
 
-        <div class="ledger" id={`ledger-${c.slug}`}>
-          {rows.map(({ slug, law, r }) => { const [lo, ce, hi] = r.share; const max = rows[0].r.share[2] || 1;
-            const rangeTitle = r.class === 'B' ? `Central estimate ${pct(ce)}. Could reach up to ${pct(hi)} depending on buyer size.` : `${pct(ce)}, measured directly.`; return (
-            <a class="lrow" href={`/laws/${slug}/`} data-sectors={sectorsOf(slug).join(',')}>
-              <div class="l-name">
-                <h3>{law.shortName || law.name}</h3>
-                <p>{law.name} · {MARKET_LABELS[r.market] || r.market}</p>
+        <div class="ledger-group" data-mech="obligation" style="margin-top:clamp(40px,5vw,60px)">
+          <div class="lg-head">
+            <h3 class="lg-title">Create buyer obligations that reach you</h3>
+            <p class="lg-sub">These never stop a shipment. They oblige your buyer to vet or report on their chain, which reaches you as questionnaires, audits and contract terms rather than a border check.</p>
+          </div>
+          {obligation.length === 0 ? (
+            <p class="mono faint lg-empty">No due-diligence or disclosure law reaches {c.name}'s tracked trade yet.</p>
+          ) : (
+            <>
+              <div class="ledger-head mono">
+                <span>Law</span><span class="lh-status">Status</span><span class="lh-from">From</span>
+                <span>Share of buyer trade in scope</span><span class="lh-share">Central</span><span class="lh-val">Value</span><span class="lh-class">Class</span>
               </div>
-              <span class="chip" data-g={law.statusType}>{law.status}</span>
-              <span class="mono l-from">{yearOf(r.first_date)}</span>
-              <span class="l-band" title={rangeTitle}>
-                <i class="central" style={`width:${ce/max*100}%`}></i>
-              </span>
-              <span class="mono l-share" title={rangeTitle}>{pct(ce)}</span>
-              <span class="mono l-val">{usd(r.value[1])}</span>
-              <span class="cbadge" data-cl={r.class}>{r.class}</span>
-            </a>
-          );})}
+              <div class="ledger">
+                {obligation.map(({ slug, law, r }) => { const [lo, ce, hi] = r.share;
+                  const rangeTitle = r.class === 'B' ? `Central estimate ${pct(ce)}. Could reach up to ${pct(hi)} depending on buyer size.` : `${pct(ce)}, measured directly.`; return (
+                  <a class="lrow" href={`/laws/${slug}/`} data-sectors={sectorsOf(slug).join(',')}>
+                    <div class="l-name">
+                      <h3>{law.shortName || law.name}</h3>
+                      <p>{law.name} · {MARKET_LABELS[r.market] || r.market} · <span class={`mech ${r.mechanism}`}>{MECH_LABEL[r.mechanism]}</span></p>
+                    </div>
+                    <span class="chip" data-g={law.statusType}>{law.status}</span>
+                    <span class="mono l-from">{yearOf(r.first_date)}</span>
+                    <span class="l-band" title={rangeTitle}><i class="central" style={`width:${ce/max*100}%`}></i></span>
+                    <span class="mono l-share" title={rangeTitle}>{pct(ce)}</span>
+                    <span class="mono l-val">{usd(r.value[1])}</span>
+                    <span class="cbadge" data-cl={r.class}>{r.class}</span>
+                  </a>
+                );})}
+              </div>
+            </>
+          )}
         </div>
         <p class="mono faint sector-empty" hidden>No tracked laws are scoped to this sector for {c.name}.</p>
 
@@ -250,6 +308,17 @@ function sectorsOf(slug){
   .qrow .chip{ justify-self:start; }
   .l-note{ font-size:11px; letter-spacing:.08em; padding-left:4px; }
 
+  /* two enforcement groups: border-control vs buyer-obligation */
+  .ledger-group.group-hide{ display:none; }
+  .lg-head{ margin:0 0 6px; padding-left:16px; border-left:2px solid var(--gold); }
+  .ledger-group[data-mech="obligation"] .lg-head{ border-left-color:var(--ink-faint); }
+  .lg-title{ font:400 clamp(20px,2.4vw,26px)/1.25 var(--serif); color:var(--ink); margin:0; }
+  .lg-sub{ margin:8px 0 0; font-size:13.5px; line-height:1.6; color:var(--ink-dim); max-width:70ch; }
+  .lg-empty{ padding:20px 0 4px; }
+  .mech{ font-family:var(--mono); font-size:9px; letter-spacing:.12em; text-transform:uppercase;
+    padding:2px 7px; border:1px solid var(--line); color:var(--ink-faint); }
+  .mech.border{ color:var(--gold-hi); border-color:var(--gold-dim); }
+
   @media (max-width:880px){
     .ledger-head{ display:none; }
     .lrow{ grid-template-columns:minmax(0,1fr) auto; grid-template-areas:"name status" "band band" "share val"; }
@@ -274,26 +343,36 @@ function sectorsOf(slug){
   if(h && document.querySelector(`.cpane[data-c="${h}"]`)) show(h);
 
   // Sector filter: each country pane has its own independent selection, so
-  // switching countries never resets a supplier's chosen sector.
+  // switching countries never resets a supplier's chosen sector. It now spans
+  // both ledger groups (border + obligations), hiding a whole group when the
+  // chosen sector empties it.
   document.querySelectorAll('.cpane').forEach(pane => {
     const filterEl = pane.querySelector('.sector-filter');
-    const ledger = pane.querySelector('.ledger');
+    const groups = pane.querySelectorAll('.ledger-group');
     const emptyMsg = pane.querySelector('.sector-empty');
-    if(!filterEl || !ledger) return;
+    if(!filterEl || !groups.length) return;
     filterEl.addEventListener('click', (e) => {
       const b = e.target instanceof Element && e.target.closest('.schip');
       if(!b) return;
       filterEl.querySelectorAll('.schip').forEach(c => c.classList.remove('on'));
       b.classList.add('on');
       const s = b.dataset.s;
-      let shown = 0;
-      ledger.querySelectorAll('.lrow').forEach(row => {
-        const sectors = (row.dataset.sectors || '').split(',');
-        const ok = s === 'all' || sectors.includes(s);
-        row.classList.toggle('sector-hide', !ok);
-        if(ok) shown++;
+      let shownTotal = 0;
+      groups.forEach(group => {
+        let shown = 0;
+        group.querySelectorAll('.lrow').forEach(row => {
+          const sectors = (row.dataset.sectors || '').split(',');
+          const ok = s === 'all' || sectors.includes(s);
+          row.classList.toggle('sector-hide', !ok);
+          if(ok) shown++;
+        });
+        // A group with a real ledger but nothing left after filtering collapses;
+        // a group that was already empty (its own lg-empty note) stays as is.
+        const hasLedger = group.querySelector('.ledger');
+        group.classList.toggle('group-hide', hasLedger && shown === 0);
+        shownTotal += shown;
       });
-      if(emptyMsg) emptyMsg.hidden = shown > 0;
+      if(emptyMsg) emptyMsg.hidden = shownTotal > 0;
     });
   });
 </script>
