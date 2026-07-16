@@ -1,0 +1,38 @@
+hredd.org — Licence and Rights Notice
+Copyright (c) 2026 Vir Viraf Mehta. All rights reserved.
+
+hredd.org was developed independently by Vir Viraf Mehta. The following terms
+distinguish what is proprietary from what is openly licensed. They are
+deliberately separate; one does not override the other.
+
+1. SOURCE CODE, DESIGN, AND BRAND — PROPRIETARY, ALL RIGHTS RESERVED
+   All source code in this repository, the site's visual design and layout,
+   and the "hredd.org" name and wordmark are the exclusive property of Vir
+   Viraf Mehta. They are NOT open source. No licence is granted to copy,
+   modify, redistribute, host, or create derivative works from the code,
+   design, or brand without prior written permission from the copyright
+   holder. Viewing the public repository does not grant any such rights.
+
+2. EDITORIAL CONTENT — ALL RIGHTS RESERVED
+   Articles, analysis, law summaries, and other written editorial content are
+   the copyright of their named author(s) and may not be reproduced in whole
+   or in substantial part without permission, beyond ordinary quotation with
+   attribution.
+
+3. PUBLISHED DATASET AND LEGAL MAPPING — CC BY 4.0
+   The trade-exposure dataset and the law-scope mapping published under
+   /public/data/ (the JSON and CSV files, and law-scope.json) are released
+   under the Creative Commons Attribution 4.0 International licence
+   (https://creativecommons.org/licenses/by/4.0/). You may use, share, and
+   adapt these data files, including commercially, provided you credit
+   hredd.org. This grant applies ONLY to those published data files, not to
+   the code that produces them, nor to the design, brand, or editorial
+   content above. This CC BY 4.0 grant is irrevocable for material already
+   released under it.
+
+4. NO OTHER RIGHTS GRANTED
+   Nothing in this notice transfers ownership of any asset. Trade, feedback,
+   and reuse of the open data are welcome under the terms above; everything
+   else requires written permission.
+
+Contact: see https://hredd.org/about/
