@@ -1,13 +1,13 @@
 {
- "dataset_version": "comtrade-live-2026-07-15",
- "generated": "2026-07-15",
+ "dataset_version": "comtrade-live-2026-07-16",
+ "generated": "2026-07-16",
  "sample_data": false,
- "vintage": "Figures come from UN Comtrade. For each country we use what its buyer markets reported importing, rather than what the country itself reported exporting, because several tracked countries report to Comtrade late or not at all. Every share is measured against that country's exports to the nine regulated markets this index tracks, not against its total exports to the world, because no reliable world total exists for countries that under-report. European Union figures add up all twenty seven member states. The European product mix is estimated from the four largest importers, Germany, France, the Netherlands and Italy, to keep the pipeline within its free daily data allowance.",
+ "vintage": "Figures come from UN Comtrade. For each country we use what its buyer markets reported importing, rather than what the country itself reported exporting, because several tracked countries report to Comtrade late or not at all. Every share is measured against that country's exports to the nine regulated markets this index tracks, not against its total exports to the world, because no reliable world total exists for countries that under-report. European Union figures add up all twenty seven member states. The European product breakdown by chapter is estimated from the four largest importers, Germany, France, the Netherlands and Italy, and scaled up to the full twenty seven member total, so it captures which products dominate without understating any single one.",
  "sources": [
   "UN Comtrade Database, https://comtradeplus.un.org, mirror (partner-reported) statistics"
  ],
  "input_checksums": {
-  "flows": "91899393d406a418f3563348c1aad4b5926b43b07da6c8d308e71f9ca8414bdf",
+  "flows": "a1fb3d948190bb6c8f66c03e36a4d58749f8a178a4670586bc22d9b501a1612a",
   "law_scope": "0c111c8e79b6d8dfebdf34bff77262d96a6fdc8d8ad0474b81dcd951af6e804c"
  },
  "mapping_version": "2026.4",
@@ -46,105 +46,109 @@
  "countries": {
   "bangladesh": {
    "name": "Bangladesh",
-   "total_exports_usd": 50405344945.382996,
-   "laws_touching": 9,
+   "total_exports_usd": 51951999749.862,
+   "laws_touching": 11,
    "markets": [
     {
      "key": "EU27",
      "total": 30230975699.245,
-     "share": 0.5998
+     "share": 0.5819
     },
     {
      "key": "USA",
      "total": 9889113312.0,
-     "share": 0.1962
+     "share": 0.1904
     },
     {
      "key": "GBR",
      "total": 5074609784.541,
-     "share": 0.1007
+     "share": 0.0977
     },
     {
      "key": "CAN",
      "total": 1963979855.795,
-     "share": 0.039
+     "share": 0.0378
     },
     {
      "key": "JPN",
      "total": 1644255148.665,
-     "share": 0.0326
+     "share": 0.0316
+    },
+    {
+     "key": "CHE",
+     "total": 1159348939.843,
+     "share": 0.0223
     },
     {
      "key": "AUS",
      "total": 989178637.137,
-     "share": 0.0196
+     "share": 0.019
     },
     {
      "key": "KOR",
      "total": 613232508.0,
-     "share": 0.0122
+     "share": 0.0118
     },
     {
      "key": "NOR",
-     "total": 0,
-     "share": 0.0
-    },
-    {
-     "key": "CHE",
-     "total": 0,
-     "share": 0.0
+     "total": 387305864.636,
+     "share": 0.0075
     }
    ],
-   "member_shares": {},
+   "member_shares": {
+    "DEU": 0.32693117288020024,
+    "FRA": 0.0,
+    "NLD": 0.06347385718119322
+   },
    "series": [
     {
      "year": 2024,
-     "union": 0.6428,
-     "border": 0.1684,
-     "diligence": 0.3599,
-     "disclosure": 0.1146
+     "union": 0.6278,
+     "border": 0.1634,
+     "diligence": 0.3532,
+     "disclosure": 0.1111
     },
     {
      "year": 2025,
-     "union": 0.6428,
-     "border": 0.1684,
-     "diligence": 0.3599,
-     "disclosure": 0.2945
+     "union": 0.6278,
+     "border": 0.1634,
+     "diligence": 0.3532,
+     "disclosure": 0.2857
     },
     {
      "year": 2026,
-     "union": 0.6428,
-     "border": 0.1685,
-     "diligence": 0.3599,
-     "disclosure": 0.2945
+     "union": 0.6278,
+     "border": 0.1637,
+     "diligence": 0.3532,
+     "disclosure": 0.2857
     },
     {
      "year": 2027,
-     "union": 0.8827,
-     "border": 0.7682,
-     "diligence": 0.3599,
-     "disclosure": 0.4744
+     "union": 0.8605,
+     "border": 0.7453,
+     "diligence": 0.3533,
+     "disclosure": 0.4603
     },
     {
      "year": 2028,
-     "union": 0.8827,
-     "border": 0.7682,
-     "diligence": 0.3599,
-     "disclosure": 0.4744
+     "union": 0.8605,
+     "border": 0.7453,
+     "diligence": 0.3533,
+     "disclosure": 0.4603
     },
     {
      "year": 2029,
-     "union": 0.8827,
-     "border": 0.7682,
-     "diligence": 0.3599,
-     "disclosure": 0.4744
+     "union": 0.8605,
+     "border": 0.7453,
+     "diligence": 0.3533,
+     "disclosure": 0.4603
     },
     {
      "year": 2030,
-     "union": 0.8827,
-     "border": 0.7682,
-     "diligence": 0.3599,
-     "disclosure": 0.4744
+     "union": 0.8605,
+     "border": 0.7453,
+     "diligence": 0.3533,
+     "disclosure": 0.4603
     }
    ],
    "regimes_2030": {
@@ -154,14 +158,14 @@
      "market": "EU27",
      "first_date": "2026-12-30",
      "share": [
-      0.0002,
-      0.0002,
-      0.0002
+      0.0005,
+      0.0005,
+      0.0005
      ],
      "value": [
-      11771702.0,
-      11771702.0,
-      11771702.0
+      25968009.0,
+      25968009.0,
+      25968009.0
      ],
      "assumption": null,
      "indicator": null
@@ -172,9 +176,9 @@
      "market": "EU27",
      "first_date": "2027-12-14",
      "share": [
-      0.5998,
-      0.5998,
-      0.5998
+      0.5819,
+      0.5819,
+      0.5819
      ],
      "value": [
       30230975699.0,
@@ -190,14 +194,14 @@
      "market": "EU27",
      "first_date": "2027-08-18",
      "share": [
-      0.0,
-      0.0,
-      0.0
+      0.0001,
+      0.0001,
+      0.0001
      ],
      "value": [
-      1227331.0,
-      1227331.0,
-      1227331.0
+      2707453.0,
+      2707453.0,
+      2707453.0
      ],
      "assumption": null,
      "indicator": null
@@ -208,9 +212,9 @@
      "market": "EU27",
      "first_date": "2029-07-26",
      "share": [
-      0.2099,
-      0.2699,
-      0.3299
+      0.2037,
+      0.2619,
+      0.32
      ],
      "value": [
       10580841495.0,
@@ -226,9 +230,9 @@
      "market": "EU27",
      "first_date": "2025-01-01",
      "share": [
-      0.2999,
-      0.3599,
-      0.4198
+      0.291,
+      0.3491,
+      0.4073
      ],
      "value": [
       15115487850.0,
@@ -244,14 +248,14 @@
      "market": "DEU",
      "first_date": "2023-01-01",
      "share": [
-      0.0,
-      0.0,
-      0.0
+      0.0951,
+      0.1141,
+      0.1332
      ],
      "value": [
-      0.0,
-      0.0,
-      0.0
+      4941724171.0,
+      5930069006.0,
+      6918413840.0
      ],
      "assumption": "A3",
      "indicator": "exposure to buyer diligence demand"
@@ -298,14 +302,14 @@
      "market": "NOR",
      "first_date": "2022-07-01",
      "share": [
-      0.0,
-      0.0,
-      0.0
+      0.0034,
+      0.0041,
+      0.0048
      ],
      "value": [
-      0.0,
-      0.0,
-      0.0
+      174287639.0,
+      213018226.0,
+      251748812.0
      ],
      "assumption": "A4",
      "indicator": "exposure to buyer diligence demand"
@@ -316,9 +320,9 @@
      "market": "GBR",
      "first_date": "2015-10-29",
      "share": [
-      0.0654,
-      0.0755,
-      0.0856
+      0.0635,
+      0.0733,
+      0.083
      ],
      "value": [
       3298496360.0,
@@ -334,9 +338,9 @@
      "market": "CAN",
      "first_date": "2024-01-01",
      "share": [
-      0.0234,
-      0.0273,
-      0.0312
+      0.0227,
+      0.0265,
+      0.0302
      ],
      "value": [
       1178387913.0,
@@ -352,9 +356,9 @@
      "market": "AUS",
      "first_date": "2019-01-01",
      "share": [
-      0.0098,
-      0.0118,
-      0.0137
+      0.0095,
+      0.0114,
+      0.0133
      ],
      "value": [
       494589319.0,
@@ -370,9 +374,9 @@
      "market": "USA",
      "first_date": "2022-06-21",
      "share": [
-      0.1684,
-      0.1684,
-      0.1962
+      0.1634,
+      0.1634,
+      0.1904
      ],
      "value": [
       8488985073.0,
@@ -416,105 +420,109 @@
   },
   "india": {
    "name": "India",
-   "total_exports_usd": 222593649132.703,
-   "laws_touching": 9,
+   "total_exports_usd": 226454353054.311,
+   "laws_touching": 11,
    "markets": [
     {
      "key": "USA",
      "total": 107594489030.0,
-     "share": 0.4834
+     "share": 0.4751
     },
     {
      "key": "EU27",
      "total": 71533805481.74,
-     "share": 0.3214
+     "share": 0.3159
     },
     {
      "key": "GBR",
      "total": 15172823204.671,
-     "share": 0.0682
+     "share": 0.067
     },
     {
      "key": "AUS",
      "total": 7851450549.259,
-     "share": 0.0353
+     "share": 0.0347
     },
     {
      "key": "CAN",
      "total": 7016768848.77,
-     "share": 0.0315
+     "share": 0.031
     },
     {
      "key": "JPN",
      "total": 7002783630.263,
-     "share": 0.0315
+     "share": 0.0309
     },
     {
      "key": "KOR",
      "total": 6421528388.0,
-     "share": 0.0288
-    },
-    {
-     "key": "NOR",
-     "total": 0,
-     "share": 0.0
+     "share": 0.0284
     },
     {
      "key": "CHE",
-     "total": 0,
-     "share": 0.0
+     "total": 2925102973.342,
+     "share": 0.0129
+    },
+    {
+     "key": "NOR",
+     "total": 935600948.266,
+     "share": 0.0041
     }
    ],
-   "member_shares": {},
+   "member_shares": {
+    "DEU": 0.2411892541224179,
+    "FRA": 0.0,
+    "NLD": 0.09484545849054372
+   },
    "series": [
     {
      "year": 2024,
-     "union": 0.5022,
-     "border": 0.215,
-     "diligence": 0.1928,
-     "disclosure": 0.0944
+     "union": 0.4959,
+     "border": 0.2114,
+     "diligence": 0.1918,
+     "disclosure": 0.0927
     },
     {
      "year": 2025,
-     "union": 0.5022,
-     "border": 0.215,
-     "diligence": 0.1928,
-     "disclosure": 0.1908
+     "union": 0.4959,
+     "border": 0.2114,
+     "diligence": 0.1918,
+     "disclosure": 0.1875
     },
     {
      "year": 2026,
-     "union": 0.5022,
-     "border": 0.2204,
-     "diligence": 0.1928,
-     "disclosure": 0.1908
+     "union": 0.4959,
+     "border": 0.2226,
+     "diligence": 0.1918,
+     "disclosure": 0.1875
     },
     {
      "year": 2027,
-     "union": 0.6307,
-     "border": 0.5364,
-     "diligence": 0.2004,
-     "disclosure": 0.2872
+     "union": 0.6223,
+     "border": 0.5272,
+     "diligence": 0.2077,
+     "disclosure": 0.2823
     },
     {
      "year": 2028,
-     "union": 0.6307,
-     "border": 0.5364,
-     "diligence": 0.2004,
-     "disclosure": 0.2872
+     "union": 0.6223,
+     "border": 0.5272,
+     "diligence": 0.2077,
+     "disclosure": 0.2823
     },
     {
      "year": 2029,
-     "union": 0.6307,
-     "border": 0.5364,
-     "diligence": 0.2004,
-     "disclosure": 0.2872
+     "union": 0.6223,
+     "border": 0.5272,
+     "diligence": 0.2077,
+     "disclosure": 0.2823
     },
     {
      "year": 2030,
-     "union": 0.6307,
-     "border": 0.5364,
-     "diligence": 0.2004,
-     "disclosure": 0.2872
+     "union": 0.6223,
+     "border": 0.5272,
+     "diligence": 0.2077,
+     "disclosure": 0.2823
     }
    ],
    "regimes_2030": {
@@ -524,14 +532,14 @@
      "market": "EU27",
      "first_date": "2026-12-30",
      "share": [
-      0.0108,
-      0.0108,
-      0.0108
+      0.0225,
+      0.0225,
+      0.0225
      ],
      "value": [
-      2396505834.0,
-      2396505834.0,
-      2396505834.0
+      5087893458.0,
+      5087893458.0,
+      5087893458.0
      ],
      "assumption": null,
      "indicator": null
@@ -542,9 +550,9 @@
      "market": "EU27",
      "first_date": "2027-12-14",
      "share": [
-      0.3214,
-      0.3214,
-      0.3214
+      0.3159,
+      0.3159,
+      0.3159
      ],
      "value": [
       71533805482.0,
@@ -560,14 +568,14 @@
      "market": "EU27",
      "first_date": "2027-08-18",
      "share": [
-      0.019,
-      0.019,
-      0.019
+      0.0397,
+      0.0397,
+      0.0397
      ],
      "value": [
-      4239356138.0,
-      4239356138.0,
-      4239356138.0
+      9000350449.0,
+      9000350449.0,
+      9000350449.0
      ],
      "assumption": null,
      "indicator": null
@@ -578,9 +586,9 @@
      "market": "EU27",
      "first_date": "2029-07-26",
      "share": [
-      0.1125,
-      0.1446,
-      0.1768
+      0.1106,
+      0.1421,
+      0.1737
      ],
      "value": [
       25036831919.0,
@@ -596,9 +604,9 @@
      "market": "EU27",
      "first_date": "2025-01-01",
      "share": [
-      0.1607,
-      0.1928,
-      0.225
+      0.1579,
+      0.1895,
+      0.2211
      ],
      "value": [
       35766902741.0,
@@ -614,14 +622,14 @@
      "market": "DEU",
      "first_date": "2023-01-01",
      "share": [
-      0.0,
-      0.0,
-      0.0
+      0.0381,
+      0.0457,
+      0.0533
      ],
      "value": [
-      0.0,
-      0.0,
-      0.0
+      8626592594.0,
+      10351911113.0,
+      12077229632.0
      ],
      "assumption": "A3",
      "indicator": "exposure to buyer diligence demand"
@@ -668,14 +676,14 @@
      "market": "NOR",
      "first_date": "2022-07-01",
      "share": [
-      0.0,
-      0.0,
-      0.0
+      0.0019,
+      0.0023,
+      0.0027
      ],
      "value": [
-      0.0,
-      0.0,
-      0.0
+      421020427.0,
+      514580522.0,
+      608140616.0
      ],
      "assumption": "A4",
      "indicator": "exposure to buyer diligence demand"
@@ -686,9 +694,9 @@
      "market": "GBR",
      "first_date": "2015-10-29",
      "share": [
-      0.0443,
-      0.0511,
-      0.0579
+      0.0436,
+      0.0503,
+      0.057
      ],
      "value": [
       9862335083.0,
@@ -704,9 +712,9 @@
      "market": "CAN",
      "first_date": "2024-01-01",
      "share": [
-      0.0189,
-      0.0221,
-      0.0252
+      0.0186,
+      0.0217,
+      0.0248
      ],
      "value": [
       4210061309.0,
@@ -722,9 +730,9 @@
      "market": "AUS",
      "first_date": "2019-01-01",
      "share": [
-      0.0176,
-      0.0212,
-      0.0247
+      0.0173,
+      0.0208,
+      0.0243
      ],
      "value": [
       3925725275.0,
@@ -740,9 +748,9 @@
      "market": "USA",
      "first_date": "2022-06-21",
      "share": [
-      0.215,
-      0.215,
-      0.4834
+      0.2114,
+      0.2114,
+      0.4751
      ],
      "value": [
       47862745923.0,
@@ -786,105 +794,109 @@
   },
   "vietnam": {
    "name": "Vietnam",
-   "total_exports_usd": 371695819348.623,
-   "laws_touching": 9,
+   "total_exports_usd": 375769922820.777,
+   "laws_touching": 11,
    "markets": [
     {
      "key": "USA",
      "total": 201257258433.0,
-     "share": 0.5415
+     "share": 0.5356
     },
     {
      "key": "EU27",
      "total": 73018097240.794,
-     "share": 0.1964
+     "share": 0.1943
     },
     {
      "key": "KOR",
      "total": 31774234906.0,
-     "share": 0.0855
+     "share": 0.0846
     },
     {
      "key": "JPN",
      "total": 30363410632.985,
-     "share": 0.0817
+     "share": 0.0808
     },
     {
      "key": "CAN",
      "total": 13956046848.393,
-     "share": 0.0375
+     "share": 0.0371
     },
     {
      "key": "GBR",
      "total": 12851621527.941,
-     "share": 0.0346
+     "share": 0.0342
     },
     {
      "key": "AUS",
      "total": 8475149759.51,
-     "share": 0.0228
-    },
-    {
-     "key": "NOR",
-     "total": 0,
-     "share": 0.0
+     "share": 0.0226
     },
     {
      "key": "CHE",
-     "total": 0,
-     "share": 0.0
+     "total": 2768920414.378,
+     "share": 0.0074
+    },
+    {
+     "key": "NOR",
+     "total": 1305183057.776,
+     "share": 0.0035
     }
    ],
-   "member_shares": {},
+   "member_shares": {
+    "DEU": 0.2787694540082301,
+    "FRA": 0.0,
+    "NLD": 0.13524582500997823
+   },
    "series": [
     {
      "year": 2024,
-     "union": 0.4222,
-     "border": 0.2385,
-     "diligence": 0.1179,
-     "disclosure": 0.0659
+     "union": 0.4196,
+     "border": 0.2359,
+     "diligence": 0.1185,
+     "disclosure": 0.0652
     },
     {
      "year": 2025,
-     "union": 0.4222,
-     "border": 0.2385,
-     "diligence": 0.1179,
-     "disclosure": 0.1248
+     "union": 0.4196,
+     "border": 0.2359,
+     "diligence": 0.1185,
+     "disclosure": 0.1235
     },
     {
      "year": 2026,
-     "union": 0.4222,
-     "border": 0.2428,
-     "diligence": 0.1179,
-     "disclosure": 0.1248
+     "union": 0.4196,
+     "border": 0.2445,
+     "diligence": 0.1185,
+     "disclosure": 0.1235
     },
     {
      "year": 2027,
-     "union": 0.5008,
-     "border": 0.4349,
-     "diligence": 0.1295,
-     "disclosure": 0.1838
+     "union": 0.4973,
+     "border": 0.4302,
+     "diligence": 0.1418,
+     "disclosure": 0.1818
     },
     {
      "year": 2028,
-     "union": 0.5008,
-     "border": 0.4349,
-     "diligence": 0.1295,
-     "disclosure": 0.1838
+     "union": 0.4973,
+     "border": 0.4302,
+     "diligence": 0.1418,
+     "disclosure": 0.1818
     },
     {
      "year": 2029,
-     "union": 0.5008,
-     "border": 0.4349,
-     "diligence": 0.1295,
-     "disclosure": 0.1838
+     "union": 0.4973,
+     "border": 0.4302,
+     "diligence": 0.1418,
+     "disclosure": 0.1818
     },
     {
      "year": 2030,
-     "union": 0.5008,
-     "border": 0.4349,
-     "diligence": 0.1295,
-     "disclosure": 0.1838
+     "union": 0.4973,
+     "border": 0.4302,
+     "diligence": 0.1418,
+     "disclosure": 0.1818
     }
    ],
    "regimes_2030": {
@@ -894,14 +906,14 @@
      "market": "EU27",
      "first_date": "2026-12-30",
      "share": [
-      0.0086,
-      0.0086,
-      0.0086
+      0.0172,
+      0.0172,
+      0.0172
      ],
      "value": [
-      3201525578.0,
-      3201525578.0,
-      3201525578.0
+      6454282561.0,
+      6454282561.0,
+      6454282561.0
      ],
      "assumption": null,
      "indicator": null
@@ -912,9 +924,9 @@
      "market": "EU27",
      "first_date": "2027-12-14",
      "share": [
-      0.1964,
-      0.1964,
-      0.1964
+      0.1943,
+      0.1943,
+      0.1943
      ],
      "value": [
       73018097241.0,
@@ -930,14 +942,14 @@
      "market": "EU27",
      "first_date": "2027-08-18",
      "share": [
-      0.0292,
-      0.0292,
-      0.0292
+      0.0581,
+      0.0581,
+      0.0581
      ],
      "value": [
-      10836053810.0,
-      10836053810.0,
-      10836053810.0
+      21845508161.0,
+      21845508161.0,
+      21845508161.0
      ],
      "assumption": null,
      "indicator": null
@@ -948,9 +960,9 @@
      "market": "EU27",
      "first_date": "2029-07-26",
      "share": [
-      0.0688,
-      0.0884,
-      0.108
+      0.068,
+      0.0874,
+      0.1069
      ],
      "value": [
       25556334034.0,
@@ -966,9 +978,9 @@
      "market": "EU27",
      "first_date": "2025-01-01",
      "share": [
-      0.0982,
-      0.1179,
-      0.1375
+      0.0972,
+      0.1166,
+      0.136
      ],
      "value": [
       36509048620.0,
@@ -984,14 +996,14 @@
      "market": "DEU",
      "first_date": "2023-01-01",
      "share": [
-      0.0,
-      0.0,
-      0.0
+      0.0271,
+      0.0325,
+      0.0379
      ],
      "value": [
-      0.0,
-      0.0,
-      0.0
+      10177607550.0,
+      12213129060.0,
+      14248650570.0
      ],
      "assumption": "A3",
      "indicator": "exposure to buyer diligence demand"
@@ -1038,14 +1050,14 @@
      "market": "NOR",
      "first_date": "2022-07-01",
      "share": [
-      0.0,
-      0.0,
-      0.0
+      0.0016,
+      0.0019,
+      0.0023
      ],
      "value": [
-      0.0,
-      0.0,
-      0.0
+      587332376.0,
+      717850682.0,
+      848368988.0
      ],
      "assumption": "A4",
      "indicator": "exposure to buyer diligence demand"
@@ -1056,9 +1068,9 @@
      "market": "GBR",
      "first_date": "2015-10-29",
      "share": [
-      0.0225,
-      0.0259,
-      0.0294
+      0.0222,
+      0.0257,
+      0.0291
      ],
      "value": [
       8353553993.0,
@@ -1074,9 +1086,9 @@
      "market": "CAN",
      "first_date": "2024-01-01",
      "share": [
-      0.0225,
-      0.0263,
-      0.03
+      0.0223,
+      0.026,
+      0.0297
      ],
      "value": [
       8373628109.0,
@@ -1092,9 +1104,9 @@
      "market": "AUS",
      "first_date": "2019-01-01",
      "share": [
-      0.0114,
-      0.0137,
-      0.016
+      0.0113,
+      0.0135,
+      0.0158
      ],
      "value": [
       4237574880.0,
@@ -1110,9 +1122,9 @@
      "market": "USA",
      "first_date": "2022-06-21",
      "share": [
-      0.2385,
-      0.2385,
-      0.5415
+      0.2359,
+      0.2359,
+      0.5356
      ],
      "value": [
       88636183334.0,
@@ -1156,105 +1168,109 @@
   },
   "indonesia": {
    "name": "Indonesia",
-   "total_exports_usd": 99787731697.26799,
-   "laws_touching": 9,
+   "total_exports_usd": 105939499007.76,
+   "laws_touching": 11,
    "markets": [
     {
      "key": "USA",
      "total": 36503205694.0,
-     "share": 0.3658
+     "share": 0.3446
     },
     {
      "key": "EU27",
      "total": 21998739592.81099,
-     "share": 0.2205
+     "share": 0.2077
     },
     {
      "key": "JPN",
      "total": 20166345880.179,
-     "share": 0.2021
+     "share": 0.1904
     },
     {
      "key": "KOR",
      "total": 11303929643.0,
-     "share": 0.1133
+     "share": 0.1067
+    },
+    {
+     "key": "CHE",
+     "total": 5862920418.128,
+     "share": 0.0553
     },
     {
      "key": "AUS",
      "total": 4258706648.995,
-     "share": 0.0427
+     "share": 0.0402
     },
     {
      "key": "GBR",
      "total": 2930420030.792,
-     "share": 0.0294
+     "share": 0.0277
     },
     {
      "key": "CAN",
      "total": 2626384207.491,
-     "share": 0.0263
+     "share": 0.0248
     },
     {
      "key": "NOR",
-     "total": 0,
-     "share": 0.0
-    },
-    {
-     "key": "CHE",
-     "total": 0,
-     "share": 0.0
+     "total": 288846892.364,
+     "share": 0.0027
     }
    ],
-   "member_shares": {},
+   "member_shares": {
+    "DEU": 0.24249632374808,
+    "FRA": 0.0,
+    "NLD": 0.17740511041866086
+   },
    "series": [
     {
      "year": 2024,
-     "union": 0.3689,
-     "border": 0.1705,
-     "diligence": 0.1323,
-     "disclosure": 0.0661
+     "union": 0.3489,
+     "border": 0.1606,
+     "diligence": 0.1261,
+     "disclosure": 0.0622
     },
     {
      "year": 2025,
-     "union": 0.3689,
-     "border": 0.1705,
-     "diligence": 0.1323,
-     "disclosure": 0.1322
+     "union": 0.3489,
+     "border": 0.1606,
+     "diligence": 0.1261,
+     "disclosure": 0.1245
     },
     {
      "year": 2026,
-     "union": 0.3689,
-     "border": 0.1853,
-     "diligence": 0.1323,
-     "disclosure": 0.1322
+     "union": 0.3489,
+     "border": 0.1851,
+     "diligence": 0.1261,
+     "disclosure": 0.1245
     },
     {
      "year": 2027,
-     "union": 0.457,
-     "border": 0.391,
-     "diligence": 0.1354,
-     "disclosure": 0.1983
+     "union": 0.432,
+     "border": 0.3683,
+     "diligence": 0.1313,
+     "disclosure": 0.1868
     },
     {
      "year": 2028,
-     "union": 0.457,
-     "border": 0.391,
-     "diligence": 0.1354,
-     "disclosure": 0.1983
+     "union": 0.432,
+     "border": 0.3683,
+     "diligence": 0.1313,
+     "disclosure": 0.1868
     },
     {
      "year": 2029,
-     "union": 0.457,
-     "border": 0.391,
-     "diligence": 0.1354,
-     "disclosure": 0.1983
+     "union": 0.432,
+     "border": 0.3683,
+     "diligence": 0.1313,
+     "disclosure": 0.1868
     },
     {
      "year": 2030,
-     "union": 0.457,
-     "border": 0.391,
-     "diligence": 0.1354,
-     "disclosure": 0.1983
+     "union": 0.432,
+     "border": 0.3683,
+     "diligence": 0.1313,
+     "disclosure": 0.1868
     }
    ],
    "regimes_2030": {
@@ -1264,14 +1280,14 @@
      "market": "EU27",
      "first_date": "2026-12-30",
      "share": [
-      0.0296,
-      0.0296,
-      0.0296
+      0.049,
+      0.049,
+      0.049
      ],
      "value": [
-      2953112945.0,
-      2953112945.0,
-      2953112945.0
+      5190603453.0,
+      5190603453.0,
+      5190603453.0
      ],
      "assumption": null,
      "indicator": null
@@ -1282,9 +1298,9 @@
      "market": "EU27",
      "first_date": "2027-12-14",
      "share": [
-      0.2205,
-      0.2205,
-      0.2205
+      0.2077,
+      0.2077,
+      0.2077
      ],
      "value": [
       21998739593.0,
@@ -1300,14 +1316,14 @@
      "market": "EU27",
      "first_date": "2027-08-18",
      "share": [
-      0.0079,
-      0.0079,
-      0.0079
+      0.0131,
+      0.0131,
+      0.0131
      ],
      "value": [
-      790048987.0,
-      790048987.0,
-      790048987.0
+      1388646854.0,
+      1388646854.0,
+      1388646854.0
      ],
      "assumption": null,
      "indicator": null
@@ -1318,9 +1334,9 @@
      "market": "EU27",
      "first_date": "2029-07-26",
      "share": [
-      0.0772,
-      0.0992,
-      0.1213
+      0.0727,
+      0.0934,
+      0.1142
      ],
      "value": [
       7699558857.0,
@@ -1336,9 +1352,9 @@
      "market": "EU27",
      "first_date": "2025-01-01",
      "share": [
-      0.1102,
-      0.1323,
-      0.1543
+      0.1038,
+      0.1246,
+      0.1454
      ],
      "value": [
       10999369796.0,
@@ -1354,14 +1370,14 @@
      "market": "DEU",
      "first_date": "2023-01-01",
      "share": [
-      0.0,
-      0.0,
-      0.0
+      0.0252,
+      0.0302,
+      0.0352
      ],
      "value": [
-      0.0,
-      0.0,
-      0.0
+      2667306739.0,
+      3200768087.0,
+      3734229435.0
      ],
      "assumption": "A3",
      "indicator": "exposure to buyer diligence demand"
@@ -1408,14 +1424,14 @@
      "market": "NOR",
      "first_date": "2022-07-01",
      "share": [
-      0.0,
-      0.0,
-      0.0
+      0.0012,
+      0.0015,
+      0.0018
      ],
      "value": [
-      0.0,
-      0.0,
-      0.0
+      129981102.0,
+      158865791.0,
+      187750480.0
      ],
      "assumption": "A4",
      "indicator": "exposure to buyer diligence demand"
@@ -1426,9 +1442,9 @@
      "market": "GBR",
      "first_date": "2015-10-29",
      "share": [
-      0.0191,
-      0.022,
-      0.025
+      0.018,
+      0.0207,
+      0.0235
      ],
      "value": [
       1904773020.0,
@@ -1444,9 +1460,9 @@
      "market": "CAN",
      "first_date": "2024-01-01",
      "share": [
-      0.0158,
-      0.0184,
-      0.0211
+      0.0149,
+      0.0174,
+      0.0198
      ],
      "value": [
       1575830524.0,
@@ -1462,9 +1478,9 @@
      "market": "AUS",
      "first_date": "2019-01-01",
      "share": [
-      0.0213,
-      0.0256,
-      0.0299
+      0.0201,
+      0.0241,
+      0.0281
      ],
      "value": [
       2129353324.0,
@@ -1480,9 +1496,9 @@
      "market": "USA",
      "first_date": "2022-06-21",
      "share": [
-      0.1705,
-      0.1705,
-      0.3658
+      0.1606,
+      0.1606,
+      0.3446
      ],
      "value": [
       17016714255.0,
@@ -1526,105 +1542,109 @@
   },
   "brazil": {
    "name": "Brazil",
-   "total_exports_usd": 118270983384.16798,
-   "laws_touching": 9,
+   "total_exports_usd": 123319882072.07999,
+   "laws_touching": 11,
    "markets": [
     {
      "key": "EU27",
      "total": 46044174256.77199,
-     "share": 0.3893
+     "share": 0.3734
     },
     {
      "key": "USA",
      "total": 41596526389.0,
-     "share": 0.3517
+     "share": 0.3373
     },
     {
      "key": "JPN",
      "total": 9003045331.842,
-     "share": 0.0761
+     "share": 0.073
     },
     {
      "key": "CAN",
      "total": 8404095842.24,
-     "share": 0.0711
+     "share": 0.0681
     },
     {
      "key": "KOR",
      "total": 6605275324.0,
-     "share": 0.0558
+     "share": 0.0536
     },
     {
      "key": "GBR",
      "total": 5569153327.523,
-     "share": 0.0471
+     "share": 0.0452
+    },
+    {
+     "key": "CHE",
+     "total": 2845432709.488,
+     "share": 0.0231
+    },
+    {
+     "key": "NOR",
+     "total": 2203465978.424,
+     "share": 0.0179
     },
     {
      "key": "AUS",
      "total": 1048712912.791,
-     "share": 0.0089
-    },
-    {
-     "key": "NOR",
-     "total": 0,
-     "share": 0.0
-    },
-    {
-     "key": "CHE",
-     "total": 0,
-     "share": 0.0
+     "share": 0.0085
     }
    ],
-   "member_shares": {},
+   "member_shares": {
+    "DEU": 0.20266815643893393,
+    "FRA": 0.0,
+    "NLD": 0.18062658110231608
+   },
    "series": [
     {
      "year": 2024,
-     "union": 0.3729,
-     "border": 0.0489,
-     "diligence": 0.2336,
-     "disclosure": 0.0904
+     "union": 0.3675,
+     "border": 0.0469,
+     "diligence": 0.2339,
+     "disclosure": 0.0867
     },
     {
      "year": 2025,
-     "union": 0.3729,
-     "border": 0.0489,
-     "diligence": 0.2336,
-     "disclosure": 0.2072
+     "union": 0.3675,
+     "border": 0.0469,
+     "diligence": 0.2339,
+     "disclosure": 0.1987
     },
     {
      "year": 2026,
-     "union": 0.3729,
-     "border": 0.0863,
-     "diligence": 0.2336,
-     "disclosure": 0.2072
+     "union": 0.3675,
+     "border": 0.1169,
+     "diligence": 0.2339,
+     "disclosure": 0.1987
     },
     {
      "year": 2027,
-     "union": 0.5286,
-     "border": 0.4383,
-     "diligence": 0.2344,
-     "disclosure": 0.324
+     "union": 0.5168,
+     "border": 0.4203,
+     "diligence": 0.2354,
+     "disclosure": 0.3107
     },
     {
      "year": 2028,
-     "union": 0.5286,
-     "border": 0.4383,
-     "diligence": 0.2344,
-     "disclosure": 0.324
+     "union": 0.5168,
+     "border": 0.4203,
+     "diligence": 0.2354,
+     "disclosure": 0.3107
     },
     {
      "year": 2029,
-     "union": 0.5286,
-     "border": 0.4383,
-     "diligence": 0.2344,
-     "disclosure": 0.324
+     "union": 0.5168,
+     "border": 0.4203,
+     "diligence": 0.2354,
+     "disclosure": 0.3107
     },
     {
      "year": 2030,
-     "union": 0.5286,
-     "border": 0.4383,
-     "diligence": 0.2344,
-     "disclosure": 0.324
+     "union": 0.5168,
+     "border": 0.4203,
+     "diligence": 0.2354,
+     "disclosure": 0.3107
     }
    ],
    "regimes_2030": {
@@ -1634,14 +1654,14 @@
      "market": "EU27",
      "first_date": "2026-12-30",
      "share": [
-      0.0748,
-      0.0748,
-      0.0748
+      0.1398,
+      0.1398,
+      0.1398
      ],
      "value": [
-      8845687571.0,
-      8845687571.0,
-      8845687571.0
+      17245366737.0,
+      17245366737.0,
+      17245366737.0
      ],
      "assumption": null,
      "indicator": null
@@ -1652,9 +1672,9 @@
      "market": "EU27",
      "first_date": "2027-12-14",
      "share": [
-      0.3893,
-      0.3893,
-      0.3893
+      0.3734,
+      0.3734,
+      0.3734
      ],
      "value": [
       46044174257.0,
@@ -1670,14 +1690,14 @@
      "market": "EU27",
      "first_date": "2027-08-18",
      "share": [
-      0.0021,
-      0.0021,
-      0.0021
+      0.004,
+      0.004,
+      0.004
      ],
      "value": [
-      251560017.0,
-      251560017.0,
-      251560017.0
+      490436127.0,
+      490436127.0,
+      490436127.0
      ],
      "assumption": null,
      "indicator": null
@@ -1688,9 +1708,9 @@
      "market": "EU27",
      "first_date": "2029-07-26",
      "share": [
-      0.1363,
-      0.1752,
-      0.2141
+      0.1307,
+      0.168,
+      0.2054
      ],
      "value": [
       16115460990.0,
@@ -1706,9 +1726,9 @@
      "market": "EU27",
      "first_date": "2025-01-01",
      "share": [
-      0.1947,
-      0.2336,
-      0.2725
+      0.1867,
+      0.224,
+      0.2614
      ],
      "value": [
       23022087128.0,
@@ -1724,14 +1744,14 @@
      "market": "DEU",
      "first_date": "2023-01-01",
      "share": [
-      0.0,
-      0.0,
-      0.0
+      0.0378,
+      0.0454,
+      0.053
      ],
      "value": [
-      0.0,
-      0.0,
-      0.0
+      4665843956.0,
+      5599012747.0,
+      6532181538.0
      ],
      "assumption": "A3",
      "indicator": "exposure to buyer diligence demand"
@@ -1778,14 +1798,14 @@
      "market": "NOR",
      "first_date": "2022-07-01",
      "share": [
-      0.0,
-      0.0,
-      0.0
+      0.008,
+      0.0098,
+      0.0116
      ],
      "value": [
-      0.0,
-      0.0,
-      0.0
+      991559690.0,
+      1211906288.0,
+      1432252886.0
      ],
      "assumption": "A4",
      "indicator": "exposure to buyer diligence demand"
@@ -1796,9 +1816,9 @@
      "market": "GBR",
      "first_date": "2015-10-29",
      "share": [
-      0.0306,
-      0.0353,
-      0.04
+      0.0294,
+      0.0339,
+      0.0384
      ],
      "value": [
       3619949663.0,
@@ -1814,9 +1834,9 @@
      "market": "CAN",
      "first_date": "2024-01-01",
      "share": [
-      0.0426,
-      0.0497,
-      0.0568
+      0.0409,
+      0.0477,
+      0.0545
      ],
      "value": [
       5042457505.0,
@@ -1832,9 +1852,9 @@
      "market": "AUS",
      "first_date": "2019-01-01",
      "share": [
-      0.0044,
-      0.0053,
-      0.0062
+      0.0043,
+      0.0051,
+      0.006
      ],
      "value": [
       524356456.0,
@@ -1850,9 +1870,9 @@
      "market": "USA",
      "first_date": "2022-06-21",
      "share": [
-      0.0489,
-      0.0489,
-      0.3517
+      0.0469,
+      0.0469,
+      0.3373
      ],
      "value": [
       5789302970.0,
@@ -1896,105 +1916,109 @@
   },
   "thailand": {
    "name": "Thailand",
-   "total_exports_usd": 184370346752.204,
-   "laws_touching": 9,
+   "total_exports_usd": 191928633509.937,
+   "laws_touching": 11,
    "markets": [
     {
      "key": "USA",
      "total": 94444336714.0,
-     "share": 0.5123
+     "share": 0.4921
     },
     {
      "key": "EU27",
      "total": 33869951119.456997,
-     "share": 0.1837
+     "share": 0.1765
     },
     {
      "key": "JPN",
      "total": 25477680429.609,
-     "share": 0.1382
+     "share": 0.1327
     },
     {
      "key": "AUS",
      "total": 12568986793.475,
-     "share": 0.0682
+     "share": 0.0655
     },
     {
      "key": "KOR",
      "total": 6969186388.0,
-     "share": 0.0378
+     "share": 0.0363
+    },
+    {
+     "key": "CHE",
+     "total": 6745564372.849,
+     "share": 0.0351
     },
     {
      "key": "GBR",
      "total": 6528203877.676,
-     "share": 0.0354
+     "share": 0.034
     },
     {
      "key": "CAN",
      "total": 4512001429.987,
-     "share": 0.0245
+     "share": 0.0235
     },
     {
      "key": "NOR",
-     "total": 0,
-     "share": 0.0
-    },
-    {
-     "key": "CHE",
-     "total": 0,
-     "share": 0.0
+     "total": 812722384.884,
+     "share": 0.0042
     }
    ],
-   "member_shares": {},
+   "member_shares": {
+    "DEU": 0.3175226031097802,
+    "FRA": 0.0,
+    "NLD": 0.2087203809096119
+   },
    "series": [
     {
      "year": 2024,
-     "union": 0.4058,
-     "border": 0.211,
-     "diligence": 0.1102,
-     "disclosure": 0.0846
+     "union": 0.3921,
+     "border": 0.2027,
+     "diligence": 0.1082,
+     "disclosure": 0.0813
     },
     {
      "year": 2025,
-     "union": 0.4058,
-     "border": 0.211,
-     "diligence": 0.1102,
-     "disclosure": 0.1397
+     "union": 0.3921,
+     "border": 0.2027,
+     "diligence": 0.1082,
+     "disclosure": 0.1342
     },
     {
      "year": 2026,
-     "union": 0.4058,
-     "border": 0.2147,
-     "diligence": 0.1102,
-     "disclosure": 0.1397
+     "union": 0.3921,
+     "border": 0.2087,
+     "diligence": 0.1082,
+     "disclosure": 0.1342
     },
     {
      "year": 2027,
-     "union": 0.4793,
-     "border": 0.3947,
-     "diligence": 0.1226,
-     "disclosure": 0.1948
+     "union": 0.4627,
+     "border": 0.3791,
+     "diligence": 0.1283,
+     "disclosure": 0.1871
     },
     {
      "year": 2028,
-     "union": 0.4793,
-     "border": 0.3947,
-     "diligence": 0.1226,
-     "disclosure": 0.1948
+     "union": 0.4627,
+     "border": 0.3791,
+     "diligence": 0.1283,
+     "disclosure": 0.1871
     },
     {
      "year": 2029,
-     "union": 0.4793,
-     "border": 0.3947,
-     "diligence": 0.1226,
-     "disclosure": 0.1948
+     "union": 0.4627,
+     "border": 0.3791,
+     "diligence": 0.1283,
+     "disclosure": 0.1871
     },
     {
      "year": 2030,
-     "union": 0.4793,
-     "border": 0.3947,
-     "diligence": 0.1226,
-     "disclosure": 0.1948
+     "union": 0.4627,
+     "border": 0.3791,
+     "diligence": 0.1283,
+     "disclosure": 0.1871
     }
    ],
    "regimes_2030": {
@@ -2004,14 +2028,14 @@
      "market": "EU27",
      "first_date": "2026-12-30",
      "share": [
-      0.0075,
-      0.0075,
-      0.0075
+      0.0121,
+      0.0121,
+      0.0121
      ],
      "value": [
-      1376857126.0,
-      1376857126.0,
-      1376857126.0
+      2320004777.0,
+      2320004777.0,
+      2320004777.0
      ],
      "assumption": null,
      "indicator": null
@@ -2022,9 +2046,9 @@
      "market": "EU27",
      "first_date": "2027-12-14",
      "share": [
-      0.1837,
-      0.1837,
-      0.1837
+      0.1765,
+      0.1765,
+      0.1765
      ],
      "value": [
       33869951119.0,
@@ -2040,14 +2064,14 @@
      "market": "EU27",
      "first_date": "2027-08-18",
      "share": [
-      0.0311,
-      0.0311,
-      0.0311
+      0.0503,
+      0.0503,
+      0.0503
      ],
      "value": [
-      5725819069.0,
-      5725819069.0,
-      5725819069.0
+      9648007292.0,
+      9648007292.0,
+      9648007292.0
      ],
      "assumption": null,
      "indicator": null
@@ -2058,9 +2082,9 @@
      "market": "EU27",
      "first_date": "2029-07-26",
      "share": [
-      0.0643,
-      0.0827,
-      0.101
+      0.0618,
+      0.0794,
+      0.0971
      ],
      "value": [
       11854482892.0,
@@ -2076,9 +2100,9 @@
      "market": "EU27",
      "first_date": "2025-01-01",
      "share": [
-      0.0919,
-      0.1102,
-      0.1286
+      0.0882,
+      0.1059,
+      0.1235
      ],
      "value": [
       16934975560.0,
@@ -2094,14 +2118,14 @@
      "market": "DEU",
      "first_date": "2023-01-01",
      "share": [
-      0.0,
-      0.0,
-      0.0
+      0.028,
+      0.0336,
+      0.0392
      ],
      "value": [
-      0.0,
-      0.0,
-      0.0
+      5377237523.0,
+      6452685028.0,
+      7528132533.0
      ],
      "assumption": "A3",
      "indicator": "exposure to buyer diligence demand"
@@ -2148,14 +2172,14 @@
      "market": "NOR",
      "first_date": "2022-07-01",
      "share": [
-      0.0,
-      0.0,
-      0.0
+      0.0019,
+      0.0023,
+      0.0028
      ],
      "value": [
-      0.0,
-      0.0,
-      0.0
+      365725073.0,
+      446997312.0,
+      528269550.0
      ],
      "assumption": "A4",
      "indicator": "exposure to buyer diligence demand"
@@ -2166,9 +2190,9 @@
      "market": "GBR",
      "first_date": "2015-10-29",
      "share": [
-      0.023,
-      0.0266,
-      0.0301
+      0.0221,
+      0.0255,
+      0.0289
      ],
      "value": [
       4243332520.0,
@@ -2184,9 +2208,9 @@
      "market": "CAN",
      "first_date": "2024-01-01",
      "share": [
-      0.0147,
-      0.0171,
-      0.0196
+      0.0141,
+      0.0165,
+      0.0188
      ],
      "value": [
       2707200858.0,
@@ -2202,9 +2226,9 @@
      "market": "AUS",
      "first_date": "2019-01-01",
      "share": [
-      0.0341,
-      0.0409,
-      0.0477
+      0.0327,
+      0.0393,
+      0.0458
      ],
      "value": [
       6284493397.0,
@@ -2220,9 +2244,9 @@
      "market": "USA",
      "first_date": "2022-06-21",
      "share": [
-      0.211,
-      0.211,
-      0.5123
+      0.2027,
+      0.2027,
+      0.4921
      ],
      "value": [
       38898973274.0,
@@ -2266,105 +2290,109 @@
   },
   "ethiopia": {
    "name": "Ethiopia",
-   "total_exports_usd": 2671787463.158,
-   "laws_touching": 9,
+   "total_exports_usd": 2764209737.138,
+   "laws_touching": 11,
    "markets": [
     {
      "key": "USA",
      "total": 1082541953.0,
-     "share": 0.4052
+     "share": 0.3916
     },
     {
      "key": "EU27",
      "total": 1065315269.3159999,
-     "share": 0.3987
+     "share": 0.3854
     },
     {
      "key": "KOR",
      "total": 171142149.0,
-     "share": 0.0641
+     "share": 0.0619
     },
     {
      "key": "JPN",
      "total": 125844705.54,
-     "share": 0.0471
+     "share": 0.0455
     },
     {
      "key": "GBR",
      "total": 98657552.46,
-     "share": 0.0369
+     "share": 0.0357
+    },
+    {
+     "key": "CHE",
+     "total": 76951178.46,
+     "share": 0.0278
     },
     {
      "key": "CAN",
      "total": 67654624.967,
-     "share": 0.0253
+     "share": 0.0245
     },
     {
      "key": "AUS",
      "total": 60631208.875,
-     "share": 0.0227
+     "share": 0.0219
     },
     {
      "key": "NOR",
-     "total": 0,
-     "share": 0.0
-    },
-    {
-     "key": "CHE",
-     "total": 0,
-     "share": 0.0
+     "total": 15471095.52,
+     "share": 0.0056
     }
    ],
-   "member_shares": {},
+   "member_shares": {
+    "DEU": 0.3301386637655301,
+    "FRA": 0.0,
+    "NLD": 0.2184610269656863
+   },
    "series": [
     {
      "year": 2024,
-     "union": 0.4754,
-     "border": 0.1771,
-     "diligence": 0.2392,
-     "disclosure": 0.059
+     "union": 0.4626,
+     "border": 0.1712,
+     "diligence": 0.2343,
+     "disclosure": 0.0571
     },
     {
      "year": 2025,
-     "union": 0.4754,
-     "border": 0.1771,
-     "diligence": 0.2392,
-     "disclosure": 0.1787
+     "union": 0.4626,
+     "border": 0.1712,
+     "diligence": 0.2343,
+     "disclosure": 0.1727
     },
     {
      "year": 2026,
-     "union": 0.4754,
-     "border": 0.2581,
-     "diligence": 0.2392,
-     "disclosure": 0.1787
+     "union": 0.4626,
+     "border": 0.2794,
+     "diligence": 0.2343,
+     "disclosure": 0.1727
     },
     {
      "year": 2027,
-     "union": 0.6349,
-     "border": 0.5759,
-     "diligence": 0.2394,
-     "disclosure": 0.2983
+     "union": 0.6167,
+     "border": 0.5566,
+     "diligence": 0.2345,
+     "disclosure": 0.2883
     },
     {
      "year": 2028,
-     "union": 0.6349,
-     "border": 0.5759,
-     "diligence": 0.2394,
-     "disclosure": 0.2983
+     "union": 0.6167,
+     "border": 0.5566,
+     "diligence": 0.2345,
+     "disclosure": 0.2883
     },
     {
      "year": 2029,
-     "union": 0.6349,
-     "border": 0.5759,
-     "diligence": 0.2394,
-     "disclosure": 0.2983
+     "union": 0.6167,
+     "border": 0.5566,
+     "diligence": 0.2345,
+     "disclosure": 0.2883
     },
     {
      "year": 2030,
-     "union": 0.6349,
-     "border": 0.5759,
-     "diligence": 0.2394,
-     "disclosure": 0.2983
+     "union": 0.6167,
+     "border": 0.5566,
+     "diligence": 0.2345,
+     "disclosure": 0.2883
     }
    ],
    "regimes_2030": {
@@ -2374,14 +2402,14 @@
      "market": "EU27",
      "first_date": "2026-12-30",
      "share": [
-      0.162,
-      0.162,
-      0.162
+      0.2163,
+      0.2163,
+      0.2163
      ],
      "value": [
-      432713758.0,
-      432713758.0,
-      432713758.0
+      597938898.0,
+      597938898.0,
+      597938898.0
      ],
      "assumption": null,
      "indicator": null
@@ -2392,9 +2420,9 @@
      "market": "EU27",
      "first_date": "2027-12-14",
      "share": [
-      0.3987,
-      0.3987,
-      0.3987
+      0.3854,
+      0.3854,
+      0.3854
      ],
      "value": [
       1065315269.0,
@@ -2410,14 +2438,14 @@
      "market": "EU27",
      "first_date": "2027-08-18",
      "share": [
-      0.0003,
-      0.0003,
-      0.0003
+      0.0004,
+      0.0004,
+      0.0004
      ],
      "value": [
-      815608.0,
-      815608.0,
-      815608.0
+      1127035.0,
+      1127035.0,
+      1127035.0
      ],
      "assumption": null,
      "indicator": null
@@ -2428,9 +2456,9 @@
      "market": "EU27",
      "first_date": "2029-07-26",
      "share": [
-      0.1396,
-      0.1794,
-      0.2193
+      0.1349,
+      0.1734,
+      0.212
      ],
      "value": [
       372860344.0,
@@ -2446,9 +2474,9 @@
      "market": "EU27",
      "first_date": "2025-01-01",
      "share": [
-      0.1994,
-      0.2392,
-      0.2791
+      0.1927,
+      0.2312,
+      0.2698
      ],
      "value": [
       532657635.0,
@@ -2464,14 +2492,14 @@
      "market": "DEU",
      "first_date": "2023-01-01",
      "share": [
-      0.0,
-      0.0,
-      0.0
+      0.0636,
+      0.0763,
+      0.0891
      ],
      "value": [
-      0.0,
-      0.0,
-      0.0
+      175850880.0,
+      211021056.0,
+      246191232.0
      ],
      "assumption": "A3",
      "indicator": "exposure to buyer diligence demand"
@@ -2518,14 +2546,14 @@
      "market": "NOR",
      "first_date": "2022-07-01",
      "share": [
-      0.0,
-      0.0,
-      0.0
+      0.0025,
+      0.0031,
+      0.0036
      ],
      "value": [
-      0.0,
-      0.0,
-      0.0
+      6961993.0,
+      8509103.0,
+      10056212.0
      ],
      "assumption": "A4",
      "indicator": "exposure to buyer diligence demand"
@@ -2536,9 +2564,9 @@
      "market": "GBR",
      "first_date": "2015-10-29",
      "share": [
-      0.024,
-      0.0277,
-      0.0314
+      0.0232,
+      0.0268,
+      0.0303
      ],
      "value": [
       64127409.0,
@@ -2554,9 +2582,9 @@
      "market": "CAN",
      "first_date": "2024-01-01",
      "share": [
-      0.0152,
-      0.0177,
-      0.0203
+      0.0147,
+      0.0171,
+      0.0196
      ],
      "value": [
       40592775.0,
@@ -2572,9 +2600,9 @@
      "market": "AUS",
      "first_date": "2019-01-01",
      "share": [
-      0.0113,
-      0.0136,
-      0.0159
+      0.011,
+      0.0132,
+      0.0154
      ],
      "value": [
       30315604.0,
@@ -2590,9 +2618,9 @@
      "market": "USA",
      "first_date": "2022-06-21",
      "share": [
-      0.1771,
-      0.1771,
-      0.4052
+      0.1712,
+      0.1712,
+      0.3916
      ],
      "value": [
       473267234.0,
@@ -2636,105 +2664,109 @@
   },
   "kenya": {
    "name": "Kenya",
-   "total_exports_usd": 3361694112.701,
-   "laws_touching": 9,
+   "total_exports_usd": 3537837139.737,
+   "laws_touching": 11,
    "markets": [
     {
      "key": "EU27",
      "total": 1658956707.578,
-     "share": 0.4935
+     "share": 0.4689
     },
     {
      "key": "USA",
      "total": 883668526.0,
-     "share": 0.2629
+     "share": 0.2498
     },
     {
      "key": "GBR",
      "total": 615597612.361,
-     "share": 0.1831
+     "share": 0.174
+    },
+    {
+     "key": "CHE",
+     "total": 97405169.651,
+     "share": 0.0275
+    },
+    {
+     "key": "NOR",
+     "total": 78737857.385,
+     "share": 0.0223
     },
     {
      "key": "JPN",
      "total": 59480739.701,
-     "share": 0.0177
+     "share": 0.0168
     },
     {
      "key": "CAN",
      "total": 58028456.575,
-     "share": 0.0173
+     "share": 0.0164
     },
     {
      "key": "AUS",
      "total": 44742614.486,
-     "share": 0.0133
+     "share": 0.0126
     },
     {
      "key": "KOR",
      "total": 41219456.0,
-     "share": 0.0123
-    },
-    {
-     "key": "NOR",
-     "total": 0,
-     "share": 0.0
-    },
-    {
-     "key": "CHE",
-     "total": 0,
-     "share": 0.0
+     "share": 0.0117
     }
    ],
-   "member_shares": {},
+   "member_shares": {
+    "DEU": 0.20627927544209904,
+    "FRA": 0.0,
+    "NLD": 0.45166243073812723
+   },
    "series": [
     {
      "year": 2024,
-     "union": 0.6393,
-     "border": 0.1858,
-     "diligence": 0.2961,
-     "disclosure": 0.1574
+     "union": 0.6197,
+     "border": 0.1765,
+     "diligence": 0.2936,
+     "disclosure": 0.1496
     },
     {
      "year": 2025,
-     "union": 0.6393,
-     "border": 0.1858,
-     "diligence": 0.2961,
-     "disclosure": 0.3055
+     "union": 0.6197,
+     "border": 0.1765,
+     "diligence": 0.2936,
+     "disclosure": 0.2902
     },
     {
      "year": 2026,
-     "union": 0.6393,
-     "border": 0.2275,
-     "diligence": 0.2961,
-     "disclosure": 0.3055
+     "union": 0.6197,
+     "border": 0.2301,
+     "diligence": 0.2936,
+     "disclosure": 0.2902
     },
     {
      "year": 2027,
-     "union": 0.8367,
-     "border": 0.6793,
-     "diligence": 0.2963,
-     "disclosure": 0.4535
+     "union": 0.8073,
+     "border": 0.6454,
+     "diligence": 0.2939,
+     "disclosure": 0.4309
     },
     {
      "year": 2028,
-     "union": 0.8367,
-     "border": 0.6793,
-     "diligence": 0.2963,
-     "disclosure": 0.4535
+     "union": 0.8073,
+     "border": 0.6454,
+     "diligence": 0.2939,
+     "disclosure": 0.4309
     },
     {
      "year": 2029,
-     "union": 0.8367,
-     "border": 0.6793,
-     "diligence": 0.2963,
-     "disclosure": 0.4535
+     "union": 0.8073,
+     "border": 0.6454,
+     "diligence": 0.2939,
+     "disclosure": 0.4309
     },
     {
      "year": 2030,
-     "union": 0.8367,
-     "border": 0.6793,
-     "diligence": 0.2963,
-     "disclosure": 0.4535
+     "union": 0.8073,
+     "border": 0.6454,
+     "diligence": 0.2939,
+     "disclosure": 0.4309
     }
    ],
    "regimes_2030": {
@@ -2744,14 +2776,14 @@
      "market": "EU27",
      "first_date": "2026-12-30",
      "share": [
-      0.0835,
-      0.0835,
-      0.0835
+      0.1072,
+      0.1072,
+      0.1072
      ],
      "value": [
-      280801599.0,
-      280801599.0,
-      280801599.0
+      379287341.0,
+      379287341.0,
+      379287341.0
      ],
      "assumption": null,
      "indicator": null
@@ -2762,9 +2794,9 @@
      "market": "EU27",
      "first_date": "2027-12-14",
      "share": [
-      0.4935,
-      0.4935,
-      0.4935
+      0.4689,
+      0.4689,
+      0.4689
      ],
      "value": [
       1658956708.0,
@@ -2780,14 +2812,14 @@
      "market": "EU27",
      "first_date": "2027-08-18",
      "share": [
-      0.0005,
-      0.0005,
-      0.0005
+      0.0007,
+      0.0007,
+      0.0007
      ],
      "value": [
-      1806110.0,
-      1806110.0,
-      1806110.0
+      2439569.0,
+      2439569.0,
+      2439569.0
      ],
      "assumption": null,
      "indicator": null
@@ -2798,9 +2830,9 @@
      "market": "EU27",
      "first_date": "2029-07-26",
      "share": [
-      0.1727,
-      0.2221,
-      0.2714
+      0.1641,
+      0.211,
+      0.2579
      ],
      "value": [
       580634848.0,
@@ -2816,9 +2848,9 @@
      "market": "EU27",
      "first_date": "2025-01-01",
      "share": [
-      0.2467,
-      0.2961,
-      0.3454
+      0.2345,
+      0.2814,
+      0.3282
      ],
      "value": [
       829478354.0,
@@ -2834,14 +2866,14 @@
      "market": "DEU",
      "first_date": "2023-01-01",
      "share": [
-      0.0,
-      0.0,
-      0.0
+      0.0484,
+      0.058,
+      0.0677
      ],
      "value": [
-      0.0,
-      0.0,
-      0.0
+      171104194.0,
+      205325033.0,
+      239545871.0
      ],
      "assumption": "A3",
      "indicator": "exposure to buyer diligence demand"
@@ -2888,14 +2920,14 @@
      "market": "NOR",
      "first_date": "2022-07-01",
      "share": [
-      0.0,
-      0.0,
-      0.0
+      0.01,
+      0.0122,
+      0.0145
      ],
      "value": [
-      0.0,
-      0.0,
-      0.0
+      35432036.0,
+      43305822.0,
+      51179607.0
      ],
      "assumption": "A4",
      "indicator": "exposure to buyer diligence demand"
@@ -2906,9 +2938,9 @@
      "market": "GBR",
      "first_date": "2015-10-29",
      "share": [
-      0.119,
-      0.1373,
-      0.1557
+      0.1131,
+      0.1305,
+      0.1479
      ],
      "value": [
       400138448.0,
@@ -2924,9 +2956,9 @@
      "market": "CAN",
      "first_date": "2024-01-01",
      "share": [
-      0.0104,
-      0.0121,
-      0.0138
+      0.0098,
+      0.0115,
+      0.0131
      ],
      "value": [
       34817074.0,
@@ -2942,9 +2974,9 @@
      "market": "AUS",
      "first_date": "2019-01-01",
      "share": [
-      0.0067,
-      0.008,
-      0.0093
+      0.0063,
+      0.0076,
+      0.0089
      ],
      "value": [
       22371307.0,
@@ -2960,9 +2992,9 @@
      "market": "USA",
      "first_date": "2022-06-21",
      "share": [
-      0.1858,
-      0.1858,
-      0.2629
+      0.1765,
+      0.1765,
+      0.2498
      ],
      "value": [
       624513194.0,
@@ -3006,105 +3038,109 @@
   },
   "ghana": {
    "name": "Ghana",
-   "total_exports_usd": 5707939308.561,
-   "laws_touching": 9,
+   "total_exports_usd": 10468812264.798,
+   "laws_touching": 11,
    "markets": [
+    {
+     "key": "CHE",
+     "total": 4749305811.724,
+     "share": 0.4537
+    },
     {
      "key": "EU27",
      "total": 3235017538.645,
-     "share": 0.5668
+     "share": 0.309
     },
     {
      "key": "USA",
      "total": 1257606769.0,
-     "share": 0.2203
+     "share": 0.1201
     },
     {
      "key": "JPN",
      "total": 497049538.436,
-     "share": 0.0871
+     "share": 0.0475
     },
     {
      "key": "GBR",
      "total": 366001113.336,
-     "share": 0.0641
+     "share": 0.035
     },
     {
      "key": "CAN",
      "total": 235811497.594,
-     "share": 0.0413
+     "share": 0.0225
     },
     {
      "key": "KOR",
      "total": 104627389.0,
-     "share": 0.0183
+     "share": 0.01
     },
     {
      "key": "AUS",
      "total": 11825462.55,
-     "share": 0.0021
+     "share": 0.0011
     },
     {
      "key": "NOR",
-     "total": 0,
-     "share": 0.0
-    },
-    {
-     "key": "CHE",
-     "total": 0,
-     "share": 0.0
+     "total": 11567144.513,
+     "share": 0.0011
     }
    ],
-   "member_shares": {},
+   "member_shares": {
+    "DEU": 0.10588074685909381,
+    "FRA": 0.0,
+    "NLD": 0.4460309650303695
+   },
    "series": [
     {
      "year": 2024,
-     "union": 0.4315,
-     "border": 0.0132,
-     "diligence": 0.3401,
-     "disclosure": 0.0783
+     "union": 0.2359,
+     "border": 0.0072,
+     "diligence": 0.186,
+     "disclosure": 0.0427
     },
     {
      "year": 2025,
-     "union": 0.4315,
-     "border": 0.0132,
-     "diligence": 0.3401,
-     "disclosure": 0.2483
+     "union": 0.2359,
+     "border": 0.0072,
+     "diligence": 0.186,
+     "disclosure": 0.1354
     },
     {
      "year": 2026,
-     "union": 0.4315,
-     "border": 0.164,
-     "diligence": 0.3401,
-     "disclosure": 0.2483
+     "union": 0.2359,
+     "border": 0.1266,
+     "diligence": 0.186,
+     "disclosure": 0.1354
     },
     {
      "year": 2027,
-     "union": 0.6582,
-     "border": 0.58,
-     "diligence": 0.3401,
-     "disclosure": 0.4183
+     "union": 0.3595,
+     "border": 0.3162,
+     "diligence": 0.1861,
+     "disclosure": 0.2281
     },
     {
      "year": 2028,
-     "union": 0.6582,
-     "border": 0.58,
-     "diligence": 0.3401,
-     "disclosure": 0.4183
+     "union": 0.3595,
+     "border": 0.3162,
+     "diligence": 0.1861,
+     "disclosure": 0.2281
     },
     {
      "year": 2029,
-     "union": 0.6582,
-     "border": 0.58,
-     "diligence": 0.3401,
-     "disclosure": 0.4183
+     "union": 0.3595,
+     "border": 0.3162,
+     "diligence": 0.1861,
+     "disclosure": 0.2281
     },
     {
      "year": 2030,
-     "union": 0.6582,
-     "border": 0.58,
-     "diligence": 0.3401,
-     "disclosure": 0.4183
+     "union": 0.3595,
+     "border": 0.3162,
+     "diligence": 0.1861,
+     "disclosure": 0.2281
     }
    ],
    "regimes_2030": {
@@ -3114,14 +3150,14 @@
      "market": "EU27",
      "first_date": "2026-12-30",
      "share": [
-      0.3015,
-      0.3015,
-      0.3015
+      0.2387,
+      0.2387,
+      0.2387
      ],
      "value": [
-      1721042756.0,
-      1721042756.0,
-      1721042756.0
+      2499104880.0,
+      2499104880.0,
+      2499104880.0
      ],
      "assumption": null,
      "indicator": null
@@ -3132,9 +3168,9 @@
      "market": "EU27",
      "first_date": "2027-12-14",
      "share": [
-      0.5668,
-      0.5668,
-      0.5668
+      0.309,
+      0.309,
+      0.309
      ],
      "value": [
       3235017539.0,
@@ -3155,9 +3191,9 @@
       0.0001
      ],
      "value": [
-      834224.0,
-      834224.0,
-      834224.0
+      1211366.0,
+      1211366.0,
+      1211366.0
      ],
      "assumption": null,
      "indicator": null
@@ -3168,9 +3204,9 @@
      "market": "EU27",
      "first_date": "2029-07-26",
      "share": [
-      0.1984,
-      0.255,
-      0.3117
+      0.1082,
+      0.1391,
+      0.17
      ],
      "value": [
       1132256139.0,
@@ -3186,9 +3222,9 @@
      "market": "EU27",
      "first_date": "2025-01-01",
      "share": [
-      0.2834,
-      0.3401,
-      0.3967
+      0.1545,
+      0.1854,
+      0.2163
      ],
      "value": [
       1617508769.0,
@@ -3204,14 +3240,14 @@
      "market": "DEU",
      "first_date": "2023-01-01",
      "share": [
-      0.0,
-      0.0,
-      0.0
+      0.0164,
+      0.0196,
+      0.0229
      ],
      "value": [
-      0.0,
-      0.0,
-      0.0
+      171263037.0,
+      205515644.0,
+      239768251.0
      ],
      "assumption": "A3",
      "indicator": "exposure to buyer diligence demand"
@@ -3258,14 +3294,14 @@
      "market": "NOR",
      "first_date": "2022-07-01",
      "share": [
-      0.0,
-      0.0,
-      0.0
+      0.0005,
+      0.0006,
+      0.0007
      ],
      "value": [
-      0.0,
-      0.0,
-      0.0
+      5205215.0,
+      6361929.0,
+      7518644.0
      ],
      "assumption": "A4",
      "indicator": "exposure to buyer diligence demand"
@@ -3276,9 +3312,9 @@
      "market": "GBR",
      "first_date": "2015-10-29",
      "share": [
-      0.0417,
-      0.0481,
-      0.0545
+      0.0227,
+      0.0262,
+      0.0297
      ],
      "value": [
       237900724.0,
@@ -3294,9 +3330,9 @@
      "market": "CAN",
      "first_date": "2024-01-01",
      "share": [
-      0.0248,
-      0.0289,
-      0.0331
+      0.0135,
+      0.0158,
+      0.018
      ],
      "value": [
       141486899.0,
@@ -3312,9 +3348,9 @@
      "market": "AUS",
      "first_date": "2019-01-01",
      "share": [
-      0.001,
-      0.0012,
-      0.0015
+      0.0006,
+      0.0007,
+      0.0008
      ],
      "value": [
       5912731.0,
@@ -3330,9 +3366,9 @@
      "market": "USA",
      "first_date": "2022-06-21",
      "share": [
-      0.0132,
-      0.0132,
-      0.2203
+      0.0072,
+      0.0072,
+      0.1201
      ],
      "value": [
       75516151.0,
@@ -3376,105 +3412,109 @@
   },
   "cote-divoire": {
    "name": "Cote Divoire",
-   "total_exports_usd": 12978612085.857,
-   "laws_touching": 9,
+   "total_exports_usd": 17285439549.002,
+   "laws_touching": 11,
    "markets": [
     {
      "key": "EU27",
      "total": 8943576618.937,
-     "share": 0.6891
+     "share": 0.5174
+    },
+    {
+     "key": "CHE",
+     "total": 4303136078.205,
+     "share": 0.2489
     },
     {
      "key": "USA",
      "total": 1967321411.0,
-     "share": 0.1516
+     "share": 0.1138
     },
     {
      "key": "GBR",
      "total": 932168236.819,
-     "share": 0.0718
+     "share": 0.0539
     },
     {
      "key": "CAN",
      "total": 759955684.648,
-     "share": 0.0586
+     "share": 0.044
     },
     {
      "key": "KOR",
      "total": 181125521.0,
-     "share": 0.014
+     "share": 0.0105
     },
     {
      "key": "JPN",
      "total": 156371184.562,
-     "share": 0.012
+     "share": 0.009
     },
     {
      "key": "AUS",
      "total": 38093428.891,
-     "share": 0.0029
+     "share": 0.0022
     },
     {
      "key": "NOR",
-     "total": 0,
-     "share": 0.0
-    },
-    {
-     "key": "CHE",
-     "total": 0,
-     "share": 0.0
+     "total": 3691384.94,
+     "share": 0.0002
     }
    ],
-   "member_shares": {},
+   "member_shares": {
+    "DEU": 0.15995575498664794,
+    "FRA": 0.0,
+    "NLD": 0.40931908361401237
+   },
    "series": [
     {
      "year": 2024,
-     "union": 0.5103,
+     "union": 0.3833,
      "border": 0.0002,
-     "diligence": 0.4135,
-     "disclosure": 0.0966
+     "diligence": 0.3106,
+     "disclosure": 0.0725
     },
     {
      "year": 2025,
-     "union": 0.5103,
+     "union": 0.3833,
      "border": 0.0002,
-     "diligence": 0.4135,
-     "disclosure": 0.3033
+     "diligence": 0.3106,
+     "disclosure": 0.2278
     },
     {
      "year": 2026,
-     "union": 0.5103,
-     "border": 0.1931,
-     "diligence": 0.4135,
-     "disclosure": 0.3033
+     "union": 0.3833,
+     "border": 0.2275,
+     "diligence": 0.3106,
+     "disclosure": 0.2278
     },
     {
      "year": 2027,
-     "union": 0.7859,
-     "border": 0.6893,
-     "diligence": 0.4135,
-     "disclosure": 0.5101
+     "union": 0.5902,
+     "border": 0.5176,
+     "diligence": 0.3106,
+     "disclosure": 0.383
     },
     {
      "year": 2028,
-     "union": 0.7859,
-     "border": 0.6893,
-     "diligence": 0.4135,
-     "disclosure": 0.5101
+     "union": 0.5902,
+     "border": 0.5176,
+     "diligence": 0.3106,
+     "disclosure": 0.383
     },
     {
      "year": 2029,
-     "union": 0.7859,
-     "border": 0.6893,
-     "diligence": 0.4135,
-     "disclosure": 0.5101
+     "union": 0.5902,
+     "border": 0.5176,
+     "diligence": 0.3106,
+     "disclosure": 0.383
     },
     {
      "year": 2030,
-     "union": 0.7859,
-     "border": 0.6893,
-     "diligence": 0.4135,
-     "disclosure": 0.5101
+     "union": 0.5902,
+     "border": 0.5176,
+     "diligence": 0.3106,
+     "disclosure": 0.383
     }
    ],
    "regimes_2030": {
@@ -3484,14 +3524,14 @@
      "market": "EU27",
      "first_date": "2026-12-30",
      "share": [
-      0.3858,
-      0.3858,
-      0.3858
+      0.4546,
+      0.4546,
+      0.4546
      ],
      "value": [
-      5007364142.0,
-      5007364142.0,
-      5007364142.0
+      7858788116.0,
+      7858788116.0,
+      7858788116.0
      ],
      "assumption": null,
      "indicator": null
@@ -3502,9 +3542,9 @@
      "market": "EU27",
      "first_date": "2027-12-14",
      "share": [
-      0.6891,
-      0.6891,
-      0.6891
+      0.5174,
+      0.5174,
+      0.5174
      ],
      "value": [
       8943576619.0,
@@ -3525,9 +3565,9 @@
       0.0
      ],
      "value": [
-      406207.0,
-      406207.0,
-      406207.0
+      637520.0,
+      637520.0,
+      637520.0
      ],
      "assumption": null,
      "indicator": null
@@ -3538,9 +3578,9 @@
      "market": "EU27",
      "first_date": "2029-07-26",
      "share": [
-      0.2412,
-      0.3101,
-      0.379
+      0.1811,
+      0.2328,
+      0.2846
      ],
      "value": [
       3130251817.0,
@@ -3556,9 +3596,9 @@
      "market": "EU27",
      "first_date": "2025-01-01",
      "share": [
-      0.3446,
-      0.4135,
-      0.4824
+      0.2587,
+      0.3104,
+      0.3622
      ],
      "value": [
       4471788309.0,
@@ -3574,14 +3614,14 @@
      "market": "DEU",
      "first_date": "2023-01-01",
      "share": [
-      0.0,
-      0.0,
-      0.0
+      0.0414,
+      0.0497,
+      0.0579
      ],
      "value": [
-      0.0,
-      0.0,
-      0.0
+      715288275.0,
+      858345930.0,
+      1001403585.0
      ],
      "assumption": "A3",
      "indicator": "exposure to buyer diligence demand"
@@ -3628,14 +3668,14 @@
      "market": "NOR",
      "first_date": "2022-07-01",
      "share": [
-      0.0,
-      0.0,
-      0.0
+      0.0001,
+      0.0001,
+      0.0001
      ],
      "value": [
-      0.0,
-      0.0,
-      0.0
+      1661123.0,
+      2030262.0,
+      2399400.0
      ],
      "assumption": "A4",
      "indicator": "exposure to buyer diligence demand"
@@ -3646,9 +3686,9 @@
      "market": "GBR",
      "first_date": "2015-10-29",
      "share": [
-      0.0467,
-      0.0539,
-      0.061
+      0.0351,
+      0.0404,
+      0.0458
      ],
      "value": [
       605909354.0,
@@ -3664,9 +3704,9 @@
      "market": "CAN",
      "first_date": "2024-01-01",
      "share": [
-      0.0351,
-      0.041,
-      0.0468
+      0.0264,
+      0.0308,
+      0.0352
      ],
      "value": [
       455973411.0,
@@ -3682,9 +3722,9 @@
      "market": "AUS",
      "first_date": "2019-01-01",
      "share": [
-      0.0015,
-      0.0018,
-      0.0021
+      0.0011,
+      0.0013,
+      0.0015
      ],
      "value": [
       19046714.0,
@@ -3702,7 +3742,7 @@
      "share": [
       0.0002,
       0.0002,
-      0.1516
+      0.1138
      ],
      "value": [
       2825141.0,
