@@ -226,27 +226,38 @@ def _rows_by_origin(data):
             out.setdefault(slug, []).append(row)
     return out
 
+# The latest year must be complete for the markets that actually move the
+# figures, not merely for the USA. Trade data lags unevenly: in mid-year the
+# USA has often filed the previous year while large EU importers like France
+# have not, and probing only the USA then picks that year and silently drops
+# France (and any other late filer) from the EU total, zeroing its member-state
+# regime too. So the probe requires every non-EU market plus the six largest EU
+# importers to be present before accepting a year; tiny members filing late are
+# tolerated, since together they move the EU total by under two percent.
+MAJOR_REPORTERS = list(MARKET_M49.values()) + ["276", "251", "528", "380", "724", "56"]
+
 def latest_available_year(key):
-    """Find the most recent year with mirror data, probing with the USA as
-    reporter and all ten origins as partners in one call. Availability depends
-    on the reporting destination markets, not the origins, since every figure
-    in this pipeline is destination-reported, so a single common year is
-    correct as well as cheaper than the old per-origin probing.
+    """Return the most recent year for which every major reporter has filed.
 
     Note that reporterCode=0 does NOT work as an all-reporters wildcard on
     this endpoint, even though partnerCode=0 does work as an all-partners
     wildcard. An earlier version assumed the symmetry held and silently
     returned zero rows for every origin country."""
+    probe = ",".join(MAJOR_REPORTERS)
+    need = {str(int(c)) for c in MAJOR_REPORTERS}
     this_year = date.today().year
     for y in range(this_year - 1, this_year - 5, -1):
         data = comtrade_get({
-            "reporterCode": MARKET_M49["USA"], "period": str(y),
-            "partnerCode": ALL_ORIGINS, "cmdCode": "TOTAL", "flowCode": "M",
-            "breakdownMode": "classic", "maxRecords": MAX_RECORDS,
+            "reporterCode": probe, "period": str(y),
+            "partnerCode": ORIGIN_M49["india"], "cmdCode": "TOTAL",
+            "flowCode": "M", "breakdownMode": "classic", "maxRecords": MAX_RECORDS,
         }, key)
-        if data.get("data"):
+        got = {str(r.get("reporterCode")) for r in (data.get("data") or [])}
+        missing = need - got
+        if not missing:
             return y
-    raise SystemExit("No mirror data found for any tracked origin in the last 4 years")
+        print(f"year {y} incomplete, missing reporters {sorted(missing)}, trying earlier")
+    raise SystemExit("No year in the last 4 with all major reporters present")
 
 def fetch_all_flows(key, year):
     """Build every country's flows entry using mirror statistics throughout:
@@ -271,16 +282,22 @@ def fetch_all_flows(key, year):
             markets_by_origin[slug][mkey] = {
                 "total": sum(float(r["primaryValue"]) for r in rows)}
 
-    # USA by_hs4: needed because UFLPA scope is chapter-level within the US market
-    per = _rows_by_origin(get(MARKET_M49["USA"], ALL_CHAPTERS))
-    for slug, rows in per.items():
-        by = {}
-        for row in rows:
-            code = str(row.get("cmdCode", "")).zfill(2)
-            if code in CHAPTERS:
-                by[code + "00"] = by.get(code + "00", 0.0) + float(row["primaryValue"])
-        if by:
-            markets_by_origin[slug]["USA"]["by_hs4"] = by
+    # Chapter breakdowns for the markets that carry a product- or priority-scoped
+    # regime and report their own chapters directly: the USA (UFLPA) and
+    # Switzerland (its due-diligence ordinance, scoped to minerals and gold,
+    # chapters 26/28/71). Without Switzerland's chapters the ordinance had no
+    # cells to match and computed to zero despite being in force. The EU is
+    # handled separately below via its member proxy.
+    for chap_market in ("USA", "CHE"):
+        per = _rows_by_origin(get(MARKET_M49[chap_market], ALL_CHAPTERS))
+        for slug, rows in per.items():
+            by = {}
+            for row in rows:
+                code = str(row.get("cmdCode", "")).zfill(2)
+                if code in CHAPTERS:
+                    by[code + "00"] = by.get(code + "00", 0.0) + float(row["primaryValue"])
+            if by:
+                markets_by_origin[slug][chap_market]["by_hs4"] = by
 
     # EU27: sum each member's own reported imports from each origin country.
     # The four proxy members' own totals are captured in the same loop, since
