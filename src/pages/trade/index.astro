@@ -106,12 +106,11 @@ function sectorsOf(slug){
         <p class="takeaway reveal">By 2030, {pct(end.union)} of {c.name}'s exports to these tracked markets fall in scope of at least one law.</p>
 
         <div class="stats" style="margin-top:34px">
-          <div class="stat"><b>{usd(c.total_exports_usd)}</b><span>Total exports per year</span></div>
+          <div class="stat" title="The nine markets are the EU, US, UK, Canada, Australia, Japan, South Korea, Norway and Switzerland. This is not this country's total exports to the world."><b>{usd(c.total_exports_usd)}</b><span>Total exports per year to markets where these laws are active</span></div>
           <div class="stat"><b>{c.laws_touching}<span style="font-size:.5em; color:var(--ink-faint)"> / 18</span></b><span>Laws touch its trade</span></div>
           <div class="stat"><b>{pct(end.union)}</b><span>Of export value in scope of at least one law by 2030</span></div>
           <div class="stat"><b>{pct(end.border)}</b><span>Stoppable at a border by 2030</span></div>
         </div>
-        <p class="scope-note mono">Figures cover only the nine markets where tracked HREDD laws apply: the EU, US, UK, Canada, Australia, Japan, South Korea, Norway and Switzerland. This is not {c.name}'s total exports to the world.</p>
 
         <div class="destbar-wrap">
           <div class="destbar" role="img" aria-label="Share of exports by destination market">
@@ -247,9 +246,6 @@ function sectorsOf(slug){
 
   .takeaway{ font:400 clamp(20px,2.2vw,26px)/1.5 var(--serif); color:var(--ink);
     max-width:56ch; margin:38px 0 0; }
-
-  .scope-note{ margin:14px 0 0; font-size:11px; letter-spacing:.06em; line-height:1.7;
-    color:var(--ink-dim); text-transform:none; max-width:62ch; }
 
   .class-legend{ margin-top:44px; padding:16px 18px; border:1px solid var(--line-soft);
     background:var(--bg-raise); }
