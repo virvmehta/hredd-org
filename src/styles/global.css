@@ -176,20 +176,31 @@ p{ text-wrap:pretty; }
 @media (max-width:720px){ .stats{ grid-auto-flow:row; grid-template-columns:1fr 1fr; } }
 
 /* --------------------------------------------------------------
-   start-here steps (homepage journey)
+   start-here steps (homepage journey) — vertical stack of thin buttons
 -------------------------------------------------------------- */
-.steps{ display:grid; grid-template-columns:repeat(4,1fr); gap:1px;
-  background:var(--line); border:1px solid var(--line); counter-reset:step; }
-.step{ background:var(--bg); padding:30px 28px 26px; display:flex; flex-direction:column;
-  gap:12px; position:relative; transition:background .35s; counter-increment:step; }
-.step:hover{ background:var(--panel); }
-.step::before{ content:counter(step,decimal-leading-zero); font-family:var(--mono);
-  font-weight:500; font-size:12px; letter-spacing:.16em; color:var(--gold); }
-.step h3{ font:400 22px/1.25 var(--serif); margin:0; letter-spacing:-.005em; }
-.step p{ margin:0; font-size:15px; line-height:1.6; color:var(--ink-dim); flex:1; }
-.step .textlink{ font-size:10.5px; }
-@media (max-width:980px){ .steps{ grid-template-columns:1fr 1fr; } }
-@media (max-width:560px){ .steps{ grid-template-columns:1fr; } }
+.steps{ display:flex; flex-direction:column; gap:10px; }
+.step{ display:grid; grid-template-columns:auto minmax(0,1fr) auto; align-items:center;
+  gap:22px; padding:18px 24px; border:1px solid var(--line); background:var(--bg);
+  position:relative; overflow:hidden; transition:border-color .3s, background .3s; }
+.step::before{ content:""; position:absolute; left:0; top:0; bottom:0; width:2px;
+  background:var(--gold); transform:scaleY(0); transform-origin:top;
+  transition:transform .35s cubic-bezier(.16,1,.3,1); }
+.step:hover{ border-color:var(--gold-dim); background:var(--panel); }
+.step:hover::before{ transform:scaleY(1); }
+.step-n{ font-size:12px; letter-spacing:.16em; color:var(--gold); }
+.step-body{ display:flex; align-items:baseline; gap:16px; min-width:0; flex-wrap:wrap; }
+.step-body b{ font:400 19px/1.25 var(--serif); color:var(--ink); font-weight:400;
+  letter-spacing:-.005em; white-space:nowrap; }
+.step-text{ font-size:14px; line-height:1.5; color:var(--ink-dim); }
+.step-arrow{ font-style:normal; color:var(--gold); font-size:16px; justify-self:end;
+  transition:transform .3s; }
+.step:hover .step-arrow{ transform:translateX(4px); }
+@media (max-width:640px){
+  .step{ grid-template-columns:auto 1fr; gap:16px; padding:16px 18px; }
+  .step-arrow{ display:none; }
+  .step-body{ flex-direction:column; gap:5px; }
+  .step-body b{ white-space:normal; }
+}
 
 /* --------------------------------------------------------------
    statement band (plain editorial position, no quotation costume)
@@ -401,6 +412,23 @@ p{ text-wrap:pretty; }
 /* --------------------------------------------------------------
    search
 -------------------------------------------------------------- */
+/* language switcher */
+.lang-switch{ font-family:var(--mono); font-weight:500; font-size:11px; letter-spacing:.11em;
+  color:var(--gold); border:1px solid var(--gold-dim); padding:6px 11px; margin-left:8px;
+  transition:all .25s; white-space:nowrap; }
+.lang-switch:hover{ background:var(--gold-ghost); color:var(--gold-hi); }
+.lang-switch.mobile{ display:block; margin:0; border:0; border-bottom:1px solid var(--line-soft);
+  padding:15px clamp(20px,4vw,48px); }
+
+/* Bengali script needs a font with Bengali glyph coverage; the Latin display
+   fonts don't have it. Applied only under the bn locale. */
+:root[lang="bn"] body, [lang="bn"]{ font-family:"Noto Serif Bengali", "Newsreader", Georgia, serif; }
+[lang="bn"] .mono, [lang="bn"] .kicker, [lang="bn"] .btn, [lang="bn"] .mast-nav a,
+[lang="bn"] .step .textlink, [lang="bn"] .foot-col h4, [lang="bn"] .foot-col a{
+  font-family:"Noto Sans Bengali", "Space Grotesk", sans-serif; }
+[lang="bn"] .display, [lang="bn"] .h2, [lang="bn"] .standfirst, [lang="bn"] .step h3,
+[lang="bn"] .statement-band p{ font-family:"Noto Serif Bengali", "Newsreader", Georgia, serif; }
+
 .search-toggle{ font-family:var(--serif); font-size:20px; line-height:1; background:none;
   border:1px solid var(--line); color:var(--ink-dim); width:38px; height:38px;
   cursor:pointer; transition:all .25s; margin-left:8px; }

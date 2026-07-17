@@ -1,0 +1,183 @@
+---
+// Locale-aware homepage body, shared by the English (/) and Bangla (/bn/)
+// pages so there is one source of truth. Only chrome and framing prose are
+// translated; law names, article titles, dates and changelog text come from
+// data and stay in their original language until human-translated.
+import { getAllLaws, getAllArticles, formatDate, formatMonthYear } from '../lib/sanity.js';
+import { buildMovements, trackedGeoIds } from '../lib/redesignData.js';
+import { t } from '../lib/i18n.js';
+
+const { locale = 'en' } = Astro.props;
+
+const laws = await getAllLaws();
+const articles = await getAllArticles();
+const lead = articles.find((a) => a.featured) || articles[0];
+const movements = buildMovements(laws, 3);
+const latestMonth = movements[0]?.date || formatMonthYear();
+const geoIds = trackedGeoIds(laws);
+
+const steps = [
+  { href: '/tracker/', title: t(locale, 'home.step1.title'), text: t(locale, 'home.step1.text') },
+  { href: '/buyer-mapping/', title: t(locale, 'home.step2.title'), text: t(locale, 'home.step2.text') },
+  { href: '/report/', title: t(locale, 'home.step3.title'), text: t(locale, 'home.step3.text') },
+  { href: '/trade/', title: t(locale, 'home.step4.title'), text: t(locale, 'home.step4.text') },
+];
+---
+<section class="hero">
+  <div class="wrap">
+    <div>
+      <p class="kicker reveal">{t(locale, 'home.kicker')}</p>
+      <h1 class="display reveal" data-delay="1" set:html={t(locale, 'home.h1')}></h1>
+      <p class="standfirst reveal" data-delay="2">{t(locale, 'home.standfirst')}</p>
+      <div class="hero-ctas reveal" data-delay="3">
+        <a class="btn solid" href="/report/"><span>{t(locale, 'home.cta.report')}</span> <i>→</i></a>
+        <a class="btn" href="/tracker/"><span>{t(locale, 'home.cta.tracker')}</span></a>
+      </div>
+    </div>
+    <div class="hero-globe reveal" data-delay="2">
+      <canvas id="globe" width="1120" height="1120" aria-label="Rotating globe highlighting jurisdictions with HREDD laws"></canvas>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div>
+        <p class="kicker">{t(locale, 'home.start.kicker')}</p>
+        <h2 class="h2" set:html={t(locale, 'home.start.h2')}></h2>
+      </div>
+    </div>
+    <div class="steps reveal" data-delay="1">
+      {steps.map((s, i) => (
+        <a class="step" href={s.href}>
+          <span class="step-n mono">{String(i + 1).padStart(2, '0')}</span>
+          <span class="step-body"><b>{s.title}</b><span class="step-text">{s.text}</span></span>
+          <i class="step-arrow">→</i>
+        </a>
+      ))}
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-top:0">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div>
+        <p class="kicker">{t(locale, 'home.changelog.kicker')}</p>
+        <h2 class="h2" set:html={t(locale, 'home.changelog.h2')}></h2>
+      </div>
+      <div class="section-head-links">
+        <a class="textlink" href="/tracker/#movements">{t(locale, 'home.changelog.full')} <i>→</i></a>
+        <span class="mono faint">{t(locale, 'home.changelog.updated')} {latestMonth}</span>
+      </div>
+    </div>
+    <div class="law-rows reveal" data-delay="1">
+      {movements.map((m) => (
+        <a class="law-row" href={`/laws/${m.slug}/`}>
+          <div><h3>{m.tag}</h3><p class="sub">{(m.latest || '').split(';')[0]}</p></div>
+          <span class="jur">{m.date}</span>
+        </a>
+      ))}
+    </div>
+  </div>
+</section>
+
+{lead && (
+  <section class="section" style="padding-top:0">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div>
+          <p class="kicker">{t(locale, 'home.articles.kicker')}</p>
+          <h2 class="h2" set:html={t(locale, 'home.articles.h2')}></h2>
+        </div>
+        <a class="textlink" href="/articles/">{t(locale, 'home.articles.all')} <i>→</i></a>
+      </div>
+      <div class="feature reveal" data-delay="1">
+        <div>
+          <span class="chip">{lead.category || 'Analysis'}</span>
+          <h3><a href={`/articles/${lead.slug}/`}>{lead.title}</a></h3>
+          <p class="standfirst">{lead.excerpt || lead.deck}</p>
+          <p class="byline"><b>{lead.authorName}</b> · {formatDate(lead.publishedAt)}{lead.readTime ? ` · ${lead.readTime}` : ''}</p>
+        </div>
+        {lead.deck && (
+          <div>
+            <p class="standfirst" style="font-style:italic; border-left:1px solid var(--gold-dim); padding-left:26px;">{lead.deck}</p>
+          </div>
+        )}
+      </div>
+    </div>
+  </section>
+)}
+
+<section class="statement-band">
+  <div class="wrap">
+    <p class="reveal" set:html={t(locale, 'home.statement')}></p>
+  </div>
+</section>
+
+<section class="section sub-band">
+  <div class="wrap">
+    <p class="kicker reveal" style="justify-content:center">{t(locale, 'home.sub.kicker')}</p>
+    <h2 class="h2 reveal" data-delay="1" set:html={t(locale, 'home.sub.h2')}></h2>
+    <p class="standfirst reveal" data-delay="2" style="margin:20px auto 0">{t(locale, 'home.sub.blurb')}</p>
+    <form class="sub-form reveal" data-delay="3" action="https://buttondown.com/api/emails/embed-subscribe/hredd" method="post" target="_blank">
+      <input type="email" name="email" placeholder="you@example.org" required aria-label="Email address" />
+      <button class="btn solid" type="submit"><span>{t(locale, 'home.sub.button')}</span></button>
+    </form>
+    <p class="form-note reveal" data-delay="3">{t(locale, 'home.sub.note')}</p>
+  </div>
+</section>
+
+<script type="application/json" id="globe-data" set:html={JSON.stringify(geoIds)}></script>
+<script>
+  import { geoOrthographic, geoPath, geoGraticule10 } from 'd3-geo';
+  import { feature } from 'topojson-client';
+  import world from 'world-atlas/countries-110m.json';
+
+  const canvas = document.getElementById('globe');
+  const dataEl = document.getElementById('globe-data');
+  if (canvas instanceof HTMLCanvasElement && dataEl) {
+    const tracked = new Set(JSON.parse(dataEl.textContent || '[]'));
+    const ctx = canvas.getContext('2d');
+    const size = canvas.width;
+    const R = size / 2 - 10;
+    const projection = geoOrthographic().translate([size / 2, size / 2]).scale(R).clipAngle(90);
+    const path = geoPath(projection, ctx);
+    const graticule = geoGraticule10();
+    const countries = feature(world, world.objects.countries).features;
+    const sphere = { type: 'Sphere' };
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let t = 0;
+    let running = false;
+
+    function frame() {
+      projection.rotate([-20 + t * 4, -12]);
+      ctx.clearRect(0, 0, size, size);
+      const g = ctx.createRadialGradient(size / 2, size / 2, R * 0.5, size / 2, size / 2, R * 1.05);
+      g.addColorStop(0, 'rgba(201,163,95,0)');
+      g.addColorStop(1, 'rgba(201,163,95,.10)');
+      ctx.beginPath(); path(sphere); ctx.fillStyle = g; ctx.fill();
+      ctx.beginPath(); path(sphere); ctx.strokeStyle = 'rgba(201,163,95,.35)'; ctx.lineWidth = 1; ctx.stroke();
+      ctx.beginPath(); path(graticule); ctx.strokeStyle = 'rgba(234,228,213,.06)'; ctx.lineWidth = 0.7; ctx.stroke();
+      for (const c of countries) {
+        const on = tracked.has(+c.id);
+        ctx.beginPath(); path(c);
+        ctx.fillStyle = on ? 'rgba(201,163,95,.55)' : 'rgba(234,228,213,.10)';
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(14,13,10,.9)'; ctx.lineWidth = 0.6; ctx.stroke();
+      }
+      if (!reduced && running) { t += 0.016; requestAnimationFrame(frame); }
+    }
+
+    frame();
+    const vio = new IntersectionObserver((es) => {
+      for (const e of es) {
+        const was = running;
+        running = e.isIntersecting;
+        if (running && !was && !reduced) requestAnimationFrame(frame);
+      }
+    });
+    vio.observe(canvas);
+  }
+</script>
