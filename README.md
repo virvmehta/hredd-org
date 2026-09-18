@@ -1,76 +1,86 @@
 # hredd.org
 
-Tracking global HREDD legislation and its implications for those most
-affected and least consulted. Built with Astro, Sanity and Cloudflare
-Pages. This is the full April 2026 rebuild with all Round 2 fixes
-included, generated in July 2026.
+An independent tracker of human rights and environmental due diligence
+(HREDD) legislation, written for suppliers in the Global South rather than
+for the buyers and law firms that most trackers serve. Built with Astro,
+Sanity and Cloudflare Pages, and developed independently by Vir Viraf Mehta.
+See `LICENSE` for rights: the code, design and brand are proprietary, and
+only the published dataset is licensed under CC BY 4.0.
 
-## What is in this repository
+## What the site contains
 
-The Astro site lives at the root and builds 47 static pages: the
-homepage, the tracker with a server-rendered Equal Earth world map, 18
-law detail pages at /laws/[slug] with redirects preserved from the old
-/tracker/[slug] routes, the articles index and article pages, the buyer
-compliance mapping page, about, and subscribe. The Sanity Studio lives
-in the studio folder with schemas for articles, tracker laws and site
-settings, including the excerpt, deck and articleDisclaimer fields.
+The site builds about 74 static pages:
 
-Content is fetched from Sanity project jw8lakl8 (dataset production) at
-build time. If Sanity is unreachable or empty, the build falls back to
-the static launch content in src/lib/staticData.js, so a broken CMS
-connection can never produce a broken deployment.
+- **Tracker** (`/tracker/`): all 18 laws on a world map, with the monthly
+  change log. The old `/tracker/<law>/` addresses redirect to the law pages.
+- **Law pages** (`/laws/<law>/`): status, deadlines, scope, penalties,
+  obligations, a timeline, a change log and sources for every law.
+- **Timelines** (`/timeline/` and `/timeline/<law>/`): the dates for each law.
+- **Regulated Trade Index** (`/trade/`, `/countries/<country>/`,
+  `/methodology/`): how much of each producing country's exports the laws
+  reach, built from UN Comtrade data.
+- **Buyer mapping** (`/buyer-mapping/`): which laws reach a supplier through
+  each buyer country.
+- **Exposure report** (`/report/`): a short questionnaire that produces a
+  downloadable supplier exposure report.
+- **Articles** (`/articles/`), **About**, **Subscribe**, and site search.
 
-## Deploying the site (do these steps in order)
+## Where the content lives
 
-### Step 1: Replace the code in your existing repository
+**Laws** are merged law by law. Any law with a published Sanity document uses
+that document, and every other law uses its entry in `src/lib/staticData.js`.
+As of September 2026, four laws are in Sanity (CSDDD, EU FLR, Loi de
+Vigilance and UK MSA) and the other fourteen are in `staticData.js`.
 
-Unzip this project, then copy everything into your local hredd-org
-folder, replacing the old files. From PowerShell:
+**Articles** come from Sanity. The old static articles are only a fallback
+for when Sanity cannot be reached, and they are out of date.
+
+**Trade data** lives in `public/data/` and is produced by the Python pipeline
+in `pipeline/`. A GitHub Actions workflow refreshes it every year on 15 July,
+or whenever it is started manually from the Actions tab on GitHub.
+
+The Sanity Studio is in the `studio` folder and is published at
+https://hredd-org.sanity.studio (project `jw8lakl8`, dataset `production`).
+
+## Publishing changes
+
+**Content in Sanity:** edit the document in Studio and press Publish.
+Publishing triggers a Cloudflare rebuild, and the live site updates in about
+ninety seconds.
+
+**Code or static law data:** commit and push from PowerShell. Name the files
+you changed rather than using `git add .`, because the unfinished Bangla
+pilot in `src/pages/bn/` must stay out of the repository for now.
 
     cd "C:\Users\Vir Mehta\hredd-org"
-    git add .
-    git commit -m "Full rebuild with Round 2 fixes"
+    npm run build
+    git add src/lib/staticData.js
+    git commit -m "Describe the change here"
     git push
 
-Cloudflare Pages will detect the push and rebuild automatically. The
-build settings are unchanged: build command `npm run build`, output
-directory `dist`, Node version 18 or higher.
+Check that the build reports about 74 pages before you push. Cloudflare
+rebuilds automatically once the push arrives.
 
-### Step 2: Redeploy the Sanity Studio
-
-The article schema gained the excerpt and deck fields, and site
-settings gained the articleDisclaimer field, so the Studio must be
-redeployed once:
+**Sanity Studio schema changes** also need the Studio redeployed:
 
     cd "C:\Users\Vir Mehta\hredd-org\studio"
     npm install
     npx sanity deploy
 
-The hostname hredd-org is already configured in sanity.cli.js, so it
-should deploy without prompting.
+## Sanity write token for scripted edits
 
-### Step 3: Fill in the new fields in Sanity
+A Sanity API token with Editor permission can be saved in `.env.local` as
+`SANITY_WRITE_TOKEN`. That file is ignored by Git and never leaves this
+computer. Never put a token in `.env`, because that file is committed to
+GitHub. Delete the token under API, then Tokens, at
+https://www.sanity.io/manage when it is no longer needed.
 
-1. Open https://hredd-org.sanity.studio
-2. Open Site Settings and write the article disclaimer.
-3. Open each article and fill in the excerpt (card text, max 220
-   characters) and the deck (subtitle on the article page, max 280
-   characters), then publish.
-4. Publishing triggers the Cloudflare rebuild webhook; the live site
-   updates within about ninety seconds.
+## Content rules
 
-### Step 4: Check the live site
-
-Visit https://hredd-org.pages.dev and confirm the new three-line
-masthead, the excerpt and deck on articles, the world map on the
-tracker, and the buyer mapping page.
-
-## Content rules baked into this build
-
-British spelling is used throughout all copy. No em dashes or en dashes
-appear anywhere in code, content or copy, and this rule applies to all
-future content as well. Every tracker entry carries a changelog and at
-least one primary source.
+All copy uses British spelling. No em dashes or en dashes appear anywhere in
+code, content or copy. No sentence is shorter than seven words. Every law
+entry carries a change log and at least one source, and any change to a date,
+status or deadline is checked against a primary source first.
 
 ## Local development
 
@@ -80,3 +90,8 @@ least one primary source.
     cd studio
     npm install
     npm run dev        # studio at localhost:3333
+
+The trade pipeline needs Python, which is only installed on the GitHub
+Actions runner. Its tests are `python pipeline/compute.py --sample` and
+`python pipeline/test_mapping.py`, and both must pass after any pipeline
+change.

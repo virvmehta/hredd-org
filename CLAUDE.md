@@ -37,10 +37,63 @@ fallback silently dropped 17 of 18 law pages when only one Sanity document
 existed) — do not regress to a "if Sanity returns anything, ignore static
 entirely" pattern.
 
+State as of September 2026: **4 of 18 laws** live in Sanity (CSDDD, EU FLR,
+Loi de Vigilance, UK MSA); the other 14 are static entries in
+`staticData.js`. **Articles come entirely from Sanity.** Unlike laws, articles
+are not merged per item: `staticArticles` is only used if Sanity returns
+nothing or is unreachable, and those four static articles are out of date
+(one still claims the CSDDD climate transition plan duty survived).
+
 `useCdn: false` on the Sanity client is intentional, not an oversight. Builds
 are infrequent, so freshness matters more than CDN speed, and `useCdn: true`
 previously caused a freshly-published Sanity edit to not appear for several
 minutes after a webhook-triggered rebuild.
+
+## Editing Sanity from scripts
+- A write token lives in `.env.local` as `SANITY_WRITE_TOKEN`. That file is
+  gitignored; `.env` is **tracked**, so a token must never go there. Never
+  print the token; read it inside the script.
+- Patch with `@sanity/client` (already in `node_modules`), using
+  `ifRevisionId` so a patch fails rather than overwriting an edit Vir made in
+  Studio since the document was read. Dry run first, then write.
+- Any API mutation to a published document fires the Cloudflare rebuild
+  webhook, so a published patch goes live within about 90 seconds.
+- Create new articles as **drafts** (`_id: "drafts.<uuid>"`) so Vir reviews
+  and publishes them in Studio himself.
+- Links inside portable text must be absolute (`https://hredd.org/laws/...`),
+  not relative; the Studio link field rejects relative URLs.
+- `status` must be one of the labels in `studio/schemas/trackerLaw.js`;
+  `statusType` (`force`, `pending`, `proposed`, `delayed`) controls the
+  grouping and tag colour. An act in force with reform pending is
+  `force` / "Reform proposed", not `proposed`.
+
+## Monthly law update routine
+1. Research every tracked law against primary sources or named law firm
+   trackers, and list the proposed changes for Vir **before** editing.
+2. For each changed law: set `lastUpdated`, rewrite `tableUpdateText`, add
+   dated timeline entries, prepend a changelog entry dated "Month YYYY", and
+   add a source for every new fact. Also reread `summary` and `obligations`,
+   because stale dates hide there (the EUDR summary once still gave 2025
+   start dates after two postponements).
+3. The homepage "What changed this month" block shows the three laws with the
+   most recent `lastUpdated`; ties fall back to the `order` field.
+4. Anything that cannot be verified stays unchanged and is reported as
+   unverified, never guessed.
+
+Open items as of 18 September 2026: whether Germany's LkSG amendment has
+passed (the static summary already says the reporting duty "was removed in
+2025", which may overstate it); whether the EU battery due diligence
+guidelines due 26 July 2026 were published; and Official Journal publication
+of the July 2026 EUDR delegated act removing leather. Once that act is
+published, relabel "Cattle or leather" in `src/lib/sectorChapters.js` and
+`src/pages/report/index.astro`. The trade figures are unaffected either way,
+because HS chapter 41 was never in the EUDR scope set.
+
+## Translations (Bangla pilot, on hold)
+`src/pages/bn/` is deliberately **untracked** and must not be committed until
+a fluent speaker reviews the draft strings in `src/lib/i18n.js`. Vir has
+asked to ignore translations for now. While that folder exists, stage files
+by explicit path rather than `git add .`.
 
 ## Design system
 - Serif: **Newsreader** (editorial headlines, articles)
@@ -103,8 +156,10 @@ PASS` is the expected final line of the second command.
 
 ## Deploy checklist
 1. `npm run build` locally (or trust the CI build) — check the page count in
-   the output against what's expected (currently ~72-73 real pages)
-2. `git add . && git commit -m "..." && git push`
+   the output against what's expected (currently 74 pages in production, 75
+   locally while the untracked Bangla page exists)
+2. `git add <paths> && git commit -m "..." && git push` (explicit paths, see
+   the translations note above)
 3. Cloudflare rebuilds automatically on push, ~90 seconds
 4. For Sanity content changes: republishing a document re-triggers the
    webhook and rebuild even with no changes, useful for testing a fix to the
