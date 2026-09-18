@@ -308,11 +308,11 @@ export const staticLaws = [
   "region": "European Union",
   "status": "Amended",
   "statusType": "force",
-  "lastUpdated": "2026-05-18",
-  "tableUpdateText": "Omnibus narrowed scope to 1,000 employees from FY2027; first wave reporting continues with opt-outs.",
+  "lastUpdated": "2026-09-18",
+  "tableUpdateText": "Simplified reporting standards adopted on 3 July 2026, with a value chain cap that limits what buyers may demand from smaller suppliers.",
   "enactedDate": "January 2023",
   "firstComplianceDeadline": "FY2027 under the revised scope; wave one reporting since 2025",
-  "companiesInScope": "Large EU companies above the revised thresholds and listed companies",
+  "companiesInScope": "EU companies with more than 1,000 employees and more than EUR 450 million net turnover",
   "maxPenalty": "Set by member states through transposition",
   "civilLiability": "Not directly; liability arises through national reporting law",
   "enforcementBody": "National audit and market supervisors",
@@ -356,7 +356,7 @@ export const staticLaws = [
    "SWE"
   ],
   "oneLineSummary": "The EU sustainability reporting regime requiring double materiality disclosure, now substantially narrowed by the 2025 simplification omnibus.",
-  "summary": "<p>The CSRD requires in-scope companies to report against the European Sustainability Reporting Standards on a double materiality basis, covering both the company's impacts on people and planet and the sustainability risks it faces. The first wave of reports was published in 2025.</p><p>The 2025 omnibus significantly raised the employee threshold, removed many mid-sized companies from scope, and delayed later reporting waves by two years while the standards themselves are simplified. For suppliers, the value chain disclosures remain the important part: buyers request primary data from suppliers to populate their own reports, and that request cascade continues regardless of the scope changes.</p>",
+  "summary": "<p>The CSRD requires in-scope companies to report against the European Sustainability Reporting Standards on a double materiality basis, covering both the company's impacts on people and planet and the sustainability risks it faces. The first wave of reports was published in 2025.</p><p>The 2025 omnibus significantly raised the employee threshold, removed many mid-sized companies from scope, and delayed later reporting waves by two years while the standards themselves are simplified. For suppliers, the value chain disclosures remain the important part: buyers request primary data from suppliers to populate their own reports, and that request cascade continues regardless of the scope changes.</p><p>The simplified standards adopted by the Commission on 3 July 2026 cut mandatory datapoints by more than 60 percent and introduce a value chain cap. Companies within the CSRD may not require smaller companies in their value chains, those averaging fewer than 1,000 employees, to provide more information than the voluntary standard covers. For most suppliers this is the most useful protection the omnibus produced, and it is worth citing when a buyer questionnaire goes beyond it.</p>",
   "obligations": [
    {
     "title": "Double materiality assessment",
@@ -393,11 +393,19 @@ export const staticLaws = [
     "event": "Omnibus I published; member states transpose the CSRD provisions by 19 March 2027."
    },
    {
+    "date": "3 July 2026",
+    "event": "Commission adopted the simplified reporting standards and the voluntary standard, including the value chain cap protecting smaller suppliers; the Parliament and Council scrutiny period follows."
+   },
+   {
     "date": "1 January 2027",
-    "event": "Revised scope applies for financial years starting on or after this date."
+    "event": "Revised scope and simplified standards apply for financial years starting on or after this date."
    }
   ],
   "changelog": [
+   {
+    "date": "September 2026",
+    "text": "Added the simplified reporting standards adopted on 3 July 2026 and the value chain cap; scope thresholds stated precisely."
+   },
    {
     "date": "May 2026",
     "text": "Entry updated to reflect the revised thresholds and the delayed reporting calendar."
@@ -411,6 +419,10 @@ export const staticLaws = [
    {
     "title": "EFRAG sustainability reporting standards workstream",
     "url": "https://www.efrag.org/"
+   },
+   {
+    "title": "European Commission: Commission adopts revised sustainability reporting standards (3 July 2026)",
+    "url": "https://finance.ec.europa.eu/news/commission-adopts-revised-sustainability-reporting-standards-2026-07-03_en"
    }
   ],
   "order": 2
@@ -423,11 +435,11 @@ export const staticLaws = [
   "region": "European Union",
   "status": "Delayed",
   "statusType": "delayed",
-  "lastUpdated": "2026-06-30",
-  "tableUpdateText": "Second postponement published one week before application; large operators now start on 30 December 2026.",
+  "lastUpdated": "2026-09-18",
+  "tableUpdateText": "Commission adopted a delegated act on 13 July 2026 removing leather from scope; it binds only once published in the Official Journal.",
   "enactedDate": "June 2023",
-  "firstComplianceDeadline": "30 December 2026 (large operators); 30 June 2027 (micro and small)",
-  "companiesInScope": "Operators and traders placing cattle, cocoa, coffee, palm oil, rubber, soy or wood products on the EU market",
+  "firstComplianceDeadline": "30 December 2026 (large and medium operators); 30 June 2027 (most micro and small)",
+  "companiesInScope": "Operators and traders placing cattle, cocoa, coffee, palm oil, rubber, soy or wood products listed in Annex I on the EU market; leather is being removed from scope",
   "maxPenalty": "At least 4 percent of EU turnover, set by member states",
   "civilLiability": "Administrative enforcement; goods can be refused entry",
   "enforcementBody": "Member state competent authorities and customs",
@@ -476,7 +488,7 @@ export const staticLaws = [
    "SWE"
   ],
   "oneLineSummary": "Geolocation-backed proof that seven commodity groups entering the EU are deforestation-free and legally produced.",
-  "summary": "<p>The EUDR requires companies placing relevant commodities on the EU market to prove, with plot-level geolocation data, that products are deforestation-free after the 2020 cut-off and produced in compliance with the laws of the country of production. After a one-year delay, obligations for large operators applied from 30 December 2025, with small and micro enterprises following on 30 June 2026.</p><p>For producer countries the regulation has already reshaped procurement. Buyers are demanding polygon mapping from farm level upwards, and smallholders without digital land records face exclusion risk unless supported. The country benchmarking system determines the intensity of checks that shipments face at the border.</p>",
+  "summary": "<p>The EUDR requires companies placing relevant commodities on the EU market to prove, with plot-level geolocation data, that products are deforestation-free after the 2020 cut-off and produced in compliance with the laws of the country of production. After two postponements, obligations apply to large and medium operators from 30 December 2026, together with micro and small operators already covered by the old Timber Regulation. All other micro and small operators follow on 30 June 2027.</p><p>On 13 July 2026 the Commission adopted a delegated act revising the product list in Annex I. It removes cattle hides, skins and leather, retreaded tyres, soybeans for sowing, certain vulcanised rubber articles, conveyor and transmission belts, and aircraft and motor vehicle seats. It adds soluble coffee, certain palm oil derivatives, frozen cattle tongues and some soaps, which will be covered from 30 December 2027. The act becomes binding only after the Parliament and Council scrutiny period and publication in the Official Journal; until then the original Annex I applies.</p><p>For producer countries the regulation has already reshaped procurement. Buyers are demanding polygon mapping from farm level upwards, and smallholders without digital land records face exclusion risk unless supported. The country benchmarking system determines the intensity of checks that shipments face at the border. Tanneries and leather exporters stand to be released from the regime entirely once the delegated act is published.</p>",
   "obligations": [
    {
     "title": "Due diligence statements with geolocation",
@@ -509,15 +521,35 @@ export const staticLaws = [
     "event": "Second postponement published in the Official Journal one week before application, moving large operators to 30 December 2026 and micro and small enterprises to 30 June 2027."
    },
    {
+    "date": "4 May 2026",
+    "event": "Commission published its simplification review of the regulation, with revised guidance, FAQs and a draft change to the product scope."
+   },
+   {
+    "date": "13 July 2026",
+    "event": "Commission adopted a delegated act removing leather and several other products from Annex I and adding soluble coffee, palm oil derivatives and frozen cattle tongues, plus an implementing act simplifying declarations for micro and small primary operators."
+   },
+   {
+    "date": "13 September 2026",
+    "event": "Standard two-month scrutiny period for the delegated act ended, unless extended; publication in the Official Journal awaited."
+   },
+   {
     "date": "30 December 2026",
-    "event": "Obligations apply to large operators and traders."
+    "event": "Obligations apply to large and medium operators and traders, and to micro and small operators already covered by the Timber Regulation."
    },
    {
     "date": "30 June 2027",
-    "event": "Obligations apply to micro and small enterprises."
+    "event": "Obligations apply to all other micro and small enterprises."
+   },
+   {
+    "date": "30 December 2027",
+    "event": "Products newly added by the delegated act come into scope."
    }
   ],
   "changelog": [
+   {
+    "date": "September 2026",
+    "text": "Added the July 2026 delegated act removing leather from scope, corrected application dates to include medium operators, and replaced a summary paragraph that still gave the superseded 2025 dates."
+   },
    {
     "date": "June 2026",
     "text": "SME application date confirmed; entry updated with benchmarking country classifications."
@@ -531,6 +563,10 @@ export const staticLaws = [
    {
     "title": "Commission EUDR implementation portal",
     "url": "https://green-business.ec.europa.eu/deforestation-regulation-implementation_en"
+   },
+   {
+    "title": "European Commission: Commission updates product scope and tools to support EUDR (13 July 2026)",
+    "url": "https://environment.ec.europa.eu/news/commission-updates-product-scope-and-tools-support-eudr-2026-07-13_en"
    }
   ],
   "order": 3
@@ -933,8 +969,8 @@ export const staticLaws = [
   "region": "European Member States and UK",
   "status": "In force",
   "statusType": "force",
-  "lastUpdated": "2026-06-05",
-  "tableUpdateText": "Consumer Authority guidance tightening expectations on information request responses.",
+  "lastUpdated": "2026-09-18",
+  "tableUpdateText": "Ministry consulting until 30 September 2026 on letting the Consumer Authority issue decisions without first negotiating with companies.",
   "enactedDate": "July 2022",
   "firstComplianceDeadline": "June 2023 statements",
   "companiesInScope": "Larger enterprises domiciled or selling in Norway meeting two of three size thresholds",
@@ -985,9 +1021,21 @@ export const staticLaws = [
    {
     "date": "2024 to 2026",
     "event": "Consumer Authority guidance and sweeps raised the adequacy bar for responses and accounts."
+   },
+   {
+    "date": "26 June 2025",
+    "event": "Ministry of Children and Family Affairs published its evaluation of the act, examining its fit with EU sustainability rules."
+   },
+   {
+    "date": "2026",
+    "event": "Ministry consulted, until 30 September 2026, on removing the negotiation model so the Consumer Authority can issue binding decisions without first seeking voluntary compliance."
    }
   ],
   "changelog": [
+   {
+    "date": "September 2026",
+    "text": "Added the 2025 evaluation and the 2026 consultation on strengthening the Consumer Authority enforcement powers."
+   },
    {
     "date": "June 2026",
     "text": "Entry updated with the latest Consumer Authority supervision findings."
@@ -1001,6 +1049,10 @@ export const staticLaws = [
    {
     "title": "Forbrukertilsynet Transparency Act guidance",
     "url": "https://www.forbrukertilsynet.no/the-transparency-act"
+   },
+   {
+    "title": "Mondaq: consumer and marketing law update, August 2026 (Norwegian)",
+    "url": "https://www.mondaq.com/consumer-law/1840130/siste-nytt-innen-forbruker-og-markedsrett-|-august-2026"
    }
   ],
   "order": 8
@@ -1013,7 +1065,7 @@ export const staticLaws = [
   "region": "European Member States and UK",
   "status": "Delayed",
   "statusType": "delayed",
-  "lastUpdated": "2026-01-22",
+  "lastUpdated": "2026-09-18",
   "tableUpdateText": "Adopted in 2019 but never brought into operation; Dutch policy now waits on CSDDD transposition.",
   "enactedDate": "Adopted 2019, not yet in operation",
   "firstComplianceDeadline": "Not set",
@@ -1063,6 +1115,10 @@ export const staticLaws = [
   ],
   "changelog": [
    {
+    "date": "September 2026",
+    "text": "Status reviewed in September 2026; the act remains out of operation and is due to be revoked once the Dutch CSDDD implementing law is adopted."
+   },
+   {
     "date": "January 2026",
     "text": "Status reviewed; no implementing decree progress to report."
    }
@@ -1083,8 +1139,8 @@ export const staticLaws = [
   "region": "European Member States and UK",
   "status": "In force",
   "statusType": "force",
-  "lastUpdated": "2026-04-08",
-  "tableUpdateText": "Federal Council consulting on alignment of Swiss rules with the revised CSDDD baseline.",
+  "lastUpdated": "2026-09-18",
+  "tableUpdateText": "A Federal Council draft law, consulted on until 9 July 2026, would impose CSDDD-style due diligence on about thirty of the largest Swiss companies.",
   "enactedDate": "January 2022",
   "firstComplianceDeadline": "2023 reports covering FY2022",
   "companiesInScope": "Swiss companies importing or processing conflict minerals, or offering goods and services with child labour risk",
@@ -1107,7 +1163,7 @@ export const staticLaws = [
    "CHE"
   ],
   "oneLineSummary": "Targeted Swiss due diligence for conflict minerals and child labour, born from the defeated Responsible Business Initiative.",
-  "summary": "<p>Switzerland requires due diligence and reporting on conflict minerals and child labour from companies exceeding the relevant thresholds, as the counter-proposal that took effect after the Responsible Business Initiative narrowly failed in the 2020 referendum. First reports were published in 2023.</p><p>The Federal Council has been consulting on whether to align Swiss law with the CSDDD as revised by the omnibus, keeping equivalence with EU requirements for Swiss-headquartered multinationals. A renewed popular initiative seeking broader corporate liability is also gathering momentum, so this entry may change substantially.</p>",
+  "summary": "<p>Switzerland requires due diligence and reporting on conflict minerals and child labour from companies exceeding the relevant thresholds, as the counter-proposal that took effect after the Responsible Business Initiative narrowly failed in the 2020 referendum. First reports were published in 2023.</p><p>On 2 April 2026 the Federal Council published a draft Federal Act on Sustainable Corporate Governance as an indirect counter-proposal to the second Responsible Business Initiative, which was submitted in May 2025. Modelled on the CSDDD and CSRD as amended by the omnibus, it would require about thirty companies with more than 5,000 full-time positions and CHF 1.5 billion in worldwide turnover to carry out human rights and environmental due diligence. A new supervisory authority could impose sanctions of up to 3 percent of worldwide turnover. The consultation closed on 9 July 2026. The existing conflict minerals and child labour duties would continue in a separate chapter, so this entry may change substantially once the bill reaches parliament.</p>",
   "obligations": [
    {
     "title": "Conflict minerals supply chain due diligence",
@@ -1132,11 +1188,23 @@ export const staticLaws = [
     "event": "First reports published."
    },
    {
-    "date": "2025 to 2026",
-    "event": "Consultation on CSDDD alignment and a renewed popular initiative under way."
+    "date": "May 2025",
+    "event": "Second Responsible Business Initiative submitted."
+   },
+   {
+    "date": "2 April 2026",
+    "event": "Federal Council published a draft Sustainable Corporate Governance Act as an indirect counter-proposal, closely modelled on the amended CSDDD and CSRD."
+   },
+   {
+    "date": "9 July 2026",
+    "event": "Consultation on the draft act closed."
    }
   ],
   "changelog": [
+   {
+    "date": "September 2026",
+    "text": "Added the April 2026 draft Sustainable Corporate Governance Act and its consultation, replacing the earlier general description of alignment work."
+   },
    {
     "date": "April 2026",
     "text": "Entry updated with the CSDDD alignment consultation status."
@@ -1146,6 +1214,10 @@ export const staticLaws = [
    {
     "title": "Ordinance on Due Diligence and Transparency (Fedlex)",
     "url": "https://www.fedlex.admin.ch/eli/cc/2021/847/en"
+   },
+   {
+    "title": "CMS: Federal Council launches consultation on the counter-proposal (April 2026)",
+    "url": "https://cms.law/en/che/legal-updates/indirect-counterproposal-to-the-responsible-business-initiative-swiss-federal-council-launches-consultation-on-scga"
    }
   ],
   "order": 10
@@ -1234,8 +1306,8 @@ export const staticLaws = [
   "region": "North America",
   "status": "Expanding",
   "statusType": "force",
-  "lastUpdated": "2026-06-22",
-  "tableUpdateText": "Entity List additions continue across new sectors; detentions remain concentrated in electronics, apparel and solar.",
+  "lastUpdated": "2026-09-18",
+  "tableUpdateText": "Largest Entity List expansion to date on 31 July 2026: 43 entities added, taking the list to 187, across aluminium, apparel, copper, cotton and tomatoes.",
   "enactedDate": "December 2021",
   "firstComplianceDeadline": "June 2022 (rebuttable presumption applied)",
   "companiesInScope": "All importers into the United States",
@@ -1260,7 +1332,7 @@ export const staticLaws = [
    "USA"
   ],
   "oneLineSummary": "A rebuttable presumption that goods linked to Xinjiang are made with forced labour and barred from US entry.",
-  "summary": "<p>The UFLPA presumes that goods mined, produced or manufactured wholly or in part in the Xinjiang Uyghur Autonomous Region, or by entities on the UFLPA Entity List, are made with forced labour and prohibited from entering the United States. Importers can rebut the presumption only with clear and convincing evidence, which in practice demands full upstream traceability.</p><p>Enforcement has widened steadily: the Entity List has grown across aluminium, seafood, polysilicon and agricultural sectors, and detentions now routinely affect goods shipped from third countries with Xinjiang-origin inputs. For South Asian exporters, proving the absence of covered inputs has become a standing documentary burden.</p>",
+  "summary": "<p>The UFLPA presumes that goods mined, produced or manufactured wholly or in part in the Xinjiang Uyghur Autonomous Region, or by entities on the UFLPA Entity List, are made with forced labour and prohibited from entering the United States. Importers can rebut the presumption only with clear and convincing evidence, which in practice demands full upstream traceability.</p><p>Enforcement has widened steadily: the Entity List has grown across aluminium, seafood, polysilicon and agricultural sectors, and detentions now routinely affect goods shipped from third countries with Xinjiang-origin inputs. On 31 July 2026 DHS announced 43 additions in a single notice, the largest expansion since the act took effect, bringing the list to 187 entities with additions in aluminium, apparel, copper, cotton and tomatoes. For South Asian exporters, proving the absence of covered inputs has become a standing documentary burden.</p>",
   "obligations": [
    {
     "title": "Supply chain tracing for covered inputs",
@@ -1283,9 +1355,17 @@ export const staticLaws = [
    {
     "date": "2023 to 2026",
     "event": "Entity List expanded repeatedly and enforcement statistics broadened across sectors."
+   },
+   {
+    "date": "31 July 2026",
+    "event": "DHS announced 43 Entity List additions, the largest single expansion, taking the list to 187 entities; the notice was published in the Federal Register on 3 August 2026. CBP reported more than 24,300 shipments denied entry, valued at nearly 1 billion dollars."
    }
   ],
   "changelog": [
+   {
+    "date": "September 2026",
+    "text": "Added the July 2026 Entity List expansion to 187 entities and the latest CBP enforcement figures."
+   },
    {
     "date": "June 2026",
     "text": "Entity List additions and sectoral detention statistics updated."
@@ -1299,6 +1379,10 @@ export const staticLaws = [
    {
     "title": "DHS UFLPA Entity List",
     "url": "https://www.dhs.gov/uflpa-entity-list"
+   },
+   {
+    "title": "DHS: addition of 43 companies to the UFLPA Entity List (31 July 2026)",
+    "url": "https://www.dhs.gov/news/2026/07/31/dhs-announces-addition-43-companies-uflpa-entity-list"
    }
   ],
   "order": 12
@@ -1311,8 +1395,8 @@ export const staticLaws = [
   "region": "North America",
   "status": "In force",
   "statusType": "force",
-  "lastUpdated": "2026-01-15",
-  "tableUpdateText": "Filing regime stable; SEC enforcement posture unchanged for over a decade.",
+  "lastUpdated": "2026-09-18",
+  "tableUpdateText": "Calendar year 2025 filings fell due on 1 June 2026; the regime and the SEC enforcement posture are unchanged.",
   "enactedDate": "July 2010",
   "firstComplianceDeadline": "May 2014 filings",
   "companiesInScope": "SEC-reporting companies using tin, tantalum, tungsten or gold necessary to their products",
@@ -1362,6 +1446,10 @@ export const staticLaws = [
   ],
   "changelog": [
    {
+    "date": "September 2026",
+    "text": "Reviewed after the 1 June 2026 filing deadline for calendar year 2025; no regime changes to report."
+   },
+   {
     "date": "January 2026",
     "text": "Annual review completed; no material regime changes."
    }
@@ -1382,8 +1470,8 @@ export const staticLaws = [
   "region": "North America",
   "status": "In committee",
   "statusType": "proposed",
-  "lastUpdated": "2026-04-25",
-  "tableUpdateText": "Reintroduced bill remains in committee; advocacy coalition targeting the current session.",
+  "lastUpdated": "2026-09-18",
+  "tableUpdateText": "The 2026 session ended without a floor vote; both the Senate and Assembly bills remain in committee.",
   "enactedDate": "Not enacted",
   "firstComplianceDeadline": "Not applicable",
   "companiesInScope": "Fashion sellers doing business in New York with global revenue above 100 million dollars, as drafted",
@@ -1425,9 +1513,17 @@ export const staticLaws = [
    {
     "date": "2023 to 2026",
     "event": "Reintroduced and amended across sessions; remains in committee."
+   },
+   {
+    "date": "2026",
+    "event": "Legislative session ended without a floor vote in either chamber; Senate bill S4558B and Assembly bill A4631B remain in committee."
    }
   ],
   "changelog": [
+   {
+    "date": "September 2026",
+    "text": "Confirmed against the New York Senate record that the 2026 session ended without a floor vote."
+   },
    {
     "date": "April 2026",
     "text": "Session status confirmed; no floor vote scheduled."
@@ -1436,7 +1532,7 @@ export const staticLaws = [
   "sources": [
    {
     "title": "New York State Senate bill tracker",
-    "url": "https://www.nysenate.gov/"
+    "url": "https://www.nysenate.gov/legislation/bills/2025/S4558/amendment/B"
    }
   ],
   "order": 14
@@ -1449,8 +1545,8 @@ export const staticLaws = [
   "region": "North America",
   "status": "In force",
   "statusType": "force",
-  "lastUpdated": "2026-06-01",
-  "tableUpdateText": "Third annual reporting cycle closed 31 May; Public Safety guidance continues to firm up expectations.",
+  "lastUpdated": "2026-09-18",
+  "tableUpdateText": "Bill C-35, introduced on 12 June 2026, would create a list-based forced labour import ban; a due diligence consultation closed on 21 August.",
   "enactedDate": "January 2024",
   "firstComplianceDeadline": "31 May 2024 reports",
   "companiesInScope": "Government institutions and entities meeting the size thresholds that produce, sell or import goods",
@@ -1474,7 +1570,7 @@ export const staticLaws = [
    "CAN"
   ],
   "oneLineSummary": "A reporting statute with personal officer liability, paired with an import ban on forced and child labour goods.",
-  "summary": "<p>S-211 requires covered entities to file annual reports on the steps taken to prevent and reduce the risk of forced labour and child labour in their supply chains, with questionnaire-based filing to Public Safety Canada and board-approved public statements. The act also extended the customs prohibition to goods made with child labour.</p><p>The personal exposure of directors and officers to fines has made Canadian boards unusually attentive to a regime that is, on paper, disclosure only. Guidance has tightened each cycle, and debate continues over graduating from reporting to mandatory due diligence.</p>",
+  "summary": "<p>S-211 requires covered entities to file annual reports on the steps taken to prevent and reduce the risk of forced labour and child labour in their supply chains, with questionnaire-based filing to Public Safety Canada and board-approved public statements. The act also extended the customs prohibition to goods made with child labour.</p><p>The personal exposure of directors and officers to fines has made Canadian boards unusually attentive to a regime that is, on paper, disclosure only. Guidance has tightened each cycle, and debate continues over graduating from reporting to mandatory due diligence.</p><p>That debate moved in 2026. On 12 June the government introduced Bill C-35, a standalone forced labour import ban that would let the Minister of Foreign Affairs list high-risk goods and require importers of those goods to supply tracing information on request. Consultations from 27 July to 21 August 2026 asked whether Canadian businesses should also carry mandatory due diligence duties with civil liability, which would take Canada well beyond reporting.</p>",
   "obligations": [
    {
     "title": "Annual report and questionnaire",
@@ -1497,9 +1593,25 @@ export const staticLaws = [
    {
     "date": "2025 to 2026",
     "event": "Guidance revisions sharpened expectations on risk assessment and remediation disclosure."
+   },
+   {
+    "date": "31 May 2026",
+    "event": "Third annual reporting deadline passed."
+   },
+   {
+    "date": "12 June 2026",
+    "event": "Bill C-35 introduced to replace the Customs Tariff import ban with a standalone, list-based framework for goods produced by forced labour."
+   },
+   {
+    "date": "27 July 2026",
+    "event": "Government opened consultations on the Bill C-35 regulations and on mandatory due diligence with civil liability, closing 21 August 2026."
    }
   ],
   "changelog": [
+   {
+    "date": "September 2026",
+    "text": "Added Bill C-35 and the 2026 consultations on mandatory due diligence and civil liability."
+   },
    {
     "date": "June 2026",
     "text": "Third cycle filing statistics and revised guidance incorporated."
@@ -1509,6 +1621,14 @@ export const staticLaws = [
    {
     "title": "Public Safety Canada reporting portal",
     "url": "https://www.publicsafety.gc.ca/cnt/cntrng-crm/frcd-lbr-cndn-spply-chns/index-en.aspx"
+   },
+   {
+    "title": "Government of Canada: legislation to strengthen the forced labour import ban (12 June 2026)",
+    "url": "https://www.canada.ca/en/global-affairs/news/2026/06/canada-introduces-legislation-to-strengthen-the-ban-on-importing-goods-produced-with-forced-labour0.html"
+   },
+   {
+    "title": "Baker McKenzie: consultation on the future of forced labour legislation (August 2026)",
+    "url": "https://globalimportblog.bakermckenzie.com/2026/08/19/canada-announces-consultation-on-future-of-forced-labour-legislation-import-prohibition-and-positive-due-diligence-obligations/"
    }
   ],
   "order": 15
@@ -1521,12 +1641,12 @@ export const staticLaws = [
   "region": "Asia-Pacific",
   "status": "In force",
   "statusType": "force",
-  "lastUpdated": "2026-05-27",
-  "tableUpdateText": "Anti-Slavery Commissioner operational; penalties and due diligence duty from the statutory review still pending.",
+  "lastUpdated": "2026-09-18",
+  "tableUpdateText": "Government announced on 16 July 2026 a criminal failure to prevent offence and civil penalties; consultation to follow, with no bill yet.",
   "enactedDate": "January 2019",
   "firstComplianceDeadline": "FY2020 statements",
   "companiesInScope": "Entities with annual consolidated revenue of 100 million Australian dollars or more",
-  "maxPenalty": "None currently; penalties recommended by the statutory review remain unlegislated",
+  "maxPenalty": "None currently; civil penalties and a criminal failure to prevent offence were announced in July 2026 but are not yet legislated",
   "civilLiability": "None under the act",
   "enforcementBody": "Attorney-General’s Department register; Commonwealth Anti-Slavery Commissioner",
   "sectorsAffected": [
@@ -1546,7 +1666,7 @@ export const staticLaws = [
    "AUS"
   ],
   "oneLineSummary": "Mandatory modern slavery statements with prescribed content, awaiting the penalties its own review recommended.",
-  "summary": "<p>The Australian act requires covered entities to publish annual modern slavery statements addressing seven mandatory criteria, filed on a public register. Unlike the UK regime the content is prescribed, but like the UK regime there are currently no financial penalties for poor or absent reporting.</p><p>The 2023 statutory review recommended penalties, a due diligence duty and lower thresholds. The Anti-Slavery Commissioner role was created and filled, while the harder-edged recommendations await legislation, making Australia the clearest live test of whether disclosure regimes graduate into due diligence regimes.</p>",
+  "summary": "<p>The Australian act requires covered entities to publish annual modern slavery statements addressing seven mandatory criteria, filed on a public register. Unlike the UK regime the content is prescribed, but like the UK regime there are currently no financial penalties for poor or absent reporting.</p><p>The 2023 statutory review recommended penalties, a due diligence duty and lower thresholds. The Anti-Slavery Commissioner role was created and filled, while the harder-edged recommendations await legislation, making Australia the clearest live test of whether disclosure regimes graduate into due diligence regimes.</p><p>On 16 July 2026 the government announced that it would create a criminal offence for companies with annual consolidated revenue above A$100 million that fail to prevent modern slavery in their supply chains, with a defence for companies that took reasonable steps. Civil penalties for reporting failures would follow alongside it. Details and a consultation are still to come, and no bill has yet been introduced.</p>",
   "obligations": [
    {
     "title": "Seven mandatory reporting criteria",
@@ -1573,9 +1693,17 @@ export const staticLaws = [
    {
     "date": "2025 to 2026",
     "event": "Government response to the review partially implemented; penalties bill pending."
+   },
+   {
+    "date": "16 July 2026",
+    "event": "Government announced a criminal failure to prevent offence for companies above A$100 million in revenue, with a reasonable steps defence, plus civil penalties for reporting breaches; consultation to follow."
    }
   ],
   "changelog": [
+   {
+    "date": "September 2026",
+    "text": "Added the July 2026 announcement of a failure to prevent offence and civil penalties."
+   },
    {
     "date": "May 2026",
     "text": "Commissioner priorities and pending reform items updated."
@@ -1589,6 +1717,10 @@ export const staticLaws = [
    {
     "title": "Australian modern slavery statements register",
     "url": "https://modernslaveryregister.gov.au/"
+   },
+   {
+    "title": "Baker McKenzie: new modern slavery offence proposed (July 2026)",
+    "url": "https://www.bakermckenzie.com/en/insight/publications/2026/07/australia-new-modern-slavery-offence-proposed"
    }
   ],
   "order": 16
@@ -1601,8 +1733,8 @@ export const staticLaws = [
   "region": "Asia-Pacific",
   "status": "Voluntary",
   "statusType": "proposed",
-  "lastUpdated": "2026-02-28",
-  "tableUpdateText": "Government study on binding options continues; procurement-linked expectations doing the practical work.",
+  "lastUpdated": "2026-09-18",
+  "tableUpdateText": "Revised National Action Plan, in effect from April 2026, makes human rights due diligence a priority area; the guidelines remain voluntary.",
   "enactedDate": "September 2022 (guidelines published)",
   "firstComplianceDeadline": "Not applicable (voluntary)",
   "companiesInScope": "All companies operating in Japan, on a voluntary basis",
@@ -1626,7 +1758,7 @@ export const staticLaws = [
    "JPN"
   ],
   "oneLineSummary": "Japan’s voluntary due diligence guidelines, increasingly hard-edged through procurement and buyer cascades.",
-  "summary": "<p>The METI guidelines set out UNGP-aligned expectations for human rights due diligence by companies operating in Japan, covering policy commitments, impact identification, prevention and mitigation, remedy and disclosure. They carry no penalties, but linkage to public procurement and the compliance programmes of the large trading houses gives them practical force.</p><p>The open question tracked here is whether Japan moves from guidance to statute. Government study groups continue to examine binding options, while Japanese buyers increasingly transmit due diligence requirements to Asian suppliers through contracts, making the guidelines a de facto regional standard whose operational mechanisms are still developing.</p>",
+  "summary": "<p>The METI guidelines set out UNGP-aligned expectations for human rights due diligence by companies operating in Japan, covering policy commitments, impact identification, prevention and mitigation, remedy and disclosure. They carry no penalties, but linkage to public procurement and the compliance programmes of the large trading houses gives them practical force.</p><p>The open question tracked here is whether Japan moves from guidance to statute. The revised National Action Plan published in December 2025 names human rights due diligence as a priority area for the first time, but it stops short of legislation. Government study groups continue to examine binding options, while Japanese buyers increasingly transmit due diligence requirements to Asian suppliers through contracts, making the guidelines a de facto regional standard whose operational mechanisms are still developing.</p>",
   "obligations": [
    {
     "title": "UNGP-aligned due diligence (voluntary)",
@@ -1649,9 +1781,21 @@ export const staticLaws = [
    {
     "date": "2023 onwards",
     "event": "Public procurement linkage introduced and binding options studied."
+   },
+   {
+    "date": "24 December 2025",
+    "event": "Government published the revised National Action Plan, making human rights due diligence and support for small and medium enterprises priority areas."
+   },
+   {
+    "date": "April 2026",
+    "event": "Implementation of the revised National Action Plan began."
    }
   ],
   "changelog": [
+   {
+    "date": "September 2026",
+    "text": "Added the revised National Action Plan published in December 2025 and in effect from April 2026."
+   },
    {
     "date": "February 2026",
     "text": "Study group progress and procurement linkage developments recorded."
@@ -1661,6 +1805,10 @@ export const staticLaws = [
    {
     "title": "METI guidelines on respect for human rights in supply chains",
     "url": "https://www.meti.go.jp/english/press/2022/0913_001.html"
+   },
+   {
+    "title": "Business and Human Rights Resource Centre: statement on the revised National Action Plan",
+    "url": "https://www.business-humanrights.org/en/latest-news/world-benchmarking-alliance-and-business-and-human-rights-centre-release-statement-on-japans-revised-national-action-plan-on-business-and-human-rights/"
    }
   ],
   "order": 17
@@ -1673,8 +1821,8 @@ export const staticLaws = [
   "region": "Asia-Pacific",
   "status": "In committee",
   "statusType": "proposed",
-  "lastUpdated": "2026-03-05",
-  "tableUpdateText": "Reintroduced bill under committee scrutiny; business association opposition remains the main obstacle.",
+  "lastUpdated": "2026-09-18",
+  "tableUpdateText": "Bill reintroduced in June 2025 remains in committee, with no progress recorded in 2026; business opposition remains the main obstacle.",
   "enactedDate": "Not enacted",
   "firstComplianceDeadline": "Not applicable",
   "companiesInScope": "Large Korean companies above the drafted thresholds",
@@ -1719,11 +1867,19 @@ export const staticLaws = [
     "event": "Broader HREDD bill introduced with civil society backing."
    },
    {
-    "date": "2024 to 2026",
-    "event": "Bills reintroduced following the assembly cycle; committee deliberations continue."
+    "date": "13 June 2025",
+    "event": "Representative Jung Tae-ho reintroduced the bill; a competing bill proposes higher company thresholds."
+   },
+   {
+    "date": "2026",
+    "event": "Committee deliberations continue with no recorded progress."
    }
   ],
   "changelog": [
+   {
+    "date": "September 2026",
+    "text": "Timeline updated with the June 2025 reintroduction; no committee progress found in 2026."
+   },
    {
     "date": "March 2026",
     "text": "Committee status and stakeholder positions updated."
@@ -1733,6 +1889,10 @@ export const staticLaws = [
    {
     "title": "National Assembly bill information system",
     "url": "https://likms.assembly.go.kr/bill/main.do"
+   },
+   {
+    "title": "Latham and Watkins: South Korea reintroduces human rights and due diligence act (August 2025)",
+    "url": "https://www.lw.com/en/insights/south-korea-reintroduces-human-rights-and-due-diligence-act"
    }
   ],
   "order": 18
