@@ -18,6 +18,13 @@ const yearOf = d => d ? d.slice(0, 4) : '';
 const countries = Object.entries(data.countries).map(([slug, c]) => ({ slug, ...c }));
 const DEFAULT = 'bangladesh';
 
+// Dataset schema. The published JSON and CSV are the openly licensed part of
+// this site (CC BY 4.0 per LICENSE), and answer engines cite datasets readily,
+// so the distributions are declared explicitly rather than left to be guessed.
+// Shared with /methodology/ through lib/datasetSchema.js so the two never drift.
+import { buildDatasetSchema } from '../../lib/datasetSchema.js';
+const datasetSchema = buildDatasetSchema(data, scope, 'https://hredd.org/trade/');
+
 // Distinct categorical colours for the destination bar, one per market, so the
 // segments read as separate regions rather than one gold gradient. Validated
 // for colour-vision separation and contrast on the dark surface (dataviz
@@ -74,6 +81,8 @@ function sectorsOf(slug){
   description="How each country's exports pass through the tracked regimes: share of value in scope, published bands, statutory dates, and open methodology."
   active="trade"
 >
+
+<script type="application/ld+json" set:html={JSON.stringify(datasetSchema)} />
 
 {data.sample_data && (
   <div class="sample-banner">

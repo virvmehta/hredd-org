@@ -393,9 +393,20 @@ p{ text-wrap:pretty; }
 .facts{ display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:1px;
   background:var(--line); border:1px solid var(--line); }
 .fact{ background:var(--bg); padding:22px 24px; }
-.fact span{ display:block; font-family:var(--mono); font-size:9.5px; letter-spacing:.12em;
+/* Law pages mark these up as a description list (dt/dd); country pages still
+   use span/b. Both are styled identically so the markup can differ. */
+.fact span, .fact dt{ display:block; font-family:var(--mono); font-size:9.5px; letter-spacing:.12em;
   text-transform:uppercase; color:var(--ink-faint); margin-bottom:10px; }
-.fact b{ font:400 17px/1.45 var(--serif); color:var(--ink); }
+.fact b, .fact dd{ font:400 17px/1.45 var(--serif); color:var(--ink); margin:0; }
+.facts{ margin:0; }
+
+/* "At a glance" bullets opening a law page: the first thing a skimming reader
+   or a parser meets, built from the same data as the facts list below. */
+.glance{ list-style:none; margin:26px 0 0; padding:0; max-width:74ch;
+  border-left:1px solid var(--gold-dim); }
+.glance li{ padding:7px 0 7px 20px; font-size:16px; line-height:1.6; color:var(--ink-dim); }
+.glance li span{ font-family:var(--mono); font-size:10px; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--gold); margin-right:8px; }
 .oblist{ margin:0; padding:0; list-style:none; counter-reset:ob; }
 .oblist li{ counter-increment:ob; padding:22px 0; border-bottom:1px solid var(--line-soft);
   display:grid; grid-template-columns:56px 1fr; gap:18px; }

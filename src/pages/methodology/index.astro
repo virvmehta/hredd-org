@@ -2,12 +2,19 @@
 import Base from '../../layouts/Base.astro';
 import data from '../../../public/data/trade-exposure.json';
 import scope from '../../../pipeline/law_scope.json';
+import { buildDatasetSchema } from '../../lib/datasetSchema.js';
+
+// Same Dataset schema as /trade/, pointed at this page, since this is the
+// canonical description of the dataset and its limits.
+const datasetSchema = buildDatasetSchema(data, scope, 'https://hredd.org/methodology/');
 ---
 <Base
   title="Methodology: the Regulated Trade Index | hredd.org"
   description="Every source, every assumption, every limitation, and the open dataset behind the hredd.org trade exposure figures. Every number carries its working."
   active="about"
 >
+
+<script type="application/ld+json" set:html={JSON.stringify(datasetSchema)} />
 
 <section class="law-head">
   <div class="wrap">

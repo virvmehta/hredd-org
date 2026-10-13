@@ -44,6 +44,47 @@ const usdBn = v => '$' + (v / 1e9).toFixed(v >= 1e10 ? 0 : 1) + 'bn';
 const clampDesc = s => s.length <= 158 ? s : s.slice(0, 155).replace(/\s+\S*$/, '') + '.';
 const primarySource = (law.sources || []).find(s => s.url)?.url;
 
+// Schema.org wants a real Date in legislationDate, but enactedDate is editorial
+// prose ("June 2023", "Not enacted", "Adopted 2019, not yet in operation").
+// Convert only the unambiguous "Month YYYY" and "YYYY" forms, optionally
+// followed by a parenthetical, and emit nothing otherwise. A wrong date is far
+// worse than a missing one on a legal tracker.
+const MONTHS = ['january','february','march','april','may','june','july','august',
+  'september','october','november','december'];
+function isoLegislationDate(raw) {
+  if (!raw) return undefined;
+  const m = String(raw).trim().match(/^(?:([A-Za-z]+)\s+)?(\d{4})\s*(?:\(.*\))?$/);
+  if (!m) return undefined;
+  const [, monthName, year] = m;
+  if (!monthName) return year;
+  const i = MONTHS.indexOf(monthName.toLowerCase());
+  return i === -1 ? undefined : `${year}-${String(i + 1).padStart(2, '0')}`;
+}
+
+// Legal force must match reality: proposed bills and voluntary guidance are not
+// in force at all, and saying "partly in force" of an unpassed bill would be a
+// factual error in machine-readable form.
+const LEGAL_FORCE = { force: 'InForce', delayed: 'PartiallyInForce',
+  pending: 'PartiallyInForce', proposed: 'NotInForce' };
+
+// A citable identifier where the instrument has one, taken from the source
+// titles and the law name rather than invented.
+const identifierFrom = (text) => (String(text || '').match(
+  /(Regulation|Directive)\s+\(EU\)\s+\d{4}\/\d+|Regulation\s+\d{4}\/\d+|Loi\s+\d{4}-\d+|Directive\s+\d{4}\/\d+\/EU/) || [])[0];
+const legislationIdentifier = identifierFrom(law.name)
+  || (law.sources || []).map(s => identifierFrom(s.title)).find(Boolean);
+
+// The bulleted summary that opens the page, for a reader skimming and for an
+// answer engine parsing. Each bullet is one fact we already hold, in the order
+// a supplier asks for it.
+const glance = [
+  { label: 'Status', value: law.status },
+  { label: 'First compliance deadline', value: law.firstComplianceDeadline },
+  { label: 'Who is covered', value: law.companiesInScope },
+  { label: 'Maximum penalty', value: law.maxPenalty },
+  { label: 'Latest movement', value: law.tableUpdateText }
+].filter((g) => g.value);
+
 // A short FAQ built from the facts an answer engine actually gets asked about
 // this law. FAQPage is among the most-quoted schema types in AI overviews, and
 // these are the exact question/answer pairs a supplier types into a chatbot.
@@ -69,12 +110,18 @@ const jsonLd = [
     "legislationJurisdiction": law.jurisdiction,
     "spatialCoverage": law.jurisdiction,
     "description": law.oneLineSummary,
-    "legislationDate": law.enactedDate || undefined,
+    ...(isoLegislationDate(law.enactedDate) ? { "legislationDate": isoLegislationDate(law.enactedDate) } : {}),
+    ...(legislationIdentifier ? { "legislationIdentifier": legislationIdentifier } : {}),
     "dateModified": law.lastUpdated,
     "inLanguage": "en-GB",
-    "legislationLegalForce": law.statusType === 'force' ? 'InForce' : 'PartiallyInForce',
+    "legislationLegalForce": LEGAL_FORCE[law.statusType] || 'NotInForce',
     "url": `https://hredd.org/laws/${law.slug}/`,
     ...(primarySource ? { "sameAs": primarySource } : {}),
+    ...((law.sources || []).some(s => s.url) ? {
+      "citation": law.sources.filter(s => s.url).map(s => ({
+        "@type": "WebPage", "name": s.title, "url": s.url
+      }))
+    } : {}),
     "isPartOf": { "@type": "WebSite", "name": "hredd.org", "url": "https://hredd.org" }
   },
   {
@@ -117,17 +164,27 @@ const jsonLd = [
       {updatedLabel && <span class="mono faint">Entry updated {updatedLabel}</span>}
     </div>
     {law.oneLineSummary && <p class="standfirst reveal" data-delay="3" style="margin-top:26px">{law.oneLineSummary}</p>}
+    {glance.length > 0 && (
+      <ul class="glance reveal" data-delay="3">
+        {glance.map((g) => (
+          <li><span>{g.label}:</span> {g.value}</li>
+        ))}
+      </ul>
+    )}
   </div>
 </section>
 
 {facts.length > 0 && (
   <section class="section" style="padding-bottom:0">
     <div class="wrap">
-      <div class="facts reveal">
+      {/* A description list, not a div grid: the label and value relationship
+          is then explicit to screen readers and to answer engines parsing the
+          page. The visual design is unchanged. */}
+      <dl class="facts reveal">
         {facts.map((f) => (
-          <div class="fact"><span>{f.label}</span><b>{f.value}</b></div>
+          <div class="fact"><dt>{f.label}</dt><dd>{f.value}</dd></div>
         ))}
-      </div>
+      </dl>
     </div>
   </section>
 )}
