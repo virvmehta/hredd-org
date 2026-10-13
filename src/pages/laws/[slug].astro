@@ -164,10 +164,12 @@ const jsonLd = [
       {updatedLabel && <span class="mono faint">Entry updated {updatedLabel}</span>}
     </div>
     {law.oneLineSummary && <p class="standfirst reveal" data-delay="3" style="margin-top:26px">{law.oneLineSummary}</p>}
+    {/* The explicit {' '} in each bullet matters: without it the extracted
+        text reads "deadline:26 July 2029", which is what answer engines quote. */}
     {glance.length > 0 && (
       <ul class="glance reveal" data-delay="3">
         {glance.map((g) => (
-          <li><span>{g.label}:</span> {g.value}</li>
+          <li><span>{g.label}:</span>{' '}{g.value}</li>
         ))}
       </ul>
     )}
