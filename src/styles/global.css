@@ -399,14 +399,6 @@ p{ text-wrap:pretty; }
   text-transform:uppercase; color:var(--ink-faint); margin-bottom:10px; }
 .fact b, .fact dd{ font:400 17px/1.45 var(--serif); color:var(--ink); margin:0; }
 .facts{ margin:0; }
-
-/* "At a glance" bullets opening a law page: the first thing a skimming reader
-   or a parser meets, built from the same data as the facts list below. */
-.glance{ list-style:none; margin:26px 0 0; padding:0; max-width:74ch;
-  border-left:1px solid var(--gold-dim); }
-.glance li{ padding:7px 0 7px 20px; font-size:16px; line-height:1.6; color:var(--ink-dim); }
-.glance li span{ font-family:var(--mono); font-size:10px; letter-spacing:.1em;
-  text-transform:uppercase; color:var(--gold); margin-right:8px; }
 .oblist{ margin:0; padding:0; list-style:none; counter-reset:ob; }
 .oblist li{ counter-increment:ob; padding:22px 0; border-bottom:1px solid var(--line-soft);
   display:grid; grid-template-columns:56px 1fr; gap:18px; }

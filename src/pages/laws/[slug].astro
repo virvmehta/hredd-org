@@ -74,16 +74,10 @@ const identifierFrom = (text) => (String(text || '').match(
 const legislationIdentifier = identifierFrom(law.name)
   || (law.sources || []).map(s => identifierFrom(s.title)).find(Boolean);
 
-// The bulleted summary that opens the page, for a reader skimming and for an
-// answer engine parsing. Each bullet is one fact we already hold, in the order
-// a supplier asks for it.
-const glance = [
-  { label: 'Status', value: law.status },
-  { label: 'First compliance deadline', value: law.firstComplianceDeadline },
-  { label: 'Who is covered', value: law.companiesInScope },
-  { label: 'Maximum penalty', value: law.maxPenalty },
-  { label: 'Latest movement', value: law.tableUpdateText }
-].filter((g) => g.value);
+// There is deliberately no second bulleted summary here. The facts list below
+// (a dt/dd description list) is the page's executive summary: it carries more
+// fields, it is already part of the design, and it parses cleanly. A bulleted
+// version duplicated it, and repeated tableUpdateText a third time.
 
 // A short FAQ built from the facts an answer engine actually gets asked about
 // this law. FAQPage is among the most-quoted schema types in AI overviews, and
@@ -164,15 +158,6 @@ const jsonLd = [
       {updatedLabel && <span class="mono faint">Entry updated {updatedLabel}</span>}
     </div>
     {law.oneLineSummary && <p class="standfirst reveal" data-delay="3" style="margin-top:26px">{law.oneLineSummary}</p>}
-    {/* The explicit {' '} in each bullet matters: without it the extracted
-        text reads "deadline:26 July 2029", which is what answer engines quote. */}
-    {glance.length > 0 && (
-      <ul class="glance reveal" data-delay="3">
-        {glance.map((g) => (
-          <li><span>{g.label}:</span>{' '}{g.value}</li>
-        ))}
-      </ul>
-    )}
   </div>
 </section>
 
