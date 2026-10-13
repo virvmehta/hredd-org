@@ -9,7 +9,7 @@ only the published dataset is licensed under CC BY 4.0.
 
 ## What the site contains
 
-The site builds about 74 static pages:
+The site builds about 75 static pages:
 
 - **Tracker** (`/tracker/`): all 18 laws on a world map, with the monthly
   change log. The old `/tracker/<law>/` addresses redirect to the law pages.
@@ -58,7 +58,7 @@ pilot in `src/pages/bn/` must stay out of the repository for now.
     git commit -m "Describe the change here"
     git push
 
-Check that the build reports about 74 pages before you push. Cloudflare
+Check that the build reports about 75 pages before you push. Cloudflare
 rebuilds automatically once the push arrives.
 
 **Sanity Studio schema changes** also need the Studio redeployed:

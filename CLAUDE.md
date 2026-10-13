@@ -156,7 +156,7 @@ PASS` is the expected final line of the second command.
 
 ## Deploy checklist
 1. `npm run build` locally (or trust the CI build) — check the page count in
-   the output against what's expected (currently 74 pages in production, 75
+   the output against what's expected (currently 75 pages in production, 76
    locally while the untracked Bangla page exists)
 2. `git add <paths> && git commit -m "..." && git push` (explicit paths, see
    the translations note above)

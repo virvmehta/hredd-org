@@ -308,8 +308,8 @@ export const staticLaws = [
   "region": "European Union",
   "status": "Amended",
   "statusType": "force",
-  "lastUpdated": "2026-09-18",
-  "tableUpdateText": "Simplified reporting standards adopted on 3 July 2026, with a value chain cap that limits what buyers may demand from smaller suppliers.",
+  "lastUpdated": "2026-10-13",
+  "tableUpdateText": "Revised reporting standards published on 21 September 2026 and in force from 10 November, with the value chain cap now final.",
   "enactedDate": "January 2023",
   "firstComplianceDeadline": "FY2027 under the revised scope; wave one reporting since 2025",
   "companiesInScope": "EU companies with more than 1,000 employees and more than EUR 450 million net turnover",
@@ -356,7 +356,7 @@ export const staticLaws = [
    "SWE"
   ],
   "oneLineSummary": "The EU sustainability reporting regime requiring double materiality disclosure, now substantially narrowed by the 2025 simplification omnibus.",
-  "summary": "<p>The CSRD requires in-scope companies to report against the European Sustainability Reporting Standards on a double materiality basis, covering both the company's impacts on people and planet and the sustainability risks it faces. The first wave of reports was published in 2025.</p><p>The 2025 omnibus significantly raised the employee threshold, removed many mid-sized companies from scope, and delayed later reporting waves by two years while the standards themselves are simplified. For suppliers, the value chain disclosures remain the important part: buyers request primary data from suppliers to populate their own reports, and that request cascade continues regardless of the scope changes.</p><p>The simplified standards adopted by the Commission on 3 July 2026 cut mandatory datapoints by more than 60 percent and introduce a value chain cap. Companies within the CSRD may not require smaller companies in their value chains, those averaging fewer than 1,000 employees, to provide more information than the voluntary standard covers. For most suppliers this is the most useful protection the omnibus produced, and it is worth citing when a buyer questionnaire goes beyond it.</p>",
+  "summary": "<p>The CSRD requires in-scope companies to report against the European Sustainability Reporting Standards on a double materiality basis, covering both the company's impacts on people and planet and the sustainability risks it faces. The first wave of reports was published in 2025.</p><p>The 2025 omnibus significantly raised the employee threshold, removed many mid-sized companies from scope, and delayed later reporting waves by two years while the standards themselves are simplified. For suppliers, the value chain disclosures remain the important part: buyers request primary data from suppliers to populate their own reports, and that request cascade continues regardless of the scope changes.</p><p>The simplified standards adopted by the Commission on 3 July 2026 cut mandatory datapoints by more than 60 percent and introduce a value chain cap. Companies within the CSRD may not require smaller companies in their value chains, those averaging fewer than 1,000 employees, to provide more information than the voluntary standard covers. The standards cleared the Parliament and Council scrutiny period without objection, were published in the Official Journal on 21 September 2026 and enter into force on 10 November 2026. For most suppliers the cap is the most useful protection the omnibus produced, and it is worth citing when a buyer questionnaire goes beyond it.</p>",
   "obligations": [
    {
     "title": "Double materiality assessment",
@@ -394,7 +394,15 @@ export const staticLaws = [
    },
    {
     "date": "3 July 2026",
-    "event": "Commission adopted the simplified reporting standards and the voluntary standard, including the value chain cap protecting smaller suppliers; the Parliament and Council scrutiny period follows."
+    "event": "Commission adopted the simplified reporting standards and the voluntary standard, including the value chain cap protecting smaller suppliers."
+   },
+   {
+    "date": "21 September 2026",
+    "event": "Revised standards published in the Official Journal after the scrutiny period ended without objection."
+   },
+   {
+    "date": "10 November 2026",
+    "event": "Revised standards enter into force."
    },
    {
     "date": "1 January 2027",
@@ -402,6 +410,10 @@ export const staticLaws = [
    }
   ],
   "changelog": [
+   {
+    "date": "October 2026",
+    "text": "Recorded that the revised standards cleared scrutiny, were published on 21 September 2026 and enter into force on 10 November 2026."
+   },
    {
     "date": "September 2026",
     "text": "Added the simplified reporting standards adopted on 3 July 2026 and the value chain cap; scope thresholds stated precisely."
@@ -423,6 +435,10 @@ export const staticLaws = [
    {
     "title": "European Commission: Commission adopts revised sustainability reporting standards (3 July 2026)",
     "url": "https://finance.ec.europa.eu/news/commission-adopts-revised-sustainability-reporting-standards-2026-07-03_en"
+   },
+   {
+    "title": "HSF Kramer: revised ESRS and voluntary standards become final (September 2026)",
+    "url": "https://www.hsfkramer.com/notes/esg/2026-posts/revised-esrs-and-voluntary-sustainability-reporting-standards-become-final"
    }
   ],
   "order": 2
@@ -435,11 +451,11 @@ export const staticLaws = [
   "region": "European Union",
   "status": "Delayed",
   "statusType": "delayed",
-  "lastUpdated": "2026-09-18",
-  "tableUpdateText": "Commission adopted a delegated act on 13 July 2026 removing leather from scope; it binds only once published in the Official Journal.",
+  "lastUpdated": "2026-10-13",
+  "tableUpdateText": "Leather left the scope on 18 September 2026, when Delegated Regulation (EU) 2026/2102 entered into force.",
   "enactedDate": "June 2023",
   "firstComplianceDeadline": "30 December 2026 (large and medium operators); 30 June 2027 (most micro and small)",
-  "companiesInScope": "Operators and traders placing cattle, cocoa, coffee, palm oil, rubber, soy or wood products listed in Annex I on the EU market; leather is being removed from scope",
+  "companiesInScope": "Operators and traders placing cattle, cocoa, coffee, palm oil, rubber, soy or wood products listed in Annex I on the EU market; cattle hides, skins and leather left the scope in September 2026",
   "maxPenalty": "At least 4 percent of EU turnover, set by member states",
   "civilLiability": "Administrative enforcement; goods can be refused entry",
   "enforcementBody": "Member state competent authorities and customs",
@@ -488,7 +504,7 @@ export const staticLaws = [
    "SWE"
   ],
   "oneLineSummary": "Geolocation-backed proof that seven commodity groups entering the EU are deforestation-free and legally produced.",
-  "summary": "<p>The EUDR requires companies placing relevant commodities on the EU market to prove, with plot-level geolocation data, that products are deforestation-free after the 2020 cut-off and produced in compliance with the laws of the country of production. After two postponements, obligations apply to large and medium operators from 30 December 2026, together with micro and small operators already covered by the old Timber Regulation. All other micro and small operators follow on 30 June 2027.</p><p>On 13 July 2026 the Commission adopted a delegated act revising the product list in Annex I. It removes cattle hides, skins and leather, retreaded tyres, soybeans for sowing, certain vulcanised rubber articles, conveyor and transmission belts, and aircraft and motor vehicle seats. It adds soluble coffee, certain palm oil derivatives, frozen cattle tongues and some soaps, which will be covered from 30 December 2027. The act becomes binding only after the Parliament and Council scrutiny period and publication in the Official Journal; until then the original Annex I applies.</p><p>For producer countries the regulation has already reshaped procurement. Buyers are demanding polygon mapping from farm level upwards, and smallholders without digital land records face exclusion risk unless supported. The country benchmarking system determines the intensity of checks that shipments face at the border. Tanneries and leather exporters stand to be released from the regime entirely once the delegated act is published.</p>",
+  "summary": "<p>The EUDR requires companies placing relevant commodities on the EU market to prove, with plot-level geolocation data, that products are deforestation-free after the 2020 cut-off and produced in compliance with the laws of the country of production. After two postponements, obligations apply to large and medium operators from 30 December 2026, together with micro and small operators already covered by the old Timber Regulation. All other micro and small operators follow on 30 June 2027.</p><p>The revision of Annex I is now law. The Commission adopted the delegated act on 13 July 2026, and it was published as Delegated Regulation (EU) 2026/2102 on 17 September 2026, entering into force the following day. The removals took effect immediately, so cattle hides, skins and leather, vulcanised rubber belts and articles, aircraft and motor vehicle seats, soybeans for sowing and retreaded tyres are no longer covered. Soluble coffee, certain palm oil derivatives, frozen cattle tongues and palm-based soaps were added, and they come into scope on 30 December 2027.</p><p>For producer countries the regulation has already reshaped procurement. Buyers are demanding polygon mapping from farm level upwards, and smallholders without digital land records face exclusion risk unless supported. The country benchmarking system determines the intensity of checks that shipments face at the border. Tanneries and leather exporters are now outside the regime altogether, although the cattle and beef those hides come from remain covered.</p>",
   "obligations": [
    {
     "title": "Due diligence statements with geolocation",
@@ -529,8 +545,8 @@ export const staticLaws = [
     "event": "Commission adopted a delegated act removing leather and several other products from Annex I and adding soluble coffee, palm oil derivatives and frozen cattle tongues, plus an implementing act simplifying declarations for micro and small primary operators."
    },
    {
-    "date": "13 September 2026",
-    "event": "Standard two-month scrutiny period for the delegated act ended, unless extended; publication in the Official Journal awaited."
+    "date": "17 September 2026",
+    "event": "Delegated Regulation (EU) 2026/2102 published in the Official Journal after scrutiny ended without objection; the removals from Annex I took effect on 18 September 2026."
    },
    {
     "date": "30 December 2026",
@@ -546,6 +562,10 @@ export const staticLaws = [
    }
   ],
   "changelog": [
+   {
+    "date": "October 2026",
+    "text": "Leather removal confirmed as law: Delegated Regulation (EU) 2026/2102 was published on 17 September 2026 and took effect the next day."
+   },
    {
     "date": "September 2026",
     "text": "Added the July 2026 delegated act removing leather from scope, corrected application dates to include medium operators, and replaced a summary paragraph that still gave the superseded 2025 dates."
@@ -567,6 +587,10 @@ export const staticLaws = [
    {
     "title": "European Commission: Commission updates product scope and tools to support EUDR (13 July 2026)",
     "url": "https://environment.ec.europa.eu/news/commission-updates-product-scope-and-tools-support-eudr-2026-07-13_en"
+   },
+   {
+    "title": "Commission Delegated Regulation (EU) 2026/2102 amending Annex I, Official Journal (17 September 2026)",
+    "url": "https://eur-lex.europa.eu/eli/reg_del/2026/2102/oj"
    }
   ],
   "order": 3
@@ -682,11 +706,11 @@ export const staticLaws = [
   "region": "European Union",
   "status": "Delayed",
   "statusType": "delayed",
-  "lastUpdated": "2026-03-20",
-  "tableUpdateText": "Due diligence postponed to 18 August 2027 by Regulation 2025/1561; guidelines due July 2026.",
+  "lastUpdated": "2026-10-13",
+  "tableUpdateText": "Due diligence applies from 18 August 2027; the Commission guidelines were due on 26 July 2026 and we cannot confirm that they were published.",
   "enactedDate": "August 2023",
   "firstComplianceDeadline": "18 August 2027 (due diligence chapter)",
-  "companiesInScope": "Economic operators placing batteries on the EU market above the turnover threshold",
+  "companiesInScope": "Economic operators placing batteries on the EU market, with an exemption for smaller operators; a pending proposal would extend that exemption to operators below EUR 150 million turnover",
   "maxPenalty": "Set by member states; market withdrawal available",
   "civilLiability": "Administrative enforcement through market surveillance",
   "enforcementBody": "National market surveillance authorities and notified bodies",
@@ -733,7 +757,7 @@ export const staticLaws = [
    "SWE"
   ],
   "oneLineSummary": "Mandatory raw material supply chain due diligence for batteries covering cobalt, lithium, nickel and natural graphite.",
-  "summary": "<p>The Batteries Regulation includes a due diligence chapter modelled on the OECD minerals guidance, requiring battery producers to establish management systems, identify and mitigate risks in cobalt, lithium, nickel and natural graphite supply chains, and have their policies verified by notified bodies.</p><p>The 2025 simplification omnibus postponed the due diligence obligations to August 2027 and adjusted thresholds, but the direction of travel is unchanged: mineral supply chains feeding the EU battery market will need documented, audited due diligence reaching mine level.</p>",
+  "summary": "<p>The Batteries Regulation includes a due diligence chapter modelled on the OECD minerals guidance, requiring battery producers to establish management systems, identify and mitigate risks in cobalt, lithium, nickel and natural graphite supply chains, and have their policies verified by notified bodies.</p><p>Regulation (EU) 2025/1561 postponed the due diligence obligations to 18 August 2027 and moved the deadline for the Commission guidelines to 26 July 2026. A separate Omnibus IV proposal, which would exempt operators below EUR 150 million in turnover and reduce public reporting to once every three years, is still in the legislative process and is not yet law. The direction of travel is unchanged even so: mineral supply chains feeding the EU battery market will need documented, audited due diligence reaching mine level.</p>",
   "obligations": [
    {
     "title": "Supply chain due diligence policy",
@@ -763,7 +787,7 @@ export const staticLaws = [
    },
    {
     "date": "26 July 2026",
-    "event": "Commission due diligence guidelines due under the revised calendar."
+    "event": "Deadline for the Commission due diligence guidelines. We have found no published guidelines as of October 2026, and we will record them here when they appear."
    },
    {
     "date": "18 February 2027",
@@ -776,6 +800,10 @@ export const staticLaws = [
   ],
   "changelog": [
    {
+    "date": "October 2026",
+    "text": "Corrected the claim that the 2025 regulation adjusted thresholds: the EUR 150 million exemption and three-yearly reporting are still proposals. Noted that the guidelines deadline of 26 July 2026 passed without confirmed publication."
+   },
+   {
     "date": "March 2026",
     "text": "Entry updated after the postponement of the due diligence chapter was confirmed."
    }
@@ -784,6 +812,10 @@ export const staticLaws = [
    {
     "title": "Regulation (EU) 2023/1542, Official Journal",
     "url": "https://eur-lex.europa.eu/eli/reg/2023/1542/oj"
+   },
+   {
+    "title": "A and L Goodbody: batteries due diligence, a two-year pause and reduced scope",
+    "url": "https://www.algoodbody.com/insights-publications/batteries-due-diligence-a-two-year-pause-and-reduced-scope"
    }
   ],
   "order": 5
@@ -796,11 +828,11 @@ export const staticLaws = [
   "region": "European Member States and UK",
   "status": "Reform proposed",
   "statusType": "delayed",
-  "lastUpdated": "2026-05-02",
-  "tableUpdateText": "Reporting abolished and fines narrowed; due diligence duties remain in force pending CSDDD transposition.",
+  "lastUpdated": "2026-10-13",
+  "tableUpdateText": "Coalition decided on 2 July 2026 to cut the scope to 5,000 employees and EUR 1.5 billion turnover from autumn 2026; the amendment bill is still unpassed.",
   "enactedDate": "January 2023",
   "firstComplianceDeadline": "January 2023 (3,000+ employees); January 2024 (1,000+)",
-  "companiesInScope": "Companies with 1,000 or more employees in Germany",
+  "companiesInScope": "Companies with 1,000 or more employees in Germany; the coalition plans to raise this to 5,000 employees and EUR 1.5 billion in worldwide turnover",
   "maxPenalty": "Up to 2 percent of average annual turnover for the largest companies",
   "civilLiability": "No new civil cause of action; special litigation standing for trade unions and NGOs",
   "enforcementBody": "Federal Office for Economic Affairs and Export Control (BAFA)",
@@ -822,7 +854,7 @@ export const staticLaws = [
    "DEU"
   ],
   "oneLineSummary": "The German due diligence law that shaped supplier questionnaires worldwide, now being folded into CSDDD transposition.",
-  "summary": "<p>The LkSG obliges companies with at least 1,000 employees in Germany to conduct risk analyses, adopt preventive and remedial measures, operate complaints procedures and document their due diligence across own operations and direct suppliers, extending to indirect suppliers on substantiated knowledge of risk.</p><p>The 2025 coalition agreement committed to replacing the LkSG with a lean CSDDD-implementing law. The reporting obligation was removed in 2025 and enforcement narrowed to serious violations while the replacement bill moves through the Bundestag. For suppliers, BAFA-driven questionnaires have already slowed, but German buyers continue to run LkSG-shaped systems as the baseline for CSDDD readiness.</p>",
+  "summary": "<p>The LkSG obliges companies with at least 1,000 employees in Germany to conduct risk analyses, adopt preventive and remedial measures, operate complaints procedures and document their due diligence across own operations and direct suppliers, extending to indirect suppliers on substantiated knowledge of risk.</p><p>The 2025 coalition agreement committed to replacing the LkSG with a lean CSDDD-implementing law. BAFA stopped reviewing reports in October 2025 and limited enforcement to serious violations, and a bill that would abolish the reporting duty retroactively has sat before the Bundestag since January 2026 without passing. On 2 July 2026 the coalition went further, deciding to restrict the act to companies with at least 5,000 employees and more than EUR 1.5 billion in worldwide turnover from autumn 2026, and to transpose the CSDDD without going beyond it. That decision is political rather than legal, and no bill giving effect to it had appeared by October 2026. For suppliers, BAFA-driven questionnaires have already slowed, but German buyers continue to run LkSG-shaped systems as the baseline for CSDDD readiness.</p>",
   "obligations": [
    {
     "title": "Annual and ad hoc risk analysis",
@@ -861,9 +893,21 @@ export const staticLaws = [
    {
     "date": "January 2026",
     "event": "Bundestag began deliberating the amendment bill."
+   },
+   {
+    "date": "2 July 2026",
+    "event": "Coalition decided to restrict the act to companies with at least 5,000 employees and more than EUR 1.5 billion in worldwide turnover from autumn 2026, and to transpose the CSDDD one to one."
+   },
+   {
+    "date": "October 2026",
+    "event": "Amendment bill still not passed, and no bill yet introduced for the narrower scope."
    }
   ],
   "changelog": [
+   {
+    "date": "October 2026",
+    "text": "Corrected the claim that the reporting duty was removed in 2025: the bill has not passed, although BAFA stopped reviewing reports in October 2025. Added the coalition decision of 2 July 2026 to narrow the scope."
+   },
    {
     "date": "May 2026",
     "text": "Entry updated to track the repeal-and-replace bill and narrowed BAFA enforcement."
@@ -877,6 +921,14 @@ export const staticLaws = [
    {
     "title": "BAFA supply chain act portal",
     "url": "https://www.bafa.de/"
+   },
+   {
+    "title": "Coalition committee decision of 2 July 2026 (Bundesregierung, German)",
+    "url": "https://www.bundesregierung.de/resource/blob/2196306/2445592/bc8e5e160d879f0bdd593121a96a45d2/2026-07-02-koaausschuss-data.pdf"
+   },
+   {
+    "title": "Bird and Bird: LkSG and CSDDD, the plans of the federal government and the EU (German)",
+    "url": "https://www.twobirds.com/de/insights/2026/germany/lksg--csddd--was-planen-bundesregierung-und-eu"
    }
   ],
   "order": 6
@@ -969,8 +1021,8 @@ export const staticLaws = [
   "region": "European Member States and UK",
   "status": "In force",
   "statusType": "force",
-  "lastUpdated": "2026-09-18",
-  "tableUpdateText": "Ministry consulting until 30 September 2026 on letting the Consumer Authority issue decisions without first negotiating with companies.",
+  "lastUpdated": "2026-10-13",
+  "tableUpdateText": "Consultation on removing the negotiation model closed on 30 September 2026, with no outcome published yet.",
   "enactedDate": "July 2022",
   "firstComplianceDeadline": "June 2023 statements",
   "companiesInScope": "Larger enterprises domiciled or selling in Norway meeting two of three size thresholds",
@@ -1028,10 +1080,14 @@ export const staticLaws = [
    },
    {
     "date": "2026",
-    "event": "Ministry consulted, until 30 September 2026, on removing the negotiation model so the Consumer Authority can issue binding decisions without first seeking voluntary compliance."
+    "event": "Ministry consultation on removing the negotiation model closed on 30 September 2026. It would let the Consumer Authority issue binding decisions without first seeking voluntary compliance, and the outcome has not been published."
    }
   ],
   "changelog": [
+   {
+    "date": "October 2026",
+    "text": "Consultation on the negotiation model closed on 30 September 2026; no outcome published yet."
+   },
    {
     "date": "September 2026",
     "text": "Added the 2025 evaluation and the 2026 consultation on strengthening the Consumer Authority enforcement powers."
@@ -1545,8 +1601,8 @@ export const staticLaws = [
   "region": "North America",
   "status": "In force",
   "statusType": "force",
-  "lastUpdated": "2026-09-18",
-  "tableUpdateText": "Bill C-35, introduced on 12 June 2026, would create a list-based forced labour import ban; a due diligence consultation closed on 21 August.",
+  "lastUpdated": "2026-10-13",
+  "tableUpdateText": "Bill C-35 still awaits second reading; the government published its consultation findings on 8 October 2026.",
   "enactedDate": "January 2024",
   "firstComplianceDeadline": "31 May 2024 reports",
   "companiesInScope": "Government institutions and entities meeting the size thresholds that produce, sell or import goods",
@@ -1570,7 +1626,7 @@ export const staticLaws = [
    "CAN"
   ],
   "oneLineSummary": "A reporting statute with personal officer liability, paired with an import ban on forced and child labour goods.",
-  "summary": "<p>S-211 requires covered entities to file annual reports on the steps taken to prevent and reduce the risk of forced labour and child labour in their supply chains, with questionnaire-based filing to Public Safety Canada and board-approved public statements. The act also extended the customs prohibition to goods made with child labour.</p><p>The personal exposure of directors and officers to fines has made Canadian boards unusually attentive to a regime that is, on paper, disclosure only. Guidance has tightened each cycle, and debate continues over graduating from reporting to mandatory due diligence.</p><p>That debate moved in 2026. On 12 June the government introduced Bill C-35, a standalone forced labour import ban that would let the Minister of Foreign Affairs list high-risk goods and require importers of those goods to supply tracing information on request. Consultations from 27 July to 21 August 2026 asked whether Canadian businesses should also carry mandatory due diligence duties with civil liability, which would take Canada well beyond reporting.</p>",
+  "summary": "<p>S-211 requires covered entities to file annual reports on the steps taken to prevent and reduce the risk of forced labour and child labour in their supply chains, with questionnaire-based filing to Public Safety Canada and board-approved public statements. The act also extended the customs prohibition to goods made with child labour.</p><p>The personal exposure of directors and officers to fines has made Canadian boards unusually attentive to a regime that is, on paper, disclosure only. Guidance has tightened each cycle, and debate continues over graduating from reporting to mandatory due diligence.</p><p>That debate moved in 2026. On 12 June the government introduced Bill C-35, a standalone forced labour import ban that would let the Minister of Foreign Affairs list high-risk goods and require importers of those goods to supply tracing information on request. Consultations from 27 July to 21 August 2026 asked whether Canadian businesses should also carry mandatory due diligence duties with civil liability, which would take Canada well beyond reporting. On 8 October 2026 the government published two reports on what it heard. Respondents supported a law requiring companies to identify, prevent and mitigate forced labour risks in their international operations and supply chains, while views divided on whether victims should be able to bring claims in Canadian courts. Bill C-35 was still awaiting second reading when Parliament returned on 21 September.</p>",
   "obligations": [
    {
     "title": "Annual report and questionnaire",
@@ -1605,9 +1661,21 @@ export const staticLaws = [
    {
     "date": "27 July 2026",
     "event": "Government opened consultations on the Bill C-35 regulations and on mandatory due diligence with civil liability, closing 21 August 2026."
+   },
+   {
+    "date": "21 September 2026",
+    "event": "Parliament returned from recess with Bill C-35 still awaiting second reading."
+   },
+   {
+    "date": "8 October 2026",
+    "event": "Government published its What We Heard reports on the import ban regulations and on due diligence with civil liability."
    }
   ],
   "changelog": [
+   {
+    "date": "October 2026",
+    "text": "Added the October 2026 consultation findings and the current stage of Bill C-35."
+   },
    {
     "date": "September 2026",
     "text": "Added Bill C-35 and the 2026 consultations on mandatory due diligence and civil liability."
@@ -1629,6 +1697,10 @@ export const staticLaws = [
    {
     "title": "Baker McKenzie: consultation on the future of forced labour legislation (August 2026)",
     "url": "https://globalimportblog.bakermckenzie.com/2026/08/19/canada-announces-consultation-on-future-of-forced-labour-legislation-import-prohibition-and-positive-due-diligence-obligations/"
+   },
+   {
+    "title": "Government of Canada: What We Heard reports on fighting forced labour (8 October 2026)",
+    "url": "https://www.canada.ca/en/employment-social-development/news/2026/10/government-of-canada-releases-what-we-heard-reports-on-fighting-forced-labour.html"
    }
   ],
   "order": 15
@@ -1641,8 +1713,8 @@ export const staticLaws = [
   "region": "Asia-Pacific",
   "status": "In force",
   "statusType": "force",
-  "lastUpdated": "2026-09-18",
-  "tableUpdateText": "Government announced on 16 July 2026 a criminal failure to prevent offence and civil penalties; consultation to follow, with no bill yet.",
+  "lastUpdated": "2026-10-13",
+  "tableUpdateText": "Consultation on the failure to prevent offence ran from 21 August to 25 September 2026, raising absolute liability and deferred prosecution agreements.",
   "enactedDate": "January 2019",
   "firstComplianceDeadline": "FY2020 statements",
   "companiesInScope": "Entities with annual consolidated revenue of 100 million Australian dollars or more",
@@ -1666,7 +1738,7 @@ export const staticLaws = [
    "AUS"
   ],
   "oneLineSummary": "Mandatory modern slavery statements with prescribed content, awaiting the penalties its own review recommended.",
-  "summary": "<p>The Australian act requires covered entities to publish annual modern slavery statements addressing seven mandatory criteria, filed on a public register. Unlike the UK regime the content is prescribed, but like the UK regime there are currently no financial penalties for poor or absent reporting.</p><p>The 2023 statutory review recommended penalties, a due diligence duty and lower thresholds. The Anti-Slavery Commissioner role was created and filled, while the harder-edged recommendations await legislation, making Australia the clearest live test of whether disclosure regimes graduate into due diligence regimes.</p><p>On 16 July 2026 the government announced that it would create a criminal offence for companies with annual consolidated revenue above A$100 million that fail to prevent modern slavery in their supply chains, with a defence for companies that took reasonable steps. Civil penalties for reporting failures would follow alongside it. Details and a consultation are still to come, and no bill has yet been introduced.</p>",
+  "summary": "<p>The Australian act requires covered entities to publish annual modern slavery statements addressing seven mandatory criteria, filed on a public register. Unlike the UK regime the content is prescribed, but like the UK regime there are currently no financial penalties for poor or absent reporting.</p><p>The 2023 statutory review recommended penalties, a due diligence duty and lower thresholds. The Anti-Slavery Commissioner role was created and filled, while the harder-edged recommendations await legislation, making Australia the clearest live test of whether disclosure regimes graduate into due diligence regimes.</p><p>On 16 July 2026 the government announced that it would create a criminal offence for companies with annual consolidated revenue above A$100 million that fail to prevent modern slavery in their supply chains, with a defence for companies that took reasonable steps. Civil penalties for reporting failures would follow alongside it. The Attorney-General's Department published its consultation paper on 21 August 2026, and the consultation closed on 25 September. The paper asks whether the offence should rest on absolute liability, so that a company could be liable without knowledge or intent, subject to the reasonable steps defence. It also raises deferred prosecution agreements and routes for survivors to seek civil remedies. No bill has yet been introduced.</p>",
   "obligations": [
    {
     "title": "Seven mandatory reporting criteria",
@@ -1697,9 +1769,17 @@ export const staticLaws = [
    {
     "date": "16 July 2026",
     "event": "Government announced a criminal failure to prevent offence for companies above A$100 million in revenue, with a reasonable steps defence, plus civil penalties for reporting breaches; consultation to follow."
+   },
+   {
+    "date": "21 August to 25 September 2026",
+    "event": "Attorney-General's Department consulted on the failure to prevent offence, with absolute liability, deferred prosecution agreements and civil remedies for survivors among the options."
    }
   ],
   "changelog": [
+   {
+    "date": "October 2026",
+    "text": "Added the August and September 2026 consultation, including the absolute liability option."
+   },
    {
     "date": "September 2026",
     "text": "Added the July 2026 announcement of a failure to prevent offence and civil penalties."
@@ -1721,6 +1801,14 @@ export const staticLaws = [
    {
     "title": "Baker McKenzie: new modern slavery offence proposed (July 2026)",
     "url": "https://www.bakermckenzie.com/en/insight/publications/2026/07/australia-new-modern-slavery-offence-proposed"
+   },
+   {
+    "title": "Attorney-General's Department: strengthening Australia's response to modern slavery in supply chains",
+    "url": "https://consultations.ag.gov.au/crime/modern-slavery/"
+   },
+   {
+    "title": "Baker McKenzie: consultation opens on the modern slavery offence (September 2026)",
+    "url": "https://www.bakermckenzie.com/en/insight/publications/2026/09/australia-consultation-opens-on-modern-slavery-offence"
    }
   ],
   "order": 16

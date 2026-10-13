@@ -14,6 +14,8 @@ export const SECTORS = [
 export const SECTOR_CHAPTERS = Object.fromEntries(SECTORS.map(s => [s.id, s.chapters]));
 
 export const COMMODITY_CHAPTERS = {
-  'Cattle or leather': '01', 'Cocoa': '18', 'Coffee': '09', 'Oil palm': '15',
+  // Leather left the EUDR scope on 18 September 2026 (Delegated Regulation
+  // (EU) 2026/2102), so this option covers cattle and beef only now.
+  'Cattle': '01', 'Cocoa': '18', 'Coffee': '09', 'Oil palm': '15',
   'Rubber': '40', 'Soya': '12', 'Wood, paper, or furniture': '44',
 };
