@@ -503,7 +503,7 @@ export const staticLaws = [
    "ESP",
    "SWE"
   ],
-  "oneLineSummary": "Geolocation-backed proof that seven commodity groups entering the EU are deforestation-free and legally produced.",
+  "oneLineSummary": "Plot-level proof that seven commodity groups entering the EU are deforestation-free and legally produced, required from 30 December 2026.",
   "summary": "<p>The EUDR requires companies placing relevant commodities on the EU market to prove, with plot-level geolocation data, that products are deforestation-free after the 2020 cut-off and produced in compliance with the laws of the country of production. After two postponements, obligations apply to large and medium operators from 30 December 2026, together with micro and small operators already covered by the old Timber Regulation. All other micro and small operators follow on 30 June 2027.</p><p>The revision of Annex I is now law. The Commission adopted the delegated act on 13 July 2026, and it was published as Delegated Regulation (EU) 2026/2102 on 17 September 2026, entering into force the following day. The removals took effect immediately, so cattle hides, skins and leather, vulcanised rubber belts and articles, aircraft and motor vehicle seats, soybeans for sowing and retreaded tyres are no longer covered. Soluble coffee, certain palm oil derivatives, frozen cattle tongues and palm-based soaps were added, and they come into scope on 30 December 2027.</p><p>For producer countries the regulation has already reshaped procurement. Buyers are demanding polygon mapping from farm level upwards, and smallholders without digital land records face exclusion risk unless supported. The country benchmarking system determines the intensity of checks that shipments face at the border. Tanneries and leather exporters are now outside the regime altogether, although the cattle and beef those hides come from remain covered.</p>",
   "obligations": [
    {
@@ -517,6 +517,40 @@ export const staticLaws = [
    {
     "title": "Legality of production",
     "detail": "Production must comply with the producing country laws on land use, labour, human rights and tax."
+   }
+  ],
+  "supplierChecklist": [
+   {
+    "title": "Plot coordinates for every production site",
+    "detail": "A latitude and longitude point for each plot up to four hectares, and a polygon for anything larger, in decimal degrees to at least six decimal places. The EU information system accepts GeoJSON only, so a spreadsheet of village names will be rejected."
+   },
+   {
+    "title": "Evidence against the 2020 cut-off",
+    "detail": "Proof that the land was not deforested after 31 December 2020. In practice this means satellite history or land records tied to the same coordinates you supplied, not a general statement about the region."
+   },
+   {
+    "title": "Proof that production was legal",
+    "detail": "Documents covering land use rights, environmental and forest law, labour rights, third party rights, and trade and customs rules in the country of production. Legality is assessed against the producing country law, not EU law."
+   },
+   {
+    "title": "Your buyer files the statement, not you",
+    "detail": "The first operator placing goods on the EU market submits the due diligence statement in the TRACES system. A supplier outside the EU does not file, so the data you hand over becomes somebody else's legal declaration."
+   },
+   {
+    "title": "One statement now travels as a reference number",
+    "detail": "Since the December 2025 amendment, downstream buyers no longer file their own statements and simply keep the reference number of the first one. Nothing further down the chain re-checks your data, so an error surfaces at the border rather than in the paperwork."
+   },
+   {
+    "title": "Know which risk tier your country sits in",
+    "detail": "Only Belarus, North Korea, Myanmar and Russia are classed high risk. Most producing countries are standard risk, where authorities must check at least 3 percent of operators, against 9 percent for high risk and 1 percent for low risk."
+   },
+   {
+    "title": "Check which deadline is yours",
+    "detail": "Large and medium operators, and downstream operators of every size, are covered from 30 December 2026. Micro and small operators follow on 30 June 2027, except in the timber sector, where they are covered from December 2026."
+   },
+   {
+    "title": "Leather no longer counts, but cattle still do",
+    "detail": "Cattle hides, skins and leather left the scope on 18 September 2026. Cattle and beef remain covered, so a tannery sits outside the regulation while the herd behind it does not."
    }
   ],
   "timeline": [

@@ -9,7 +9,7 @@ export const queries = {
     lastUpdated, tableUpdateText, enactedDate, firstComplianceDeadline,
     companiesInScope, maxPenalty, civilLiability, enforcementBody,
     sectorsAffected, supplierCountries, countryCode, countryCodes,
-    oneLineSummary, summary, obligations, timeline, changelog, sources, order
+    oneLineSummary, summary, obligations, supplierChecklist, timeline, changelog, sources, order
   }`,
 
   allArticles: `*[_type == "article"] {

@@ -110,6 +110,23 @@ export default {
       ]
     },
     {
+      // The supplier-side mirror of "obligations": what the buyer will demand
+      // from a supplier, rather than what the law demands of the buyer. Optional,
+      // so a law without one simply does not show the section.
+      name: 'supplierChecklist',
+      title: 'What your buyer will ask you for (supplier checklist)',
+      type: 'array',
+      of: [
+        {
+          type: 'object',
+          fields: [
+            { name: 'title', type: 'string', title: 'Item' },
+            { name: 'detail', type: 'text', rows: 3, title: 'Detail' }
+          ]
+        }
+      ]
+    },
+    {
       name: 'timeline',
       title: 'Timeline',
       type: 'array',

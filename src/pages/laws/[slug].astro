@@ -126,6 +126,18 @@ const jsonLd = [
       { "@type": "ListItem", "position": 2, "name": law.shortName || law.name, "item": `https://hredd.org/laws/${law.slug}/` }
     ]
   },
+  // The supplier checklist as a list an answer engine can lift item by item,
+  // rather than leaving it as prose it has to infer structure from.
+  ...((law.supplierChecklist || []).length ? [{
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": `What suppliers must provide under the ${law.shortName || law.name}`,
+    "itemListOrder": "https://schema.org/ItemListOrderAscending",
+    "numberOfItems": law.supplierChecklist.length,
+    "itemListElement": law.supplierChecklist.map((c, i) => ({
+      "@type": "ListItem", "position": i + 1, "name": c.title, "description": c.detail
+    }))
+  }] : []),
   ...(faq.length ? [{
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -194,6 +206,21 @@ const jsonLd = [
         <div><p class="kicker">In plain language</p><h2 class="h2">What this law does</h2></div>
       </div>
       <div class="prose" style="margin:0" set:html={summaryHtml}></div>
+    </div>
+  </section>
+)}
+
+{law.supplierChecklist && law.supplierChecklist.length > 0 && (
+  <section class="section" style="padding-bottom:0">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div><p class="kicker">For suppliers</p><h2 class="h2">What your buyer will ask you for</h2></div>
+      </div>
+      <ol class="oblist reveal" data-delay="1">
+        {law.supplierChecklist.map((c) => (
+          <li><div><h3>{c.title}</h3><p>{c.detail}</p></div></li>
+        ))}
+      </ol>
     </div>
   </section>
 )}
