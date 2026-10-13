@@ -1,0 +1,48 @@
+---
+import Base from '../layouts/Base.astro';
+import { getAllLaws } from '../lib/sanity.js';
+
+// Without this page every unknown path returned 200 with the homepage HTML,
+// which is a "soft 404": search engines and answer engines treat those as real
+// pages, scanners probing /.env or /wp-login.php get a success, and a model can
+// cite an address that was never a page. Cloudflare Pages serves dist/404.html
+// with a real 404 status for any unmatched path.
+const laws = await getAllLaws();
+const popular = laws.slice(0, 6);
+---
+<Base
+  title="Page not found | hredd.org"
+  description="That page does not exist on hredd.org. The tracker, the law pages and the trade index are linked here."
+  active=""
+  noindex={true}
+>
+
+<section class="law-head">
+  <div class="wrap">
+    <p class="kicker reveal">Error 404</p>
+    <h1 class="display reveal" data-delay="1" style="font-size:clamp(34px,4.6vw,64px)">That page does not exist</h1>
+    <p class="standfirst reveal" data-delay="2">The address you followed is not part of this site, or the page has moved since it was linked. Everything we publish is reachable from the sections below.</p>
+    <div class="hero-ctas reveal" data-delay="3" style="margin-top:26px">
+      <a class="btn solid" href="/tracker/"><span>Go to the tracker</span> <i>&#8594;</i></a>
+      <a class="btn" href="/"><span>Return to the homepage</span></a>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div><p class="kicker">The laws</p><h2 class="h2">Start from a law instead</h2></div>
+      <a class="textlink" href="/tracker/">All eighteen laws <i>&#8594;</i></a>
+    </div>
+    <div class="law-rows reveal" data-delay="1">
+      {popular.map((l) => (
+        <a class="law-row" href={`/laws/${l.slug}/`}>
+          <div><h3>{l.shortName || l.name}</h3><p class="sub">{l.oneLineSummary}</p></div>
+          <span class="jur">{l.jurisdiction}</span>
+        </a>
+      ))}
+    </div>
+  </div>
+</section>
+</Base>
