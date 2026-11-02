@@ -542,7 +542,7 @@ export const staticLaws = [
    },
    {
     "title": "Know which risk tier your country sits in",
-    "detail": "Only Belarus, North Korea, Myanmar and Russia are classed high risk. Most producing countries are standard risk, where authorities must check at least 3 percent of operators, against 9 percent for high risk and 1 percent for low risk."
+    "detail": "Only Belarus, North Korea, Myanmar and Russia are classed high risk, where authorities must check at least 9 percent of operators. About 140 countries are low risk, including India, Bangladesh, Sri Lanka, Vietnam, Ghana and Kenya, where the rate is 1 percent and buyers may use simplified due diligence. Brazil, Indonesia, Malaysia and Côte d'Ivoire are among the standard risk countries, checked at 3 percent."
    },
    {
     "title": "Check which deadline is yours",
@@ -598,7 +598,7 @@ export const staticLaws = [
   "changelog": [
    {
     "date": "November 2026",
-    "text": "Aligned the application dates with Article 38 as amended in 2025. The June 2027 date covers only micro and small operators established by 31 December 2024, and the regulation's definition of operator excludes downstream operators, so they and traders of every size start on 30 December 2026."
+    "text": "Aligned the application dates with Article 38 as amended in 2025. The June 2027 date covers only micro and small operators established by 31 December 2024, and the regulation's definition of operator excludes downstream operators, so they and traders of every size start on 30 December 2026. Also corrected the risk tier checklist item, which said most producing countries are standard risk: about 140 countries, including India, Bangladesh and Vietnam, are classed low risk."
    },
    {
     "date": "October 2026",
@@ -633,6 +633,10 @@ export const staticLaws = [
    {
     "title": "Regulation (EU) 2025/2650 amending the EUDR, Official Journal (Article 38 application dates)",
     "url": "https://eur-lex.europa.eu/eli/reg/2025/2650/oj"
+   },
+   {
+    "title": "Commission Implementing Regulation (EU) 2025/1093, country risk classification, Official Journal",
+    "url": "https://eur-lex.europa.eu/eli/reg_impl/2025/1093/oj"
    }
   ],
   "order": 3
