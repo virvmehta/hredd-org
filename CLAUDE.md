@@ -37,7 +37,7 @@ fallback silently dropped 17 of 18 law pages when only one Sanity document
 existed) — do not regress to a "if Sanity returns anything, ignore static
 entirely" pattern.
 
-State as of September 2026: **4 of 18 laws** live in Sanity (CSDDD, EU FLR,
+State as of November 2026: **4 of 18 laws** live in Sanity (CSDDD, EU FLR,
 Loi de Vigilance, UK MSA); the other 14 are static entries in
 `staticData.js`. **Articles come entirely from Sanity.** Unlike laws, articles
 are not merged per item: `staticArticles` is only used if Sanity returns
@@ -80,14 +80,24 @@ minutes after a webhook-triggered rebuild.
 4. Anything that cannot be verified stays unchanged and is reported as
    unverified, never guessed.
 
-Open items as of 18 September 2026: whether Germany's LkSG amendment has
-passed (the static summary already says the reporting duty "was removed in
-2025", which may overstate it); whether the EU battery due diligence
-guidelines due 26 July 2026 were published; and Official Journal publication
-of the July 2026 EUDR delegated act removing leather. Once that act is
-published, relabel "Cattle or leather" in `src/lib/sectorChapters.js` and
-`src/pages/report/index.astro`. The trade figures are unaffected either way,
-because HS chapter 41 was never in the EUDR scope set.
+Open items as of 2 November 2026:
+- UK: the Public Bill Committee on the Immigration and Asylum Bill must
+  finish by 3 November 2026, so record the report stage next.
+- CSRD: the revised ESRS enter into force on 10 November 2026; after that,
+  move the CSRD wording into the past tense.
+- Batteries: the due diligence guidelines due 26 July 2026 are still
+  unpublished.
+- EU FLR: the Article 8 risk database, legally due by 14 June 2026, is still
+  not live (the guidelines and Single Portal did launch in June).
+- Switzerland: the Federal Council message on the draft Sustainable Corporate
+  Governance Act is expected at the end of 2026.
+- Germany: the LkSG amendment bill is still unpassed.
+
+EUR-Lex blocks scripted downloads (it returns an empty 202). The Publications
+Office serves the same official text, which is the quickest way to check a
+date against the Official Journal:
+`curl -sL -H "Accept: application/xhtml+xml" -H "Accept-Language: eng" https://publications.europa.eu/resource/celex/<CELEX>`
+(for example `32025R2650` for the second EUDR postponement).
 
 ## Translations (Bangla pilot, on hold)
 `src/pages/bn/` is deliberately **untracked** and must not be committed until
@@ -156,8 +166,9 @@ PASS` is the expected final line of the second command.
 
 ## Deploy checklist
 1. `npm run build` locally (or trust the CI build) — check the page count in
-   the output against what's expected (currently 75 pages in production, 76
-   locally while the untracked Bangla page exists)
+   the output against what's expected (77 pages in production as of November
+   2026, 78 locally while the untracked Bangla page exists; each new Sanity
+   article adds one)
 2. `git add <paths> && git commit -m "..." && git push` (explicit paths, see
    the translations note above)
 3. Cloudflare rebuilds automatically on push, ~90 seconds

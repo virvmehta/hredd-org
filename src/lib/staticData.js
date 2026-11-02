@@ -451,10 +451,10 @@ export const staticLaws = [
   "region": "European Union",
   "status": "Delayed",
   "statusType": "delayed",
-  "lastUpdated": "2026-10-13",
-  "tableUpdateText": "Leather left the scope on 18 September 2026, when Delegated Regulation (EU) 2026/2102 entered into force.",
+  "lastUpdated": "2026-11-02",
+  "tableUpdateText": "Downstream operators and traders of every size start on 30 December 2026; the June 2027 delay covers only small operators established by the end of 2024.",
   "enactedDate": "June 2023",
-  "firstComplianceDeadline": "30 December 2026 (large and medium operators); 30 June 2027 (most micro and small)",
+  "firstComplianceDeadline": "30 December 2026 (large and medium operators, and all downstream operators and traders); 30 June 2027 (most micro and small operators)",
   "companiesInScope": "Operators and traders placing cattle, cocoa, coffee, palm oil, rubber, soy or wood products listed in Annex I on the EU market; cattle hides, skins and leather left the scope in September 2026",
   "maxPenalty": "At least 4 percent of EU turnover, set by member states",
   "civilLiability": "Administrative enforcement; goods can be refused entry",
@@ -504,7 +504,7 @@ export const staticLaws = [
    "SWE"
   ],
   "oneLineSummary": "Plot-level proof that seven commodity groups entering the EU are deforestation-free and legally produced, required from 30 December 2026.",
-  "summary": "<p>The EUDR requires companies placing relevant commodities on the EU market to prove, with plot-level geolocation data, that products are deforestation-free after the 2020 cut-off and produced in compliance with the laws of the country of production. After two postponements, obligations apply to large and medium operators from 30 December 2026, together with micro and small operators already covered by the old Timber Regulation. All other micro and small operators follow on 30 June 2027.</p><p>The revision of Annex I is now law. The Commission adopted the delegated act on 13 July 2026, and it was published as Delegated Regulation (EU) 2026/2102 on 17 September 2026, entering into force the following day. The removals took effect immediately, so cattle hides, skins and leather, vulcanised rubber belts and articles, aircraft and motor vehicle seats, soybeans for sowing and retreaded tyres are no longer covered. Soluble coffee, certain palm oil derivatives, frozen cattle tongues and palm-based soaps were added, and they come into scope on 30 December 2027.</p><p>For producer countries the regulation has already reshaped procurement. Buyers are demanding polygon mapping from farm level upwards, and smallholders without digital land records face exclusion risk unless supported. The country benchmarking system determines the intensity of checks that shipments face at the border. Tanneries and leather exporters are now outside the regime altogether, although the cattle and beef those hides come from remain covered.</p>",
+  "summary": "<p>The EUDR requires companies placing relevant commodities on the EU market to prove, with plot-level geolocation data, that products are deforestation-free after the 2020 cut-off and produced in compliance with the laws of the country of production. After two postponements, obligations apply from 30 December 2026 to large and medium operators, to downstream operators and traders of every size, and to micro and small operators already covered by the old Timber Regulation. Other micro and small operators that were established as such by 31 December 2024 follow on 30 June 2027.</p><p>The revision of Annex I is now law. The Commission adopted the delegated act on 13 July 2026, and it was published as Delegated Regulation (EU) 2026/2102 on 17 September 2026, entering into force the following day. The removals took effect immediately, so cattle hides, skins and leather, vulcanised rubber belts and articles, aircraft and motor vehicle seats, soybeans for sowing and retreaded tyres are no longer covered. Soluble coffee, certain palm oil derivatives, frozen cattle tongues and palm-based soaps were added, and they come into scope on 30 December 2027.</p><p>For producer countries the regulation has already reshaped procurement. Buyers are demanding polygon mapping from farm level upwards, and smallholders without digital land records face exclusion risk unless supported. The country benchmarking system determines the intensity of checks that shipments face at the border. Tanneries and leather exporters are now outside the regime altogether, although the cattle and beef those hides come from remain covered.</p>",
   "obligations": [
    {
     "title": "Due diligence statements with geolocation",
@@ -546,7 +546,7 @@ export const staticLaws = [
    },
    {
     "title": "Check which deadline is yours",
-    "detail": "Large and medium operators, and downstream operators of every size, are covered from 30 December 2026. Micro and small operators follow on 30 June 2027, except in the timber sector, where they are covered from December 2026."
+    "detail": "Large and medium operators, and downstream operators of every size, are covered from 30 December 2026. Micro and small operators established by the end of 2024 follow on 30 June 2027, except in the timber sector, where they are covered from December 2026."
    },
    {
     "title": "Leather no longer counts, but cattle still do",
@@ -568,7 +568,7 @@ export const staticLaws = [
    },
    {
     "date": "23 December 2025",
-    "event": "Second postponement published in the Official Journal one week before application, moving large operators to 30 December 2026 and micro and small enterprises to 30 June 2027."
+    "event": "Second postponement published in the Official Journal one week before application, moving large and medium operators to 30 December 2026 and most micro and small operators to 30 June 2027."
    },
    {
     "date": "4 May 2026",
@@ -584,11 +584,11 @@ export const staticLaws = [
    },
    {
     "date": "30 December 2026",
-    "event": "Obligations apply to large and medium operators and traders, and to micro and small operators already covered by the Timber Regulation."
+    "event": "Obligations apply to large and medium operators, to downstream operators and traders of every size, and to micro and small operators already covered by the Timber Regulation."
    },
    {
     "date": "30 June 2027",
-    "event": "Obligations apply to all other micro and small enterprises."
+    "event": "Obligations apply to other micro and small operators that were established as such by 31 December 2024."
    },
    {
     "date": "30 December 2027",
@@ -596,6 +596,10 @@ export const staticLaws = [
    }
   ],
   "changelog": [
+   {
+    "date": "November 2026",
+    "text": "Aligned the application dates with Article 38 as amended in 2025. The June 2027 date covers only micro and small operators established by 31 December 2024, and the regulation's definition of operator excludes downstream operators, so they and traders of every size start on 30 December 2026."
+   },
    {
     "date": "October 2026",
     "text": "Leather removal confirmed as law: Delegated Regulation (EU) 2026/2102 was published on 17 September 2026 and took effect the next day."
@@ -625,6 +629,10 @@ export const staticLaws = [
    {
     "title": "Commission Delegated Regulation (EU) 2026/2102 amending Annex I, Official Journal (17 September 2026)",
     "url": "https://eur-lex.europa.eu/eli/reg_del/2026/2102/oj"
+   },
+   {
+    "title": "Regulation (EU) 2025/2650 amending the EUDR, Official Journal (Article 38 application dates)",
+    "url": "https://eur-lex.europa.eu/eli/reg/2025/2650/oj"
    }
   ],
   "order": 3
@@ -1943,8 +1951,8 @@ export const staticLaws = [
   "region": "Asia-Pacific",
   "status": "In committee",
   "statusType": "proposed",
-  "lastUpdated": "2026-09-18",
-  "tableUpdateText": "Bill reintroduced in June 2025 remains in committee, with no progress recorded in 2026; business opposition remains the main obstacle.",
+  "lastUpdated": "2026-11-02",
+  "tableUpdateText": "Several bills now sit in committee, the latest introduced by Representative Park Jee-hye on 27 August 2026, and none has yet advanced.",
   "enactedDate": "Not enacted",
   "firstComplianceDeadline": "Not applicable",
   "companiesInScope": "Large Korean companies above the drafted thresholds",
@@ -1968,7 +1976,7 @@ export const staticLaws = [
    "KOR"
   ],
   "oneLineSummary": "The leading Asian attempt at a binding due diligence statute, repeatedly introduced and still in committee.",
-  "summary": "<p>Korean legislators have repeatedly introduced bills that would require large companies to conduct human rights and environmental due diligence across their supply chains, with civil liability and administrative enforcement modelled on European precedents while adapting to Korean corporate structures.</p><p>The bills have not advanced past committee, with business associations arguing for voluntary approaches and alignment with eventual international consensus. The entry matters for this tracker because Korea would be the first Asian jurisdiction with a binding horizontal due diligence law, changing the regional conversation entirely.</p>",
+  "summary": "<p>Korean legislators have repeatedly introduced bills that would require large companies to conduct human rights and environmental due diligence across their supply chains, with civil liability and administrative enforcement modelled on European precedents while adapting to Korean corporate structures. At least three such bills are pending in the current National Assembly, introduced in June 2025, November 2025 and August 2026.</p><p>The bills have not advanced past committee, with business associations arguing for voluntary approaches and alignment with eventual international consensus. The entry matters for this tracker because Korea would be the first Asian jurisdiction with a binding horizontal due diligence law, changing the regional conversation entirely.</p>",
   "obligations": [
    {
     "title": "Horizontal due diligence duty (as drafted)",
@@ -1993,11 +2001,23 @@ export const staticLaws = [
     "event": "Representative Jung Tae-ho reintroduced the bill; a competing bill proposes higher company thresholds."
    },
    {
-    "date": "2026",
-    "event": "Committee deliberations continue with no recorded progress."
+    "date": "4 November 2025",
+    "event": "Representative Park Hong-bae introduced another bill (No. 2213897), with a government dispute mediation committee able to issue corrective orders."
+   },
+   {
+    "date": "27 August 2026",
+    "event": "Representative Park Jee-hye introduced a further bill (No. 2220854), adding liability for damages and Scope 1, 2 and 3 emissions reporting."
+   },
+   {
+    "date": "November 2026",
+    "event": "None of the pending bills has advanced beyond the committee stage."
    }
   ],
   "changelog": [
+   {
+    "date": "November 2026",
+    "text": "Added the bills introduced by Representatives Park Hong-bae in November 2025 and Park Jee-hye in August 2026, replacing the claim that nothing moved in 2026."
+   },
    {
     "date": "September 2026",
     "text": "Timeline updated with the June 2025 reintroduction; no committee progress found in 2026."
@@ -2015,6 +2035,14 @@ export const staticLaws = [
    {
     "title": "Latham and Watkins: South Korea reintroduces human rights and due diligence act (August 2025)",
     "url": "https://www.lw.com/en/insights/south-korea-reintroduces-human-rights-and-due-diligence-act"
+   },
+   {
+    "title": "Business and Human Rights Centre: third bill on mandatory HREDD proposed in the National Assembly (November 2025)",
+    "url": "https://www.business-humanrights.org/en/latest-news/s-korea-third-bill-on-mandatory-human-rights-and-environmental-due-diligence-proposed-in-national-assembly/"
+   },
+   {
+    "title": "KTNC Watch: statement on Representative Park Jee-hye's Supply Chain Accountability Act (28 August 2026)",
+    "url": "https://ktncwatch.org/news/statement-we-welcome-representative-park-jee-hyes-introduction-supply-chain-acco/"
    }
   ],
   "order": 18

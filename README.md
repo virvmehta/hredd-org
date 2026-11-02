@@ -9,7 +9,7 @@ only the published dataset is licensed under CC BY 4.0.
 
 ## What the site contains
 
-The site builds about 75 static pages:
+The site builds about 77 static pages:
 
 - **Tracker** (`/tracker/`): all 18 laws on a world map, with the monthly
   change log. The old `/tracker/<law>/` addresses redirect to the law pages.
@@ -29,7 +29,7 @@ The site builds about 75 static pages:
 
 **Laws** are merged law by law. Any law with a published Sanity document uses
 that document, and every other law uses its entry in `src/lib/staticData.js`.
-As of September 2026, four laws are in Sanity (CSDDD, EU FLR, Loi de
+As of November 2026, four laws are in Sanity (CSDDD, EU FLR, Loi de
 Vigilance and UK MSA) and the other fourteen are in `staticData.js`.
 
 **Articles** come from Sanity. The old static articles are only a fallback
@@ -58,7 +58,7 @@ pilot in `src/pages/bn/` must stay out of the repository for now.
     git commit -m "Describe the change here"
     git push
 
-Check that the build reports about 75 pages before you push. Cloudflare
+Check that the build reports about 77 pages before you push. Cloudflare
 rebuilds automatically once the push arrives.
 
 **Sanity Studio schema changes** also need the Studio redeployed:
