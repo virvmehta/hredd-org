@@ -49,6 +49,13 @@ const REPORT_LAWS = laws.map(l => {
 
     <form id="rq" novalidate>
 
+      {/* Shown only once the script has switched the form to one question at
+          a time. Without JavaScript all nine questions stay on the page. */}
+      <div class="step-head" id="step-head" hidden>
+        <p class="mono" id="step-label">Question 1 of 9</p>
+        <div class="step-bar" role="progressbar" aria-label="Questions answered" aria-valuemin="0" aria-valuemax="9" aria-valuenow="0" id="step-bar"><i id="step-fill"></i></div>
+      </div>
+
       <div class="q reveal" data-n="01">
         <p class="qnum mono">Question 01</p>
         <h3 class="qtitle">Where is your business located?</h3>
@@ -183,6 +190,11 @@ const REPORT_LAWS = laws.map(l => {
         </div>
       </div>
 
+      <div class="step-nav" id="step-nav" hidden>
+        <button type="button" class="btn" id="step-back"><i>←</i> <span>Back</span></button>
+        <button type="button" class="btn solid" id="step-next"><span>Next question</span> <i>→</i></button>
+      </div>
+
       <div class="gen-row reveal">
         <button type="button" class="btn solid" id="gen"><span>Generate my report</span> <i>→</i></button>
         <p class="mono faint" id="gen-msg" style="margin:14px 0 0"></p>
@@ -271,6 +283,26 @@ const REPORT_LAWS = laws.map(l => {
   .ring .rlabel{ position:absolute; inset:0; display:grid; place-items:center;
     font-family:var(--mono); font-size:12px; letter-spacing:.12em; color:var(--ink-dim); }
   .ring.full .rlabel{ color:var(--gold-hi); }
+
+  /* ---- one question at a time ---- */
+  #rq{ scroll-margin-top:96px; }
+  .step-head{ margin:0 0 6px; }
+  .step-head p{ margin:0 0 12px; color:var(--gold); font-size:11.5px; letter-spacing:.14em; }
+  .step-bar{ height:3px; background:var(--panel-2); position:relative; overflow:hidden; }
+  .step-bar i{ position:absolute; left:0; top:0; bottom:0; width:0; background:linear-gradient(90deg,var(--gold-dim),var(--gold-hi));
+    transition:width .5s cubic-bezier(.16,1,.3,1); }
+  .stepper .q{ display:none; border-bottom:0; min-height:330px; opacity:1; transform:none; }
+  .stepper .q.current{ display:block; animation:step-in .45s cubic-bezier(.16,1,.3,1); }
+  @keyframes step-in{ from{ opacity:0; transform:translateY(14px); } to{ opacity:1; transform:none; } }
+  @media (prefers-reduced-motion:reduce){ .stepper .q.current{ animation:none; } }
+  .stepper .q .qnum{ display:none; }
+  .step-nav{ display:flex; gap:12px; flex-wrap:wrap; padding-top:8px; }
+  .step-nav[hidden]{ display:none; }
+  .step-nav .btn:disabled{ opacity:.35; cursor:default; }
+  .step-nav .btn:disabled::before{ display:none; }
+  .stepper .gen-row{ display:none; padding-top:20px; opacity:1; transform:none; }
+  .stepper .gen-row.show{ display:flex; }
+  .stepper + .ring{ display:none; }
 
   /* ---- generate row ---- */
   .gen-row{ padding:54px 0 10px; display:flex; flex-direction:column; align-items:flex-start; gap:0; }
@@ -566,6 +598,62 @@ document.getElementById('gen').addEventListener('click', () => {
     r.scrollIntoView({ behavior:'smooth', block:'start' });
   }, 550);
 });
+
+/* ---------------- one question at a time ----------------
+   A layer over the form above: it only shows and hides questions. Answers,
+   validation, the report and the PDF are untouched. */
+{
+  const form = document.getElementById('rq');
+  const qs = [...form.querySelectorAll('.q')];
+  const head = document.getElementById('step-head');
+  const nav = document.getElementById('step-nav');
+  const label = document.getElementById('step-label');
+  const bar = document.getElementById('step-bar');
+  const fill = document.getElementById('step-fill');
+  const back = document.getElementById('step-back');
+  const next = document.getElementById('step-next');
+  const genRow = form.querySelector('.gen-row');
+  let cur = 0, timer = 0;
+
+  const sync = () => {
+    const n = answeredCount();
+    fill.style.width = (n / qs.length * 100) + '%';
+    bar.setAttribute('aria-valuenow', String(n));
+    next.disabled = !qs[cur].classList.contains('done');
+  };
+  const go = (i, scroll) => {
+    clearTimeout(timer);
+    cur = Math.max(0, Math.min(qs.length - 1, i));
+    qs.forEach((q, k) => q.classList.toggle('current', k === cur));
+    const last = cur === qs.length - 1;
+    label.textContent = 'Question ' + (cur + 1) + ' of ' + qs.length;
+    back.disabled = cur === 0;
+    next.hidden = last;
+    genRow.classList.toggle('show', last);
+    sync();
+    if (scroll && form.getBoundingClientRect().top < 0) form.scrollIntoView({ block: 'start' });
+  };
+
+  form.classList.add('stepper');
+  head.hidden = false; nav.hidden = false;
+  back.addEventListener('click', () => go(cur - 1, true));
+  next.addEventListener('click', () => { if (!next.disabled) go(cur + 1, true); });
+  form.addEventListener('click', (e) => {
+    const b = e.target instanceof Element && e.target.closest('.opts button');
+    if (!b) return;
+    sync();
+    // a single-choice answer moves on by itself; multiple choice waits for Next
+    const single = b.closest('.opts').dataset.type === 'single';
+    clearTimeout(timer);
+    if (single && cur < qs.length - 1 && qs[cur].classList.contains('done')) timer = setTimeout(() => go(cur + 1, true), 420);
+  });
+  // if Generate finds a gap, show that question instead of scrolling to a hidden one
+  document.getElementById('gen').addEventListener('click', () => {
+    const m = qs.findIndex((q) => q.classList.contains('missing'));
+    if (m >= 0) go(m, true);
+  });
+  go(0, false);
+}
 
 /* ---------------- PDF ---------------- */
 document.getElementById('dl').addEventListener('click', () => {
