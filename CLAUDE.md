@@ -218,3 +218,29 @@ visitors. Bots, localhost and `?notrack=1` browsers are skipped. Until the D1
 binding and `STATS_KEY` exist in the Cloudflare Pages settings, the counter
 does nothing and `/stats/` says what is missing. Test locally with
 `npx wrangler pages dev dist --d1 DB --binding STATS_KEY=test`.
+
+## Interactive layer (added 10 November 2026)
+- **Globe** (`HomeContent.astro`): opens on Africa and South Asia, drag or
+  arrow keys to turn. Arcs join each supplier country to the capitals of its
+  two largest regulated markets, read from `trade-exposure.json`.
+- **Countdown** on the homepage and the **map hover's next date** both read
+  the `steps` in `pipeline/law_scope.json`. Keep that file's dates right.
+- **Exposure report** shows one question at a time. It is a display layer
+  only (`.stepper` class); answers, validation, report text and PDF are the
+  original code. After touching the report, rerun the same answers before
+  and after and compare the generated text.
+- **Law pages** have a sticky "on this page" menu (`.law-toc`), built from
+  the sections each law has.
+- **Country memory**: `localStorage.hredd_country`, set on the trade index
+  and by the report's first question; read by the homepage greeting.
+- **Page transitions** are CSS-only (`@view-transition`). Do not add Astro's
+  ClientRouter: page scripts here run once per load and would break.
+- **Count-up** on `[data-count]` was restored at Vir's request after an
+  earlier removal; it is one block at the end of `Base.astro`.
+- Timeline date labels are placed in four lanes by estimated pixel width.
+- Screenshots: Chrome headless cannot go narrower than about 500px and
+  renders `#anchor` URLs blank. For phone checks, load pages in 390px
+  iframes from a helper page in `dist/`.
+- Known data issue, not yet fixed: on the tracker map the CSDDD's country
+  list in Sanity includes the UK and omits France and Bulgaria, and the EU
+  FLR's omits Hungary and Bulgaria.
