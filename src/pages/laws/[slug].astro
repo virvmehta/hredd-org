@@ -147,6 +147,19 @@ const jsonLd = [
     }))
   }] : [])
 ];
+
+// "On this page" menu: only the sections this law actually has.
+const toc = [
+  facts.length > 0 && { id: 'facts', label: 'Key facts' },
+  summaryHtml && { id: 'what', label: 'What this law does' },
+  law.supplierChecklist?.length > 0 && { id: 'buyer', label: 'What your buyer will ask' },
+  law.obligations?.length > 0 && { id: 'obligations', label: 'What it asks of companies' },
+  law.timeline?.length > 0 && { id: 'history', label: 'How it got here' },
+  law.changelog?.length > 0 && { id: 'changes', label: 'Entry history' },
+  tradeRows.length > 0 && { id: 'trade', label: 'Trade under this law' },
+  law.sources?.length > 0 && { id: 'sources', label: 'Primary documents' },
+  relatedArticles.length > 0 && { id: 'coverage', label: 'We wrote about this' },
+].filter(Boolean);
 ---
 {/* Title leads with the acronym people actually search (CSDDD, EUDR, UFLPA),
     then the full name. Brand suffix is allowed to truncate on the longest
@@ -179,7 +192,7 @@ const jsonLd = [
       {/* A description list, not a div grid: the label and value relationship
           is then explicit to screen readers and to answer engines parsing the
           page. The visual design is unchanged. */}
-      <dl class="facts reveal">
+      <dl class="facts reveal" id="facts">
         {facts.map((f) => (
           <div class="fact"><dt>{f.label}</dt><dd>{f.value}</dd></div>
         ))}
@@ -199,11 +212,13 @@ const jsonLd = [
   </section>
 )}
 
+<div class="wrap law-body">
+<div class="law-main">
 {summaryHtml && (
   <section class="section" style="padding-bottom:0">
     <div class="wrap">
       <div class="section-head reveal">
-        <div><p class="kicker">In plain language</p><h2 class="h2">What this law does</h2></div>
+        <div><p class="kicker">In plain language</p><h2 class="h2" id="what">What this law does</h2></div>
       </div>
       <div class="prose" style="margin:0" set:html={summaryHtml}></div>
     </div>
@@ -214,7 +229,7 @@ const jsonLd = [
   <section class="section" style="padding-bottom:0">
     <div class="wrap">
       <div class="section-head reveal">
-        <div><p class="kicker">For suppliers</p><h2 class="h2">What your buyer will ask you for</h2></div>
+        <div><p class="kicker">For suppliers</p><h2 class="h2" id="buyer">What your buyer will ask you for</h2></div>
       </div>
       <ol class="oblist reveal" data-delay="1">
         {law.supplierChecklist.map((c) => (
@@ -229,7 +244,7 @@ const jsonLd = [
   <section class="section" style="padding-bottom:0">
     <div class="wrap">
       <div class="section-head reveal">
-        <div><p class="kicker">Obligations</p><h2 class="h2">What it asks of companies</h2></div>
+        <div><p class="kicker">Obligations</p><h2 class="h2" id="obligations">What it asks of companies</h2></div>
       </div>
       <ol class="oblist reveal" data-delay="1">
         {law.obligations.map((o) => (
@@ -244,7 +259,7 @@ const jsonLd = [
   <section class="section" style="padding-bottom:0">
     <div class="wrap">
       <div class="section-head reveal">
-        <div><p class="kicker">Timeline</p><h2 class="h2">How it got here</h2></div>
+        <div><p class="kicker">Timeline</p><h2 class="h2" id="history">How it got here</h2></div>
       <a class="textlink" href={`/timeline/${law.slug}/`}>Full timeline with what comes next <i>→</i></a>
       </div>
       <div class="timeline">
@@ -263,7 +278,7 @@ const jsonLd = [
   <section class="section" style="padding-bottom:0">
     <div class="wrap">
       <div class="section-head reveal">
-        <div><p class="kicker">Changelog</p><h2 class="h2">Entry history</h2></div>
+        <div><p class="kicker">Changelog</p><h2 class="h2" id="changes">Entry history</h2></div>
       </div>
       <div class="timeline">
         {law.changelog.map((c, i) => (
@@ -280,7 +295,7 @@ const jsonLd = [
 {tradeRows.length > 0 && (
   <section class="section" style="padding-bottom:0">
     <div class="wrap">
-      <div class="panel reveal">
+      <div class="panel reveal" id="trade">
         <h4>Trade under this regime · Regulated Trade Index</h4>
         <p class="mono faint" style="margin:0 0 18px">Exposed export value at full application, across the ten tracked origins · {tradeData.sample_data ? 'SAMPLE DATA, ILLUSTRATIVE ONLY' : tradeData.vintage} · <a href="/methodology/" style="color:var(--gold)">methodology</a></p>
         <div style="font:400 42px/1 var(--serif); color:var(--gold-hi); margin-bottom:20px">{usdBn(tradeTotal)}</div>
@@ -300,7 +315,7 @@ const jsonLd = [
   <section class="section" style="padding-bottom:0">
     <div class="wrap">
       <div class="section-head reveal">
-        <div><p class="kicker">Sources</p><h2 class="h2">Primary documents</h2></div>
+        <div><p class="kicker">Sources</p><h2 class="h2" id="sources">Primary documents</h2></div>
       </div>
       <ul class="sources reveal" data-delay="1">
         {law.sources.map((s) => (
@@ -315,7 +330,7 @@ const jsonLd = [
   <section class="section" style="padding-bottom:0">
     <div class="wrap">
       <div class="section-head reveal">
-        <div><p class="kicker">Coverage</p><h2 class="h2">We wrote about this</h2></div>
+        <div><p class="kicker">Coverage</p><h2 class="h2" id="coverage">We wrote about this</h2></div>
       </div>
       <div class="law-rows reveal" data-delay="1">
         {relatedArticles.map((a) => (
@@ -329,6 +344,16 @@ const jsonLd = [
     </div>
   </section>
 )}
+
+</div>
+<aside class="law-toc" aria-label="On this page">
+  <nav>
+    <p class="mono">On this page</p>
+    {toc.map((t) => (<a href={`#${t.id}`} data-toc={t.id}>{t.label}</a>))}
+    <a class="textlink" href={`/timeline/${law.slug}/`} style="margin-top:18px">Full timeline <i>→</i></a>
+  </nav>
+</aside>
+</div>
 
 {related.length > 0 && (
   <section class="section">
@@ -350,5 +375,39 @@ const jsonLd = [
     </div>
   </section>
 )}
+
+<style>
+  .law-body{ display:grid; grid-template-columns:minmax(0,1fr) 230px; gap:clamp(40px,5vw,72px); align-items:start; }
+  /* the sections inside keep their own markup; only their gutters are reset */
+  .law-main .wrap{ padding:0; max-width:none; }
+  .law-toc{ position:sticky; top:96px; padding-top:clamp(64px,9vw,120px); }
+  .law-toc nav{ display:flex; flex-direction:column; border-left:1px solid var(--line); padding-left:20px; }
+  .law-toc p{ margin:0 0 14px; color:var(--gold); font-size:11px; }
+  .law-toc a:not(.textlink){ font:400 15px/1.35 var(--serif); color:var(--ink-dim); padding:7px 0; position:relative;
+    transition:color .25s; }
+  .law-toc a:not(.textlink):hover{ color:var(--ink); }
+  .law-toc a.on{ color:var(--gold-hi); }
+  .law-toc a.on::before{ content:""; position:absolute; left:-21px; top:6px; bottom:6px; width:1px; background:var(--gold); }
+  .law-main [id], #facts{ scroll-margin-top:96px; }
+  @media (max-width:1100px){
+    .law-body{ grid-template-columns:minmax(0,1fr); }
+    .law-toc{ display:none; }
+  }
+</style>
+
+<script>
+  // highlight the section being read in the "on this page" menu
+  const links = [...document.querySelectorAll('.law-toc a[data-toc]')];
+  const targets = links.map((a) => document.getElementById(a.dataset.toc)).filter(Boolean);
+  if (links.length && targets.length) {
+    const mark = () => {
+      let current = targets[0];
+      for (const t of targets) { if (t.getBoundingClientRect().top < 160) current = t; }
+      links.forEach((a) => a.classList.toggle('on', a.dataset.toc === current.id));
+    };
+    addEventListener('scroll', mark, { passive: true });
+    mark();
+  }
+</script>
 
 </Base>
