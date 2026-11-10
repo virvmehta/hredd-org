@@ -32,6 +32,25 @@ for (const [slug, c] of Object.entries(trade.countries)) {
 }
 const globeData = { tracked: geoIds, arcs, suppliers: Object.values(SUPPLIER), capitals: Object.values(CAPITAL) };
 
+// Countdown: the next statutory date across every tracked law, read from the
+// same pipeline mapping the timelines use. The day count is recomputed in the
+// browser, so it stays right between builds.
+import scope from '../../pipeline/law_scope.json';
+const todayISO = new Date().toISOString().slice(0, 10);
+const upcoming = scope.regimes
+  .flatMap((r) => (r.steps || []).map((s) => ({ ...s, slug: r.slug })))
+  .filter((s) => s.date > todayISO)
+  .sort((a, b) => a.date.localeCompare(b.date))
+  .map((s) => ({ ...s, law: laws.find((l) => l.slug === s.slug) }))
+  .find((s) => s.law);
+const countdown = upcoming && {
+  date: upcoming.date,
+  days: Math.ceil((new Date(upcoming.date + 'T00:00:00Z') - Date.now()) / 86400000),
+  href: `/timeline/${upcoming.slug}/`,
+  name: upcoming.law.shortName || upcoming.law.name,
+  when: new Date(upcoming.date + 'T00:00:00Z').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }),
+};
+
 const steps = [
   { href: '/tracker/', title: t(locale, 'home.step1.title'), text: t(locale, 'home.step1.text') },
   { href: '/buyer-mapping/', title: t(locale, 'home.step2.title'), text: t(locale, 'home.step2.text') },
@@ -49,6 +68,15 @@ const steps = [
         <a class="btn solid" href="/report/"><span>{t(locale, 'home.cta.report')}</span> <i>→</i></a>
         <a class="btn" href="/tracker/"><span>{t(locale, 'home.cta.tracker')}</span></a>
       </div>
+      {locale === 'en' && countdown && (
+        <a class="countdown reveal" data-delay="3" id="countdown" href={countdown.href} data-date={countdown.date}>
+          <b id="countdown-n">{countdown.days}</b>
+          <span class="cd-text">
+            <span class="mono" id="countdown-unit">days to the next statutory date</span>
+            <span class="cd-law">{countdown.name}, {countdown.when} <i>→</i></span>
+          </span>
+        </a>
+      )}
     </div>
     <div class="hero-globe reveal" data-delay="2">
       <canvas id="globe" width="1120" height="1120" role="img" aria-label="Globe showing lines from the capitals where due diligence laws are made to the supplier countries they reach. Drag to turn it."></canvas>
@@ -258,4 +286,27 @@ const steps = [
   .hero-globe canvas.dragging{ cursor:grabbing; }
   .hero-globe canvas:focus-visible{ outline:1px solid var(--gold); border-radius:50%; }
   .globe-note{ margin:14px 0 0; text-align:center; font-size:10.5px; letter-spacing:.1em; color:var(--ink-dim); }
+  .countdown{ display:inline-flex; align-items:center; gap:18px; margin-top:34px; padding:14px 22px 14px 18px;
+    border:1px solid var(--line); border-left:2px solid var(--gold); background:var(--bg-raise);
+    transition:border-color .3s, background .3s; }
+  .countdown:hover{ border-color:var(--gold-dim); border-left-color:var(--gold-hi); background:var(--panel); }
+  .countdown b{ font:400 clamp(40px,4.4vw,56px)/1 var(--serif); color:var(--gold-hi);
+    font-variant-numeric:tabular-nums; min-width:1.2em; text-align:right; }
+  .cd-text{ display:flex; flex-direction:column; gap:5px; }
+  .cd-text .mono{ font-size:10.5px; color:var(--ink-dim); }
+  .cd-law{ font:400 17px/1.3 var(--serif); color:var(--ink); }
+  .cd-law i{ font-style:normal; color:var(--gold); margin-left:4px; }
 </style>
+
+<script is:inline>
+  // Recount the days in the reader's own browser, and hide the box once the
+  // date has passed and the site has not yet been rebuilt.
+  (function () {
+    var box = document.getElementById('countdown');
+    if (!box) return;
+    var days = Math.ceil((new Date(box.dataset.date + 'T00:00:00Z') - Date.now()) / 86400000);
+    if (days < 1) { box.hidden = true; return; }
+    document.getElementById('countdown-n').textContent = String(days);
+    if (days === 1) document.getElementById('countdown-unit').textContent = 'day to the next statutory date';
+  })();
+</script>
