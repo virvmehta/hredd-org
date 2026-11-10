@@ -68,12 +68,30 @@ const threadD = nodes.map((n, i) => `${i === 0 ? 'M' : 'L'}${n.x},${50 - (n.tier
 
 
 // ---- page copy generated from data, unique per law ----
-const title = `${sn} Timeline: Key Dates and What Comes Next | hredd.org`.length <= 70
-  ? `${sn} Timeline: Key Dates and What Comes Next | hredd.org`
-  : `${sn} Timeline: Key Dates | hredd.org`;
+// The next dated event still ahead of us. Month-only dates sort to the 15th,
+// so an entry for the current month is skipped unless it names a day.
+const upcoming = spine.find(e => e.future &&
+  (/^\d{1,2}\s/.test(e.when) || e.iso.slice(0, 7) > todayISO.slice(0, 7))) || null;
+const nextWhen = upcoming && /\d{4}/.test(upcoming.when) && upcoming.when.length <= 20 ? upcoming.when : null;
 
-const clamp = s => s.length <= 158 ? s : s.slice(0, 155).replace(/\s+\S*$/, '') + '.';
-const description = clamp(`Every key date for the ${law.name}: enactment, amendments, and application deadlines on one verified timeline, updated monthly from primary sources.`);
+// Searchers skim for the date, so it goes in the title when we have one.
+const titleOptions = [
+  nextWhen && `${sn} Timeline: Next Key Date ${nextWhen} | hredd.org`,
+  nextWhen && `${sn} Timeline: Next Date ${nextWhen} | hredd.org`,
+  `${sn} Timeline: Key Dates and What Comes Next | hredd.org`,
+  `${sn} Timeline: Key Dates | hredd.org`,
+].filter(Boolean);
+const title = titleOptions.find(t => t.length <= 70) || titleOptions[titleOptions.length - 1];
+
+// Whole sentences only: pick the longest version that fits, never cut one off.
+const tail = 'Every past and future date on one timeline, verified against primary sources.';
+const descOptions = [
+  nextWhen && `The next key date for the ${law.name} is ${nextWhen}. ${tail}`,
+  nextWhen && `${sn}: the next key date is ${nextWhen}. ${tail}`,
+  `Every key date for the ${law.name} on one timeline, verified against primary sources and updated monthly.`,
+  `${sn} timeline with every key date, verified against primary sources and updated monthly.`,
+].filter(Boolean);
+const description = descOptions.find(d => d.length <= 158) || descOptions[descOptions.length - 1];
 
 const standfirst = `${law.name} (${law.jurisdiction}) is currently ${law.status.toLowerCase()}. ` +
   (nextStep

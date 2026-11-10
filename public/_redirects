@@ -1,0 +1,41 @@
+# Served by Cloudflare Pages. One rule per line: from, to, status.
+/salient-risks /tracker/ 301
+/salient-risks/ /tracker/ 301
+
+# Old law addresses under /tracker/ moved to /laws/. Add two lines for each new law.
+/tracker/eu-csddd /laws/eu-csddd/ 301
+/tracker/eu-csddd/ /laws/eu-csddd/ 301
+/tracker/eu-csrd /laws/eu-csrd/ 301
+/tracker/eu-csrd/ /laws/eu-csrd/ 301
+/tracker/eu-deforestation-regulation /laws/eu-deforestation-regulation/ 301
+/tracker/eu-deforestation-regulation/ /laws/eu-deforestation-regulation/ 301
+/tracker/eu-forced-labour-regulation /laws/eu-forced-labour-regulation/ 301
+/tracker/eu-forced-labour-regulation/ /laws/eu-forced-labour-regulation/ 301
+/tracker/eu-batteries-regulation /laws/eu-batteries-regulation/ 301
+/tracker/eu-batteries-regulation/ /laws/eu-batteries-regulation/ 301
+/tracker/germany-lksg /laws/germany-lksg/ 301
+/tracker/germany-lksg/ /laws/germany-lksg/ 301
+/tracker/france-duty-of-vigilance /laws/france-duty-of-vigilance/ 301
+/tracker/france-duty-of-vigilance/ /laws/france-duty-of-vigilance/ 301
+/tracker/norway-transparency-act /laws/norway-transparency-act/ 301
+/tracker/norway-transparency-act/ /laws/norway-transparency-act/ 301
+/tracker/netherlands-child-labour-act /laws/netherlands-child-labour-act/ 301
+/tracker/netherlands-child-labour-act/ /laws/netherlands-child-labour-act/ 301
+/tracker/switzerland-due-diligence-ordinance /laws/switzerland-due-diligence-ordinance/ 301
+/tracker/switzerland-due-diligence-ordinance/ /laws/switzerland-due-diligence-ordinance/ 301
+/tracker/uk-modern-slavery-act /laws/uk-modern-slavery-act/ 301
+/tracker/uk-modern-slavery-act/ /laws/uk-modern-slavery-act/ 301
+/tracker/us-uflpa /laws/us-uflpa/ 301
+/tracker/us-uflpa/ /laws/us-uflpa/ 301
+/tracker/us-dodd-frank-1502 /laws/us-dodd-frank-1502/ 301
+/tracker/us-dodd-frank-1502/ /laws/us-dodd-frank-1502/ 301
+/tracker/new-york-fashion-act /laws/new-york-fashion-act/ 301
+/tracker/new-york-fashion-act/ /laws/new-york-fashion-act/ 301
+/tracker/canada-s211 /laws/canada-s211/ 301
+/tracker/canada-s211/ /laws/canada-s211/ 301
+/tracker/australia-modern-slavery-act /laws/australia-modern-slavery-act/ 301
+/tracker/australia-modern-slavery-act/ /laws/australia-modern-slavery-act/ 301
+/tracker/japan-meti-guidelines /laws/japan-meti-guidelines/ 301
+/tracker/japan-meti-guidelines/ /laws/japan-meti-guidelines/ 301
+/tracker/south-korea-hredd-bill /laws/south-korea-hredd-bill/ 301
+/tracker/south-korea-hredd-bill/ /laws/south-korea-hredd-bill/ 301

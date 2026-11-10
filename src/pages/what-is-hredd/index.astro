@@ -1,0 +1,165 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getAllLaws } from '../../lib/sanity.js';
+
+// Explainer for the searches "hredd", "what is hredd" and "hredd meaning",
+// which are the site's largest source of search impressions. Counts come
+// from the tracker data so the page never drifts from it.
+const laws = await getAllLaws();
+const inForce = laws.filter((l) => l.statusType === 'force').length;
+
+const steps = [
+  { title: 'Embed it in policy', text: 'Adopt a policy on responsible business conduct and build it into management systems, so that someone is accountable for it.' },
+  { title: 'Identify and assess harm', text: 'Map where the business and its supply chain could harm people or the environment, and rank those risks by severity.' },
+  { title: 'Cease, prevent and mitigate', text: 'Stop the harm the company causes, and use its leverage to reduce the harm caused by its business partners.' },
+  { title: 'Track what happens', text: 'Check whether the measures taken are working, using data, worker feedback and independent evidence.' },
+  { title: 'Communicate', text: 'Report publicly on the risks found and on what was done about them.' },
+  { title: 'Provide remedy', text: 'Where the company caused or contributed to harm, repair it or cooperate in repairing it.' },
+];
+
+const faqs = [
+  { q: 'What does HREDD stand for?',
+    a: 'HREDD stands for human rights and environmental due diligence. It describes the continuing process a company uses to find, prevent, reduce and account for harm to people and the environment, across its own operations and its supply chain.' },
+  { q: 'What is the difference between HRDD and HREDD?',
+    a: 'HRDD covers human rights alone, while HREDD adds environmental harm such as deforestation, pollution and unsafe waste. Most recent laws, including the EU Corporate Sustainability Due Diligence Directive, cover both.' },
+  { q: 'Is HREDD mandatory?',
+    a: 'It depends on the company and the country. Laws such as the French Duty of Vigilance Law, the German Supply Chain Due Diligence Act and the EU Corporate Sustainability Due Diligence Directive make it mandatory for large companies. Smaller suppliers are rarely covered directly, but their buyers pass the requirements down through contracts and questionnaires.' },
+  { q: 'Is an HREDD audit the same as due diligence?',
+    a: 'No, an audit is only one tool within due diligence. An audit records conditions at one site on one day, while due diligence is a continuing process that also covers prevention, remedy and public reporting.' },
+  { q: 'Do I need HREDD software?',
+    a: 'No law tracked on this site requires any particular software. Tools can help to store supplier data and track actions, but the legal duty concerns what a company actually does to find and address harm. A small supplier can keep sound records in ordinary documents.' },
+  { q: 'What will my buyer ask me for?',
+    a: 'Typical requests cover wages and working hours, recruitment and contract terms, health and safety, grievance channels, environmental permits and, for some commodities, the location of farms or plots. The buyer mapping tool on hredd.org shows which laws reach you through each buyer country.' },
+];
+
+const faqJson = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question', name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+const termJson = {
+  '@context': 'https://schema.org',
+  '@type': 'DefinedTerm',
+  name: 'HREDD',
+  alternateName: 'Human rights and environmental due diligence',
+  description: 'The process by which a company identifies, prevents, mitigates and accounts for harm to people and the environment in its own operations and across its supply chain.',
+  url: 'https://hredd.org/what-is-hredd/',
+};
+---
+<Base
+  title="What Is HREDD? Meaning, Steps and Laws Explained | hredd.org"
+  description="HREDD means human rights and environmental due diligence. A plain guide to what it is, the six steps, which laws require it and what suppliers are asked for."
+  active=""
+>
+
+<script type="application/ld+json" set:html={JSON.stringify(faqJson)} />
+<script type="application/ld+json" set:html={JSON.stringify(termJson)} />
+
+<section class="section" style="padding-bottom:clamp(36px,4vw,56px)">
+  <div class="wrap">
+    <p class="kicker reveal">Explainer</p>
+    <h1 class="display reveal" data-delay="1" style="font-size:clamp(40px,5.6vw,80px)">What is <em>HREDD</em>?</h1>
+    <p class="standfirst reveal" data-delay="2" style="margin-top:26px">HREDD stands for human rights and environmental
+      due diligence. It is the process by which a company identifies, prevents and accounts for the harm its business
+      does to people and the environment, in its own operations and across its supply chain.</p>
+  </div>
+</section>
+
+<section class="section" style="padding-top:0; padding-bottom:0">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div><p class="kicker">In plain language</p><h2 class="h2">Where the idea comes from</h2></div>
+    </div>
+    <div class="prose" style="margin:0">
+      <p>The idea comes from the UN Guiding Principles on Business and Human Rights, which the UN Human Rights Council
+        endorsed in 2011. The principles say that every company has a responsibility to respect human rights, and that
+        due diligence is how a company shows that it does. The OECD later turned that idea into a practical six step
+        process and applied it to environmental harm as well.</p>
+      <p>For years the process remained entirely voluntary. Since France passed its Duty of Vigilance Law in 2017, governments have
+        been writing it into statute. This site tracks {laws.length} of those laws and proposals, {inForce} of which are
+        in force today, on <a href="/tracker/">the tracker</a>.</p>
+      <p>You will also meet the terms HRDD, which covers human rights only, and mHREDD, in which the m stands for
+        mandatory. Both describe the same process with a narrower or a stricter scope.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-bottom:0">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div><p class="kicker">The process</p><h2 class="h2">The six steps of due diligence</h2></div>
+    </div>
+    <div class="steps reveal" data-delay="1">
+      {steps.map((s, i) => (
+        <div class="step">
+          <span class="step-n mono">{String(i + 1).padStart(2, '0')}</span>
+          <span class="step-body"><b>{s.title}</b><span class="step-text">{s.text}</span></span>
+        </div>
+      ))}
+    </div>
+    <p class="form-note reveal" style="margin-top:18px; text-align:left">The steps follow the OECD Due Diligence Guidance for Responsible Business Conduct, published in 2018.</p>
+  </div>
+</section>
+
+<section class="section" style="padding-bottom:0">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div><p class="kicker">From the supplier side</p><h2 class="h2">What it means for suppliers</h2></div>
+    </div>
+    <div class="prose" style="margin:0">
+      <p>Most of these laws place their duties on large buyers in Europe, North America and Australia. Suppliers feel
+        them through questionnaires, audits, contract clauses and requests for data. A supplier in Tiruppur or Dhaka may
+        never be named in a statute, and may still be asked to prove its wages, working hours, recruitment practices and
+        environmental permits.</p>
+      <p>Due diligence is meant to be a continuing process and not a certificate. An audit can be one source of
+        evidence, but a passed audit is not due diligence in itself, and no software package can perform it for you.</p>
+    </div>
+    <div class="hero-ctas reveal" style="margin-top:28px">
+      <a class="btn solid" href="/report/"><span>See which laws reach you</span> <i>→</i></a>
+      <a class="btn" href="/buyer-mapping/"><span>Check your buyers</span></a>
+      <a class="btn" href="/tracker/"><span>Open the tracker</span></a>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-bottom:0">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div><p class="kicker">Questions</p><h2 class="h2">Common questions about HREDD</h2></div>
+    </div>
+    <div class="panel reveal">
+      {faqs.map((f) => (
+        <div class="faq-item">
+          <h3>{f.q}</h3>
+          <p>{f.a}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="panel reveal">
+      <h4>Sources</h4>
+      <p style="margin:0; color:var(--ink-dim)">
+        <a href="https://www.ohchr.org/en/business-and-human-rights" rel="noopener">UN Guiding Principles on Business and Human Rights, OHCHR</a> ·
+        <a href="https://mneguidelines.oecd.org/due-diligence-guidance-for-responsible-business-conduct.htm" rel="noopener">OECD Due Diligence Guidance for Responsible Business Conduct</a>
+      </p>
+    </div>
+  </div>
+</section>
+
+</Base>
+
+<style>
+  .faq-item{ padding:18px 0; border-bottom:1px solid var(--line-soft); }
+  .faq-item:first-child{ padding-top:0; }
+  .faq-item:last-child{ border-bottom:0; padding-bottom:0; }
+  .faq-item h3{ font:400 19px/1.4 var(--serif); margin:0 0 8px; color:var(--ink); }
+  .faq-item p{ margin:0; font-size:15px; line-height:1.65; color:var(--ink-dim); }
+  div.step{ grid-template-columns:auto minmax(0,1fr); cursor:default; }
+</style>
