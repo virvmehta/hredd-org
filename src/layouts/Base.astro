@@ -278,8 +278,28 @@ const nav = [
   }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
   document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
 
-  // Numbers render statically. The count-up animation was removed deliberately:
-  // animated statistics read as marketing on a site whose brand is sobriety.
+  // Count-up for whole-number statistics marked with data-count. It was once
+  // removed as too close to marketing, and came back in November 2026 at Vir's
+  // request in a restrained form: one short run, the first time the number is
+  // seen, and never under reduced motion. Delete this block to switch it off.
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const counters = new IntersectionObserver((es) => {
+      for (const e of es) {
+        if (!e.isIntersecting) continue;
+        counters.unobserve(e.target);
+        const el = e.target, end = parseInt(el.dataset.count, 10);
+        if (!(end > 1)) continue;
+        const t0 = performance.now(), dur = 700;
+        const tick = (now) => {
+          const k = Math.min(1, (now - t0) / dur);
+          el.firstChild.nodeValue = String(Math.round(end * (1 - Math.pow(1 - k, 3))));
+          if (k < 1) requestAnimationFrame(tick);
+        };
+        if (el.firstChild && el.firstChild.nodeType === 3) requestAnimationFrame(tick);
+      }
+    }, { threshold: 0.6 });
+    document.querySelectorAll('[data-count]').forEach((el) => counters.observe(el));
+  }
 </script>
 </body>
 </html>
