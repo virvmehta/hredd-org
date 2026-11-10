@@ -52,7 +52,7 @@ p{ text-wrap:pretty; }
 .gold{ color:var(--gold); }
 .hairline{ border:0; border-top:1px solid var(--line); margin:0; }
 
-.progress{ position:fixed; top:0; left:0; height:2px; width:0%;
+.progress{ position:fixed; top:0; left:0; height:3px; width:0%;
   background:linear-gradient(90deg,var(--gold-dim),var(--gold-hi));
   z-index:200; transition:width .1s linear; }
 
@@ -68,6 +68,16 @@ p{ text-wrap:pretty; }
 @media (prefers-reduced-motion:reduce){
   .js .reveal{ opacity:1; transform:none; transition:none; }
   html{ scroll-behavior:auto; }
+}
+
+/* Cross-page transition: a short cross-fade with the new page rising a
+   little. Pure CSS, no router, so tools and scripts are unaffected. */
+@media (prefers-reduced-motion:no-preference){
+  @view-transition{ navigation:auto; }
+  ::view-transition-old(root){ animation:vt-out .18s ease-in both; }
+  ::view-transition-new(root){ animation:vt-in .32s cubic-bezier(.16,1,.3,1) both; }
+  @keyframes vt-out{ to{ opacity:0; } }
+  @keyframes vt-in{ from{ opacity:0; transform:translateY(10px); } }
 }
 
 /* --------------------------------------------------------------
