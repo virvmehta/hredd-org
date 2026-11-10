@@ -51,6 +51,13 @@ const countdown = upcoming && {
   when: new Date(upcoming.date + 'T00:00:00Z').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }),
 };
 
+// Returning visitors who chose a country on the trade index or in the report
+// are greeted with that country's figure. The choice lives only in their own
+// browser (localStorage), never on a server.
+const NICE_NAME = { 'cote-divoire': "Côte d'Ivoire" };
+const greetData = Object.fromEntries(Object.entries(trade.countries).map(([slug, c]) =>
+  [slug, { name: NICE_NAME[slug] || c.name, laws: c.laws_touching }]));
+
 const steps = [
   { href: '/tracker/', title: t(locale, 'home.step1.title'), text: t(locale, 'home.step1.text') },
   { href: '/buyer-mapping/', title: t(locale, 'home.step2.title'), text: t(locale, 'home.step2.text') },
@@ -68,6 +75,12 @@ const steps = [
         <a class="btn solid" href="/report/"><span>{t(locale, 'home.cta.report')}</span> <i>→</i></a>
         <a class="btn" href="/tracker/"><span>{t(locale, 'home.cta.tracker')}</span></a>
       </div>
+      {locale === 'en' && (
+        <a class="greet" id="greet" href="/trade/" hidden>
+          <span class="mono">Your country</span>
+          <span class="greet-text" id="greet-text"></span> <i>→</i>
+        </a>
+      )}
       {locale === 'en' && countdown && (
         <a class="countdown reveal" data-delay="3" id="countdown" href={countdown.href} data-date={countdown.date}>
           <b id="countdown-n">{countdown.days}</b>
@@ -286,6 +299,13 @@ const steps = [
   .hero-globe canvas.dragging{ cursor:grabbing; }
   .hero-globe canvas:focus-visible{ outline:1px solid var(--gold); border-radius:50%; }
   .globe-note{ margin:14px 0 0; text-align:center; font-size:10.5px; letter-spacing:.1em; color:var(--ink-dim); }
+  .greet{ display:flex; flex-wrap:wrap; align-items:baseline; gap:6px 14px; margin-top:30px;
+    font:400 18px/1.4 var(--serif); color:var(--ink); max-width:56ch; }
+  .greet[hidden]{ display:none; }
+  .greet .mono{ color:var(--gold); font-size:11px; }
+  .greet i{ font-style:normal; color:var(--gold); transition:transform .3s; }
+  .greet:hover .greet-text{ color:var(--gold-hi); }
+  .greet:hover i{ transform:translateX(4px); }
   .countdown{ display:inline-flex; align-items:center; gap:18px; margin-top:34px; padding:14px 22px 14px 18px;
     border:1px solid var(--line); border-left:2px solid var(--gold); background:var(--bg-raise);
     transition:border-color .3s, background .3s; }
@@ -297,6 +317,24 @@ const steps = [
   .cd-law{ font:400 17px/1.3 var(--serif); color:var(--ink); }
   .cd-law i{ font-style:normal; color:var(--gold); margin-left:4px; }
 </style>
+
+<script type="application/json" id="greet-data" set:html={JSON.stringify({ total: laws.length, countries: greetData })}></script>
+<script is:inline>
+  // Greet a returning visitor with the country they chose earlier.
+  (function () {
+    var box = document.getElementById('greet'), src = document.getElementById('greet-data');
+    if (!box || !src) return;
+    var slug = null;
+    try { slug = localStorage.getItem('hredd_country'); } catch (e) {}
+    var data = JSON.parse(src.textContent || '{}');
+    var c = slug && data.countries && data.countries[slug];
+    if (!c) return;
+    document.getElementById('greet-text').textContent =
+      c.laws + ' of the ' + data.total + ' tracked laws reach ' + c.name + '’s exports.';
+    box.href = '/trade/#' + slug;
+    box.hidden = false;
+  })();
+</script>
 
 <script is:inline>
   // Recount the days in the reader's own browser, and hide the box once the

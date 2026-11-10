@@ -655,6 +655,15 @@ document.getElementById('gen').addEventListener('click', () => {
   go(0, false);
 }
 
+/* ---------------- remember the country ----------------
+   Kept in this browser only, so the homepage and trade index can open on it. */
+document.querySelector('.opts[data-q="country"]')?.addEventListener('click', (e) => {
+  const b = e.target instanceof Element && e.target.closest('button');
+  const slug = b && { India: 'india', Bangladesh: 'bangladesh', Vietnam: 'vietnam', Indonesia: 'indonesia',
+    Thailand: 'thailand', Brazil: 'brazil', Kenya: 'kenya', Ethiopia: 'ethiopia' }[b.dataset.v];
+  if (slug) { try { localStorage.setItem('hredd_country', slug); } catch (err) {} }
+});
+
 /* ---------------- PDF ---------------- */
 document.getElementById('dl').addEventListener('click', () => {
   if(!currentReport) return;

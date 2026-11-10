@@ -344,9 +344,15 @@ function sectorsOf(slug){
     panes.forEach(p => { p.hidden = p.dataset.c !== slug; });
     history.replaceState(null, '', '#' + slug);
   }
-  chips.forEach(ch => ch.addEventListener('click', () => show(ch.dataset.c)));
+  // The chosen country is remembered in this browser only (localStorage), so
+  // the page reopens on it and the homepage can greet the visitor with it.
+  const remember = (slug) => { try { localStorage.setItem('hredd_country', slug); } catch (e) {} };
+  chips.forEach(ch => ch.addEventListener('click', () => { show(ch.dataset.c); remember(ch.dataset.c); }));
   const h = location.hash.slice(1);
+  let saved = null;
+  try { saved = localStorage.getItem('hredd_country'); } catch (e) {}
   if(h && document.querySelector(`.cpane[data-c="${h}"]`)) show(h);
+  else if(saved && document.querySelector(`.cpane[data-c="${saved}"]`)) show(saved);
 
   // Sector filter: each country pane has its own independent selection, so
   // switching countries never resets a supplier's chosen sector. It now spans
