@@ -16,6 +16,22 @@ const movements = buildMovements(laws, 3);
 const latestMonth = movements[0]?.date || formatMonthYear();
 const geoIds = trackedGeoIds(laws);
 
+// Globe arcs: each supplier country is joined to the capitals of its two
+// largest regulated export markets, taken from the trade dataset, so the
+// lines show real trade relationships and not decoration.
+import trade from '../../public/data/trade-exposure.json';
+const CAPITAL = { EU27: [4.35, 50.85], USA: [-77.04, 38.9], GBR: [-0.13, 51.51], CAN: [-75.7, 45.42],
+  AUS: [149.13, -35.28], JPN: [139.69, 35.68], KOR: [126.98, 37.57], CHE: [7.45, 46.95], NOR: [10.75, 59.91] };
+const SUPPLIER = { bangladesh: [90.41, 23.81], india: [77.21, 28.61], vietnam: [105.85, 21.03],
+  indonesia: [106.85, -6.21], brazil: [-47.93, -15.78], thailand: [100.5, 13.76], ethiopia: [38.75, 9.03],
+  kenya: [36.82, -1.29], ghana: [-0.19, 5.6], 'cote-divoire': [-4.01, 5.35] };
+const arcs = [];
+for (const [slug, c] of Object.entries(trade.countries)) {
+  if (!SUPPLIER[slug]) continue;
+  for (const m of c.markets.filter((x) => CAPITAL[x.key]).slice(0, 2)) arcs.push({ a: CAPITAL[m.key], b: SUPPLIER[slug] });
+}
+const globeData = { tracked: geoIds, arcs, suppliers: Object.values(SUPPLIER), capitals: Object.values(CAPITAL) };
+
 const steps = [
   { href: '/tracker/', title: t(locale, 'home.step1.title'), text: t(locale, 'home.step1.text') },
   { href: '/buyer-mapping/', title: t(locale, 'home.step2.title'), text: t(locale, 'home.step2.text') },
@@ -35,7 +51,8 @@ const steps = [
       </div>
     </div>
     <div class="hero-globe reveal" data-delay="2">
-      <canvas id="globe" width="1120" height="1120" aria-label="Rotating globe highlighting jurisdictions with HREDD laws"></canvas>
+      <canvas id="globe" width="1120" height="1120" role="img" aria-label="Globe showing lines from the capitals where due diligence laws are made to the supplier countries they reach. Drag to turn it."></canvas>
+      {locale === 'en' && <p class="globe-note mono">Drag the globe to follow each law from its capital to its suppliers.</p>}
     </div>
   </div>
 </section>
@@ -129,16 +146,19 @@ const steps = [
   </div>
 </section>
 
-<script type="application/json" id="globe-data" set:html={JSON.stringify(geoIds)}></script>
+<script type="application/json" id="globe-data" set:html={JSON.stringify(globeData)}></script>
 <script>
-  import { geoOrthographic, geoPath, geoGraticule10 } from 'd3-geo';
+  import { geoOrthographic, geoPath, geoGraticule10, geoInterpolate, geoDistance } from 'd3-geo';
   import { feature } from 'topojson-client';
   import world from 'world-atlas/countries-110m.json';
 
   const canvas = document.getElementById('globe');
   const dataEl = document.getElementById('globe-data');
   if (canvas instanceof HTMLCanvasElement && dataEl) {
-    const tracked = new Set(JSON.parse(dataEl.textContent || '[]'));
+    const data = JSON.parse(dataEl.textContent || '{}');
+    const tracked = new Set(data.tracked || []);
+    const arcs = (data.arcs || []).map((x, i) => ({ ...x, line: { type: 'LineString', coordinates: [x.a, x.b] },
+      at: geoInterpolate(x.a, x.b), offset: (i * 0.137) % 1 }));
     const ctx = canvas.getContext('2d');
     const size = canvas.width;
     const R = size / 2 - 10;
@@ -148,11 +168,22 @@ const steps = [
     const countries = feature(world, world.objects.countries).features;
     const sphere = { type: 'Sphere' };
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    let t = 0;
-    let running = false;
 
-    function frame() {
-      projection.rotate([-20 + t * 4, -12]);
+    // Open on the Arabian Sea, so Africa and South Asia face the reader.
+    let lambda = -62, phi = -14;
+    let running = false, dragging = false, idleUntil = 0, lastX = 0, lastY = 0, queued = false;
+
+    const visible = (p) => geoDistance(p, [-lambda, -phi]) < Math.PI / 2 - 0.02;
+    function dot(p, r, fill, stroke) {
+      if (!visible(p)) return;
+      const xy = projection(p);
+      ctx.beginPath(); ctx.arc(xy[0], xy[1], r, 0, Math.PI * 2);
+      if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+      if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = 2; ctx.stroke(); }
+    }
+
+    function draw(now) {
+      projection.rotate([lambda, phi]);
       ctx.clearRect(0, 0, size, size);
       const g = ctx.createRadialGradient(size / 2, size / 2, R * 0.5, size / 2, size / 2, R * 1.05);
       g.addColorStop(0, 'rgba(201,163,95,0)');
@@ -167,17 +198,64 @@ const steps = [
         ctx.fill();
         ctx.strokeStyle = 'rgba(14,13,10,.9)'; ctx.lineWidth = 0.6; ctx.stroke();
       }
-      if (!reduced && running) { t += 0.016; requestAnimationFrame(frame); }
+      // arcs from the law-making capitals to the supplier countries
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = 'rgba(226,194,134,.38)';
+      for (const arc of arcs) { ctx.beginPath(); path(arc.line); ctx.stroke(); }
+      for (const p of data.capitals || []) dot(p, 6, 'rgba(14,13,10,.9)', 'rgba(226,194,134,.9)');
+      for (const p of data.suppliers || []) dot(p, 7, '#e2c286', null);
+      // a point of light travels each arc, capital to supplier
+      if (!reduced) {
+        for (const arc of arcs) {
+          const k = ((now || 0) / 3200 + arc.offset) % 1;
+          dot(arc.at(k), 4.5, 'rgba(255,240,210,.95)', null);
+        }
+      }
     }
 
-    frame();
+    function loop(now) {
+      queued = false;
+      if (!dragging && !reduced && now > idleUntil) lambda += 0.05;
+      draw(now);
+      if (running && !reduced) { queued = true; requestAnimationFrame(loop); }
+    }
+    const kick = () => { if (!queued) { queued = true; requestAnimationFrame(loop); } };
+
+    canvas.addEventListener('pointerdown', (e) => {
+      dragging = true; lastX = e.clientX; lastY = e.clientY;
+      canvas.setPointerCapture(e.pointerId); canvas.classList.add('dragging');
+    });
+    canvas.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      lambda += (e.clientX - lastX) * 0.35;
+      phi = Math.max(-55, Math.min(55, phi - (e.clientY - lastY) * 0.35));
+      lastX = e.clientX; lastY = e.clientY;
+      kick();
+    });
+    const release = () => { if (dragging) { dragging = false; idleUntil = performance.now() + 2500; canvas.classList.remove('dragging'); } };
+    canvas.addEventListener('pointerup', release);
+    canvas.addEventListener('pointercancel', release);
+    // keyboard: arrow keys turn the globe
+    canvas.tabIndex = 0;
+    canvas.addEventListener('keydown', (e) => {
+      const step = { ArrowLeft: [-8, 0], ArrowRight: [8, 0], ArrowUp: [0, 6], ArrowDown: [0, -6] }[e.key];
+      if (!step) return;
+      e.preventDefault();
+      lambda += step[0]; phi = Math.max(-55, Math.min(55, phi + step[1]));
+      idleUntil = performance.now() + 2500; kick();
+    });
+
+    draw(0);
     const vio = new IntersectionObserver((es) => {
-      for (const e of es) {
-        const was = running;
-        running = e.isIntersecting;
-        if (running && !was && !reduced) requestAnimationFrame(frame);
-      }
+      for (const e of es) { running = e.isIntersecting; if (running) kick(); }
     });
     vio.observe(canvas);
   }
 </script>
+
+<style>
+  .hero-globe canvas{ cursor:grab; touch-action:pan-y; outline-offset:6px; }
+  .hero-globe canvas.dragging{ cursor:grabbing; }
+  .hero-globe canvas:focus-visible{ outline:1px solid var(--gold); border-radius:50%; }
+  .globe-note{ margin:14px 0 0; text-align:center; font-size:10.5px; letter-spacing:.1em; color:var(--ink-dim); }
+</style>
