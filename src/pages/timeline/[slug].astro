@@ -95,7 +95,7 @@ const description = descOptions.find(d => d.length <= 158) || descOptions[descOp
 
 const standfirst = `${law.name} (${law.jurisdiction}) is currently ${law.status.toLowerCase()}. ` +
   (nextStep
-    ? `The next statutory date is ${nextStep.when}, when ${nextStep.text.replace(/\.$/, '').toLowerCase()} takes effect, and every date below is verified against primary sources.`
+    ? `The next statutory date is ${nextStep.when} (${nextStep.text.replace(/\.$/, '').toLowerCase()}), and every date below is verified against primary sources.`
     : `Every date below is verified against primary sources, with tracker revisions logged openly at the foot of the page.`);
 
 // ---- FAQ, generated from tracker fields, unique per law ----

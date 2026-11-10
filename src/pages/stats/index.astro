@@ -1,0 +1,162 @@
+---
+import Base from '../../layouts/Base.astro';
+// Private read-out of the site's own page view counter (functions/api/).
+// The numbers load only after the password is entered; the page itself
+// holds no data and is kept out of search engines and the sitemap.
+---
+<Base title="Site statistics | hredd.org" description="Private page view statistics for hredd.org." noindex={true}>
+
+<section class="section">
+  <div class="wrap">
+    <p class="kicker">Private</p>
+    <h1 class="h2">Site statistics</h1>
+
+    <div class="panel" id="st-login" style="margin-top:28px; max-width:520px">
+      <h4>Enter the statistics password</h4>
+      <div class="st-row">
+        <input id="st-key" type="password" autocomplete="current-password" aria-label="Statistics password" />
+        <button class="btn solid" id="st-go" type="button"><span>Show</span></button>
+      </div>
+      <p class="form-note" id="st-msg" style="text-align:left; margin-top:14px"></p>
+    </div>
+
+    <div id="st-out" hidden>
+      <div class="st-bar">
+        <div class="st-range" role="group" aria-label="Period">
+          <button type="button" data-days="7">7 days</button>
+          <button type="button" data-days="30" aria-pressed="true">30 days</button>
+          <button type="button" data-days="90">90 days</button>
+          <button type="button" data-days="365">1 year</button>
+        </div>
+        <span class="mono faint" id="st-since"></span>
+      </div>
+
+      <div class="st-tiles">
+        <div class="panel"><h4>Page views</h4><p class="st-big" id="st-views">0</p></div>
+        <div class="panel"><h4>Daily visitors</h4><p class="st-big" id="st-visitors">0</p></div>
+        <div class="panel"><h4>Views per visitor</h4><p class="st-big" id="st-ratio">0</p></div>
+      </div>
+      <p class="form-note" style="text-align:left">A daily visitor is one person on one day. The same person on two days counts twice, because nothing is stored that could recognise them across days. Bots and your own opted-out browsers are left out.</p>
+
+      <div class="panel" style="margin-top:24px">
+        <h4>Page views per day</h4>
+        <div id="st-chart" class="st-chart"></div>
+      </div>
+
+      <div class="st-grid">
+        <div class="panel"><h4>Pages</h4><table class="st-table" id="st-pages"></table></div>
+        <div class="panel"><h4>Where visitors came from</h4><table class="st-table" id="st-sources"></table></div>
+        <div class="panel"><h4>Countries</h4><table class="st-table" id="st-countries"></table></div>
+        <div class="panel"><h4>Devices</h4><table class="st-table" id="st-devices"></table></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</Base>
+
+<style>
+  .st-row{ display:flex; gap:10px; flex-wrap:wrap; }
+  .st-row input{ flex:1 1 200px; min-width:0; background:var(--bg); color:var(--ink); border:1px solid var(--line);
+    padding:12px 14px; font:400 16px var(--serif); }
+  .st-bar{ display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap; margin:28px 0 20px; }
+  .st-range{ display:flex; gap:8px; flex-wrap:wrap; }
+  .st-range button{ background:none; color:var(--ink-dim); border:1px solid var(--line); padding:8px 14px; cursor:pointer;
+    font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; }
+  .st-range button[aria-pressed="true"]{ background:var(--gold); color:#14120d; border-color:var(--gold); }
+  .st-tiles{ display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:16px; margin-bottom:14px; }
+  .st-big{ font:400 44px/1.1 var(--serif); margin:0; font-variant-numeric:tabular-nums; }
+  .st-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:16px; margin-top:16px; }
+  .st-grid .panel{ min-width:0; overflow-x:auto; }
+  .st-chart{ display:flex; align-items:flex-end; gap:2px; height:180px; }
+  .st-chart div{ flex:1 1 0; min-width:1px; background:var(--gold); border-radius:3px 3px 0 0; }
+  .st-chart div:hover{ background:var(--gold-hi); }
+</style>
+<style is:global>
+  .st-table{ width:100%; border-collapse:collapse; font-size:14px; font-variant-numeric:tabular-nums; }
+  .st-table th{ text-align:left; font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--ink-faint); font-weight:500; padding:0 0 8px; }
+  .st-table td{ padding:7px 0; border-top:1px solid var(--line-soft); color:var(--ink-dim); word-break:break-word; }
+  .st-table td:first-child{ color:var(--ink); padding-right:12px; }
+  .st-table .n{ text-align:right; white-space:nowrap; padding-left:12px; }
+</style>
+
+<script is:inline>
+  (function () {
+    var $ = function (id) { return document.getElementById(id); };
+    var fmt = function (n) { return Number(n || 0).toLocaleString('en-GB'); };
+    var key = '';
+    var days = 30;
+    try { key = sessionStorage.getItem('hredd_stats_key') || ''; } catch (e) {}
+
+    function table(id, rows, label) {
+      var t = $(id);
+      t.textContent = '';
+      var head = t.insertRow();
+      [label, 'Views', 'Visitors'].forEach(function (h, i) {
+        var th = document.createElement('th'); th.textContent = h; if (i) th.className = 'n'; head.appendChild(th);
+      });
+      (rows || []).forEach(function (r) {
+        var tr = t.insertRow();
+        tr.insertCell().textContent = r.label;
+        var a = tr.insertCell(); a.textContent = fmt(r.views); a.className = 'n';
+        var b = tr.insertCell(); b.textContent = fmt(r.visitors); b.className = 'n';
+      });
+      if (!rows || !rows.length) { var e = t.insertRow().insertCell(); e.colSpan = 3; e.textContent = 'Nothing counted yet.'; }
+    }
+
+    function chart(daily, since, n) {
+      var by = {};
+      (daily || []).forEach(function (d) { by[d.day] = d; });
+      var box = $('st-chart');
+      box.textContent = '';
+      var start = new Date(since + 'T00:00:00Z').getTime();
+      var list = [];
+      for (var i = 0; i < n; i++) {
+        var day = new Date(start + i * 86400000).toISOString().slice(0, 10);
+        list.push(by[day] || { day: day, views: 0, visitors: 0 });
+      }
+      var max = Math.max.apply(null, list.map(function (d) { return d.views; }).concat([1]));
+      list.forEach(function (d) {
+        var bar = document.createElement('div');
+        bar.style.height = Math.max(1, Math.round(d.views / max * 100)) + '%';
+        if (!d.views) bar.style.opacity = '.25';
+        bar.title = d.day + ': ' + fmt(d.views) + ' views, ' + fmt(d.visitors) + ' visitors';
+        box.appendChild(bar);
+      });
+    }
+
+    function load() {
+      $('st-msg').textContent = 'Loading…';
+      fetch('/api/stats?days=' + days, { headers: { 'x-stats-key': key } })
+        .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+        .then(function (res) {
+          if (!res.ok) { $('st-msg').textContent = res.j.error || 'Could not load the statistics.'; $('st-out').hidden = true; $('st-login').hidden = false; return; }
+          try { sessionStorage.setItem('hredd_stats_key', key); } catch (e) {}
+          var d = res.j;
+          $('st-login').hidden = true; $('st-out').hidden = false;
+          $('st-views').textContent = fmt(d.totals.views);
+          $('st-visitors').textContent = fmt(d.totals.visitors);
+          $('st-ratio').textContent = d.totals.visitors ? (d.totals.views / d.totals.visitors).toFixed(1) : '0';
+          $('st-since').textContent = d.counting_since ? 'Counting since ' + d.counting_since : 'Nothing counted yet';
+          chart(d.daily, d.since, d.days);
+          table('st-pages', d.pages, 'Page');
+          table('st-sources', d.sources, 'Source');
+          table('st-countries', d.countries, 'Country');
+          table('st-devices', d.devices, 'Device');
+        })
+        .catch(function () { $('st-msg').textContent = 'Could not reach the statistics service.'; });
+    }
+
+    $('st-go').addEventListener('click', function () { key = $('st-key').value; if (key) load(); });
+    $('st-key').addEventListener('keydown', function (e) { if (e.key === 'Enter') { key = $('st-key').value; if (key) load(); } });
+    document.querySelectorAll('.st-range button').forEach(function (b) {
+      b.addEventListener('click', function () {
+        days = Number(b.dataset.days);
+        document.querySelectorAll('.st-range button').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+        load();
+      });
+    });
+    if (key) load();
+  })();
+</script>

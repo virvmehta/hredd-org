@@ -104,7 +104,19 @@ const nav = [
       if (q === '0') localStorage.removeItem('hredd_notrack');
       off = localStorage.getItem('hredd_notrack') === '1';
     } catch (e) {}
-    if (off || /^(localhost|127\.|\[::1\])/.test(location.hostname)) window['ga-disable-G-12M8LFB8G1'] = true;
+    var skip = off || /^(localhost|127\.|\[::1\])/.test(location.hostname);
+    if (skip) window['ga-disable-G-12M8LFB8G1'] = true;
+    // Our own page view counter (functions/api/hit.js). It works without
+    // Google Analytics and sets no cookies; the private read-out is /stats/.
+    if (!skip && location.pathname.indexOf('/stats') !== 0 && navigator.sendBeacon) {
+      try {
+        var p = new URLSearchParams(location.search);
+        navigator.sendBeacon('/api/hit', new Blob([JSON.stringify({
+          p: location.pathname, r: document.referrer || '',
+          s: p.get('utm_source') || '', w: window.innerWidth || 0
+        })], { type: 'application/json' }));
+      } catch (e) {}
+    }
   })();
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}

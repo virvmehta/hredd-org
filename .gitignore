@@ -6,3 +6,6 @@ dist/
 studio/node_modules/
 studio/dist/
 pipeline/__pycache__/
+
+# local Cloudflare test state
+.wrangler/

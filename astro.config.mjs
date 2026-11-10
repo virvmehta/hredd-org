@@ -12,7 +12,7 @@ export default defineConfig({
     routing: { prefixDefaultLocale: false }
   },
   integrations: [sitemap({
-    filter: (page) => !page.includes('/buyer-compliance/') &&
+    filter: (page) => !page.includes('/buyer-compliance/') && !page.includes('/stats/') &&
       !(/\/tracker\/.+\//.test(new URL(page).pathname))
   })],
   output: 'static',
