@@ -143,7 +143,7 @@ const nav = [
       <a class="wordmark" href={homeHref}><b>hredd</b><i>.org</i></a>
       <nav class="mast-nav right">
         {nav.slice(4).map((n) => (
-          <a href={n.href} aria-current={active === n.active ? 'page' : undefined}>{t(locale, n.key)}</a>
+          <a href={n.href} class={n.active === 'subscribe' ? 'nav-cta' : undefined} aria-current={active === n.active ? 'page' : undefined}>{t(locale, n.key)}</a>
         ))}
         {localized && <a class="lang-switch" href={altHref(locale === 'bn' ? 'en' : 'bn')}>{locale === 'bn' ? 'EN' : 'বাংলা'}</a>}
         <button class="search-toggle" id="search-open" aria-label={t(locale, 'nav.search')}>⌕</button>
@@ -152,7 +152,7 @@ const nav = [
     </div>
   </div>
   <nav class="mobile-menu">
-    {nav.map((n) => (<a href={n.href}>{t(locale, n.key)}</a>))}
+    {nav.map((n) => (<a href={n.href} class={n.active === 'subscribe' ? 'nav-cta' : undefined}>{t(locale, n.key)}</a>))}
     {localized && <a class="lang-switch mobile" href={altHref(locale === 'bn' ? 'en' : 'bn')}>{locale === 'bn' ? 'English' : 'বাংলা'}</a>}
     <button class="search-toggle mobile" id="search-open-mobile">⌕ {t(locale, 'nav.search')}</button>
   </nav>

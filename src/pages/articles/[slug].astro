@@ -71,6 +71,16 @@ const relatedArticles = article.relatedArticles || [];
   <div class="wrap">
     <div class="prose" set:html={bodyHtml}></div>
     <div class="disclosure" style="margin-top:clamp(40px,5vw,64px)">{disclosure}</div>
+    <aside class="article-sub" aria-label="Subscribe to the monthly digest">
+      <p class="kicker">The monthly digest</p>
+      <h2>Get the next piece <em>by email</em></h2>
+      <p>One briefing a month on what changed in due diligence law, and what it means for your orders.</p>
+      <form class="sub-form" action="https://buttondown.com/api/emails/embed-subscribe/hredd" method="post" target="_blank">
+        <input type="email" name="email" placeholder="you@example.org" required aria-label="Email address" />
+        <button class="btn solid" type="submit"><span>Subscribe</span></button>
+      </form>
+      <p class="form-note">Monthly · Free · Unsubscribe anytime</p>
+    </aside>
   </div>
 </section>
 
