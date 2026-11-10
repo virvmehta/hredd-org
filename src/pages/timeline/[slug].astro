@@ -51,12 +51,20 @@ const t0 = new Date(spine[0].iso).getTime();
 const t1 = new Date(spine[spine.length - 1].iso).getTime();
 const span = Math.max(t1 - t0, 86400000);
 const nowPos = Math.min(98, Math.max(2, 4 + 92 * (Date.now() - t0) / span));
-let lastX = -99, tier = 0;
+// Lanes: 0 just above the rail, 2 below it, 1 high above with a stem. Label
+// widths are estimated from the 10px uppercase face on the 1080px track.
+const TRACK_PX = 1080;
+const labelPx = (s) => String(s).length * 7.4 + 22;
+const laneEnd = [-Infinity, -Infinity, -Infinity];
 const nodes = spine.map((e, i) => {
   const x = 4 + 92 * (new Date(e.iso).getTime() - t0) / span;
-  tier = (x - lastX < 9) ? (tier + 1) % 3 : 0;
-  lastX = x;
-  return { ...e, x: +x.toFixed(2), tier, i };
+  const px = x / 100 * TRACK_PX, w = labelPx(e.when);
+  const edge = x < 7 ? 'l' : x > 93 ? 'r' : '';
+  const left = edge === 'l' ? px - 10 : edge === 'r' ? px - w + 10 : px - w / 2;
+  let tier = [0, 2, 1].find(t => laneEnd[t] < left);
+  if (tier === undefined) tier = [0, 2, 1].reduce((a, b) => laneEnd[a] <= laneEnd[b] ? a : b);
+  laneEnd[tier] = left + w;
+  return { ...e, x: +x.toFixed(2), tier, edge, i };
 });
 const defaultActive = Math.max(0, nodes.filter(n => !n.future).length - 1);
 const yearTicks = [];
@@ -161,7 +169,7 @@ const crumbJson = {
           ))}
           <div class="htl-now" style={`left:${nowPos}%`} aria-hidden="true"><i></i><span>Today</span></div>
           {nodes.map(n => (
-            <button class={`htl-node t${n.tier}${n.future ? ' future' : ''}`} style={`left:${n.x}%`}
+            <button class={`htl-node t${n.tier}${n.future ? ' future' : ''}${n.edge ? ' edge-' + n.edge : ''}`} style={`left:${n.x}%`}
               data-i={n.i} aria-label={`${n.when}: ${n.text}`}>
               <span class="htl-stem" aria-hidden="true"></span>
               <span class="htl-diamond" aria-hidden="true"></span>
@@ -213,20 +221,21 @@ const crumbJson = {
     scrollbar-color:var(--gold-dim) transparent; cursor:grab; }
   .htl-scroll.dragging{ cursor:grabbing; user-select:none; }
   .htl-scroll:focus-visible{ outline:1px solid var(--gold); outline-offset:4px; }
-  .htl-track{ position:relative; height:190px; min-width:900px; width:max(100%, 1080px); }
+  .htl-track{ position:relative; height:200px; min-width:900px; width:max(100%, 1080px); }
   .htl-rail{ position:absolute; left:1%; right:1%; top:50%; height:1px; background:var(--line); }
   .htl-rail-future{ position:absolute; right:1%; top:50%; height:1px;
     background:repeating-linear-gradient(90deg, var(--gold-dim) 0 5px, transparent 5px 11px); }
-  .htl-year{ position:absolute; top:calc(50% + 14px); transform:translateX(-50%);
-    font-family:var(--mono); font-weight:500; font-size:9px; letter-spacing:.12em; color:var(--ink-faint); }
-  .htl-year::before{ content:""; position:absolute; left:50%; top:-12px; height:8px; width:1px;
-    background:var(--line-soft); }
+  /* Years sit below the lowest label lane, with their tick drawn on the rail. */
+  .htl-year{ position:absolute; top:calc(50% + 46px); transform:translateX(-50%);
+    font-family:var(--mono); font-weight:500; font-size:10px; letter-spacing:.12em; color:var(--ink-faint); opacity:.8; }
+  .htl-year::before{ content:""; position:absolute; left:50%; top:-50px; height:9px; width:1px;
+    background:var(--ink-faint); }
   .htl-now{ position:absolute; top:14%; bottom:14%; width:1px; transform:translateX(-50%);
     background:linear-gradient(180deg, transparent, var(--gold-dim), transparent); }
   .htl-now i{ position:absolute; top:-4px; left:50%; width:7px; height:7px; border-radius:50%;
     background:var(--gold); transform:translateX(-50%); animation:htl-pulse 2.6s infinite; }
   .htl-now span{ position:absolute; top:-22px; left:50%; transform:translateX(-50%);
-    font-family:var(--mono); font-weight:500; font-size:8px; letter-spacing:.16em;
+    font-family:var(--mono); font-weight:500; font-size:9.5px; letter-spacing:.16em;
     text-transform:uppercase; color:var(--gold-hi); white-space:nowrap; }
   @keyframes htl-pulse{ 0%{ box-shadow:0 0 0 0 rgba(201,163,95,.35); }
     70%{ box-shadow:0 0 0 12px rgba(201,163,95,0); } 100%{ box-shadow:0 0 0 0 rgba(201,163,95,0); } }
@@ -237,10 +246,13 @@ const crumbJson = {
     background:var(--gold); border:1px solid var(--gold); transition:all .3s; }
   .htl-node.future .htl-diamond{ background:transparent; border-style:dashed; border-color:var(--gold-dim); }
   .htl-date{ position:absolute; left:50%; transform:translateX(-50%); white-space:nowrap;
-    font-family:var(--mono); font-weight:500; font-size:9px; letter-spacing:.1em;
+    background:var(--bg); padding:1px 4px; z-index:1;
+    font-family:var(--mono); font-weight:500; font-size:10px; letter-spacing:.08em;
     text-transform:uppercase; color:var(--ink-faint); transition:color .3s; }
   .htl-node.t0 .htl-date{ top:-6px; }
-  .htl-node.t1 .htl-date{ top:-26px; } .htl-node.t1 .htl-stem{ height:20px; bottom:calc(50% + 6px); }
+  .htl-node.t1 .htl-date{ top:-30px; } .htl-node.t1 .htl-stem{ height:24px; bottom:calc(50% + 6px); }
+  .htl-node.edge-l .htl-date{ left:10px; transform:none; }
+  .htl-node.edge-r .htl-date{ left:auto; right:10px; transform:none; }
   .htl-node.t2 .htl-date{ top:auto; bottom:-6px; }
   .htl-node:hover .htl-diamond{ box-shadow:0 0 10px var(--gold-ghost); }
   .htl-node.on .htl-diamond{ width:12px; height:12px; background:var(--gold-hi);

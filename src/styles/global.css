@@ -352,9 +352,9 @@ p{ text-wrap:pretty; }
 .crumb a:hover{ color:var(--gold); }
 
 .prose{ max-width:680px; margin:0 auto; font-size:18.5px; line-height:1.75; }
-/* Justified with hyphenation on the long-form pages (articles, methodology,
-   law summaries, the report preview) for the editorial column look. */
-.prose p{ text-align:justify; text-justify:inter-word; hyphens:auto; -webkit-hyphens:auto; }
+/* Ragged right on long-form pages. Justified text left wide rivers between
+   words in this narrow column, which read worse than an uneven right edge. */
+.prose p{ text-align:left; hyphens:manual; -webkit-hyphens:manual; }
 /* Prose lists (report law lists, article bullets) get a gold diamond marker
    and stay left-aligned, which reads better than justified list items. */
 .prose ul{ margin:0 0 1.4em; padding:0; list-style:none; }
@@ -363,7 +363,7 @@ p{ text-wrap:pretty; }
   color:var(--gold); font-size:10px; }
 .prose p{ margin:0 0 1.4em; }
 .prose > p:first-of-type::first-letter, .prose > div > p:first-of-type::first-letter{
-  font-size:3.4em; line-height:.85; float:left; padding:6px 12px 0 0; color:var(--gold); }
+  font-size:3.55em; line-height:.8; float:left; padding:7px 5px 0 0; margin-right:2px; color:var(--gold); }
 .prose h2, .prose h3{ font:400 28px/1.3 var(--serif); margin:1.8em 0 .7em; }
 .prose blockquote{ margin:2em 0; padding-left:26px; border-left:2px solid var(--gold);
   font-style:italic; font-size:21px; color:var(--gold-hi); }
