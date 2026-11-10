@@ -7,6 +7,20 @@ import { buildMovements } from '../../lib/redesignData.js';
 const laws = await getAllLaws();
 const map = buildWorldMap(laws);
 const countryIndex = buildCountryLawIndex(laws);
+
+// Next statutory date for each law, from the same pipeline mapping the
+// timelines use, so the map can show a country's next deadline on hover.
+import scope from '../../../pipeline/law_scope.json';
+const todayISO = new Date().toISOString().slice(0, 10);
+const fmtDay = (iso) => new Date(iso + 'T00:00:00Z').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+for (const entry of countryIndex.laws) {
+  const law = laws.find((l) => l.slug === entry.slug);
+  const regime = scope.regimes.find((r) => r.slug === entry.slug);
+  const next = (regime?.steps || []).map((x) => x.date).filter((d) => d > todayISO).sort()[0] || null;
+  entry.short = law?.shortName || entry.name;
+  entry.next = next;
+  entry.nextLabel = next ? fmtDay(next) : null;
+}
 const movements = buildMovements(laws, 8);
 const latestMonth = movements[0]?.date || '';
 
@@ -47,7 +61,7 @@ const counts = {
         <p class="kicker">The map</p>
         <h2 class="h2">Where these laws are made</h2>
       </div>
-      <span class="mono faint">Tap or click a gold country to filter the list below</span>
+      <span class="mono faint">Hover a gold country for its laws and next date, or click to filter the list</span>
     </div>
     <div class="map-panel reveal" data-delay="1">
       <svg id="worldmap" viewBox={`0 0 ${map.width} ${map.height}`} role="img" aria-label="World map of jurisdictions with tracked HREDD laws">
@@ -176,15 +190,21 @@ const counts = {
     const code = p.getAttribute('data-code');
     const ids = index.byCountry[code] || [];
     p.setAttribute('fill', 'rgba(226,194,134,.8)');
+    // the earliest upcoming statutory date among this country's laws
+    const soonest = ids.map((i) => index.laws[i]).filter((l) => l.next).sort((a, b) => a.next.localeCompare(b.next))[0];
     tip.innerHTML =
-      '<div class="t-jur">' + (p.getAttribute('data-name') || '') + '</div><ul>' +
+      '<div class="t-jur">' + (p.getAttribute('data-name') || '') + ' · ' + ids.length + (ids.length === 1 ? ' law' : ' laws') + '</div><ul>' +
       ids.map((i) => {
         const l = index.laws[i];
         return '<li>' + l.name + ' <span>· ' + l.status + '</span></li>';
-      }).join('') + '</ul>';
+      }).join('') + '</ul>' +
+      '<div class="t-next">' + (soonest
+        ? 'Next statutory date: <b>' + soonest.nextLabel + '</b> (' + soonest.short + ')'
+        : 'No dated step ahead for these laws') + '</div>';
     tip.classList.add('show');
     tip.style.left = Math.min(e.clientX + 18, innerWidth - 320) + 'px';
-    tip.style.top = e.clientY + 18 + 'px';
+    // keep the box on screen near the bottom edge
+    tip.style.top = Math.min(e.clientY + 18, innerHeight - tip.offsetHeight - 12) + 'px';
   });
 
   svg?.addEventListener('mouseout', (e) => {
@@ -218,5 +238,11 @@ const counts = {
     apply();
   });
 </script>
+
+<style is:global>
+  .tooltip .t-next{ margin-top:10px; padding-top:10px; border-top:1px solid var(--line);
+    font-family:var(--mono); font-size:11px; letter-spacing:.06em; color:var(--ink-dim); }
+  .tooltip .t-next b{ color:var(--gold-hi); font-weight:500; }
+</style>
 
 </Base>
