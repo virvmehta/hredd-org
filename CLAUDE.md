@@ -213,8 +213,9 @@ Independent of Google Analytics. `functions/api/hit.js` (a Cloudflare Pages
 Function) stores one row per page view in a D1 database bound as `DB`; the
 beacon is in `Base.astro`. `functions/api/stats.js` serves the totals to the
 private page `/stats/`, guarded by the `STATS_KEY` variable. No cookies and no
-stored IPs: a visitor is a daily one-way hash, so "visitors" means daily
-visitors. Bots, localhost and `?notrack=1` browsers are skipped. Until the D1
+stored IPs: a visitor is a one-way hash per day (`visitor`) and per
+calendar month (`mvisitor`). `/stats/` leads with real visitors today and
+this month, which is the figure Vir cares about. Bots, localhost and `?notrack=1` browsers are skipped. Until the D1
 binding and `STATS_KEY` exist in the Cloudflare Pages settings, the counter
 does nothing and `/stats/` says what is missing. Test locally with
 `npx wrangler pages dev dist --d1 DB --binding STATS_KEY=test`.
