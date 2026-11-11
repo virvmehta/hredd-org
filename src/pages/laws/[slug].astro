@@ -209,7 +209,7 @@ const toc = [
 {law.tableUpdateText && (
   <section class="section" style="padding-bottom:0">
     <div class="wrap">
-      <div class="panel reveal">
+      <div class="panel reveal" id="latest">
         <h4>Latest movement</h4>
         <p style="margin:0; font-size:18px; line-height:1.65">{law.tableUpdateText}</p>
       </div>
@@ -399,6 +399,16 @@ const toc = [
 )}
 
 <style>
+  /* Vir asked for justified paragraphs on law pages (November 2026).
+     Hyphenation (British, from the page language) keeps the gaps between
+     words even. Headings, short labels and the two-line summary under the
+     title stay left, as do phone screens, where a narrow justified column
+     opens wide gaps between words. */
+  @media (min-width:640px){
+    :global(#latest p), :global(.law-main .prose p),
+    :global(.law-main .oblist p), :global(.law-main .tl-item p){
+      text-align:justify; hyphens:auto; -webkit-hyphens:auto; text-wrap:pretty; }
+  }
   .law-body{ display:grid; grid-template-columns:minmax(0,1fr) 230px; gap:clamp(40px,5vw,72px); align-items:start; }
   /* the sections inside keep their own markup; only their gutters are reset */
   .law-main .wrap{ padding:0; max-width:none; }
