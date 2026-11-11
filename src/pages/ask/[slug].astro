@@ -2,6 +2,7 @@
 import Base from '../../layouts/Base.astro';
 import { getAllLaws, formatDate } from '../../lib/sanity.js';
 import { liveAnswers } from '../../lib/answers.js';
+import { authorRef } from '../../lib/author.js';
 
 // One page per approved answer, so each question can be found by search
 // engines and shared as a link.
@@ -21,7 +22,9 @@ const description = plain.length <= 158 ? plain : plain.slice(0, 155).replace(/\
 const faqJson = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
-  mainEntity: [{ '@type': 'Question', name: answer.q, acceptedAnswer: { '@type': 'Answer', text: plain } }],
+  mainEntity: [{ '@type': 'Question', name: answer.q, acceptedAnswer: { '@type': 'Answer', text: plain, author: authorRef } }],
+  reviewedBy: authorRef,
+  lastReviewed: answer.checked,
 };
 const crumbJson = {
   '@context': 'https://schema.org',

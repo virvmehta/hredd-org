@@ -1,6 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import tradeData from '../../../public/data/trade-exposure.json';
+import { authorRef } from '../../lib/author.js';
 import { getAllLaws, getAllArticles, getSiteSettings, renderBody, formatDate, formatMonthYear } from '../../lib/sanity.js';
 
 export async function getStaticPaths() {
@@ -117,6 +118,17 @@ const jsonLd = [
       }))
     } : {}),
     "isPartOf": { "@type": "WebSite", "name": "hredd.org", "url": "https://hredd.org" }
+  },
+  // the page itself: who wrote and checks this entry
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "url": `https://hredd.org/laws/${law.slug}/`,
+    "name": law.name,
+    "author": authorRef,
+    "reviewedBy": authorRef,
+    "publisher": { "@type": "Organization", "name": "hredd.org", "url": "https://hredd.org" },
+    "about": { "@type": "Legislation", "name": law.name }
   },
   {
     "@context": "https://schema.org",

@@ -1,6 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import { getSiteSettings } from '../../lib/sanity.js';
+import { AUTHOR, authorSchema } from '../../lib/author.js';
 
 const settings = await getSiteSettings();
 const contactEmail = settings?.contactEmail || 'hello@hredd.org';
@@ -8,8 +9,8 @@ const disclosure = 'hredd.org is an independent publication with no affiliation 
 
 // Organization + founder Person: the "who stands behind this" signal that both
 // Google E-E-A-T and AI answer engines look for before trusting a source on a
-// legal topic. sameAs is intentionally omitted rather than faked; add real
-// LinkedIn/X profile URLs there when available for a further authority lift.
+// legal topic. The founder is the shared author profile (src/lib/author.js),
+// linked to LinkedIn through sameAs.
 const aboutSchema = {
   "@context": "https://schema.org",
   "@type": "Organization",
@@ -20,13 +21,7 @@ const aboutSchema = {
   "logo": { "@type": "ImageObject", "url": "https://hredd.org/favicon.png" },
   "description": "An independent tracker of human rights and environmental due diligence law, read from the supplier side of the chain.",
   "knowsAbout": ["Human rights due diligence", "Environmental due diligence", "CSDDD", "EUDR", "UFLPA", "Supply chain law", "Global South suppliers"],
-  "founder": {
-    "@type": "Person",
-    "name": "Vir Mehta",
-    "jobTitle": "Decent work and supply chain sustainability practitioner",
-    "description": "Vir Mehta is a decent work and supply chain sustainability practitioner based in Noida, India.",
-    "address": { "@type": "PostalAddress", "addressLocality": "Noida", "addressCountry": "IN" }
-  }
+  "founder": authorSchema
 };
 ---
 <Base
@@ -69,6 +64,19 @@ const aboutSchema = {
   </div>
 </section>
 
+<section class="section" style="padding-bottom:0">
+  <div class="wrap">
+    <div class="panel reveal author-card" id="author">
+      <div>
+        <h4>Who writes it</h4>
+        <h2 class="h2" style="margin:0 0 14px">{AUTHOR.name}</h2>
+        <p style="margin:0; color:var(--ink-dim); max-width:62ch">{AUTHOR.bio}</p>
+      </div>
+      <a class="btn" href={AUTHOR.linkedin} rel="me noopener" target="_blank"><span>LinkedIn profile</span> <i>→</i></a>
+    </div>
+  </div>
+</section>
+
 <section class="section">
   <div class="wrap">
     <div class="disclosure reveal">{disclosure}</div>
@@ -76,3 +84,8 @@ const aboutSchema = {
 </section>
 
 </Base>
+
+<style>
+  .author-card{ display:flex; justify-content:space-between; align-items:flex-end; gap:24px 40px; flex-wrap:wrap;
+    border-left:2px solid var(--gold); scroll-margin-top:96px; }
+</style>

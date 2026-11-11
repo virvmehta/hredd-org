@@ -1,6 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import { getAllArticles, getSiteSettings, renderBody, formatDate } from '../../lib/sanity.js';
+import { AUTHOR, authorRef, isSiteAuthor } from '../../lib/author.js';
 
 export async function getStaticPaths() {
   const articles = await getAllArticles();
@@ -36,10 +37,9 @@ const heroPos = hero ? `${Math.round((hero.hotspot?.x ?? 0.5) * 100)}% ${Math.ro
   "@type": "NewsArticle",
   "headline": article.title,
   "description": article.excerpt || article.deck || article.title,
-  "author": {
+  "author": isSiteAuthor(article.authorName) ? authorRef : {
     "@type": "Person",
     "name": article.authorName,
-    "url": "https://hredd.org/about/",
     ...(article.authorLocation ? { "address": article.authorLocation } : {})
   },
   "publisher": {
@@ -66,7 +66,9 @@ const heroPos = hero ? `${Math.round((hero.hotspot?.x ?? 0.5) * 100)}% ${Math.ro
     <h1 class="display reveal" data-delay="1" style="font-size:clamp(36px,5vw,68px); margin-top:28px">{article.title}</h1>
     {article.deck && <p class="standfirst reveal" data-delay="2" style="margin-top:24px">{article.deck}</p>}
     <p class="byline reveal" data-delay="3">
-      <b>{article.authorName}</b>
+      {isSiteAuthor(article.authorName)
+        ? <a href={AUTHOR.page} rel="author"><b>{article.authorName}</b></a>
+        : <b>{article.authorName}</b>}
       {article.authorLocation ? ` · ${article.authorLocation}` : ''} · {formatDate(article.publishedAt)}
       {article.readTime ? ` · ${article.readTime}` : ''}
     </p>
