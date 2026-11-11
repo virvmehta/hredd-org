@@ -26,6 +26,10 @@ export async function onRequestGet({ request, env }) {
     top('path', 25), top('source', 15), top('country', 15), top('device', 5),
     db.prepare('SELECT MIN(day) AS day FROM hits'),
   ]);
+  // real visitors per calendar month, the last twelve months, newest first
+  const months = await db.prepare(
+    `SELECT substr(day, 1, 7) AS month, COUNT(DISTINCT mvisitor) AS visitors, COUNT(*) AS views
+     FROM hits WHERE mvisitor != '' GROUP BY month ORDER BY month DESC LIMIT 12`).all();
   // questions sent through Ask hredd, newest first
   const questions = await db.prepare('SELECT day, question, level, top FROM questions ORDER BY id DESC LIMIT 100').all();
 
@@ -33,6 +37,7 @@ export async function onRequestGet({ request, env }) {
     days, since,
     counting_since: first.results[0]?.day || null,
     totals: totals.results[0],
+    months: months.results,
     daily: daily.results,
     pages: pages.results,
     sources: sources.results,

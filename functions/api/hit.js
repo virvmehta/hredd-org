@@ -2,8 +2,8 @@
 // stores one row per page view in a D1 database bound as `DB`.
 //
 // Privacy: no cookies and no stored IP addresses. A visitor is recognised
-// within a single day by a one-way hash of date + IP + browser, so the same
-// person on two different days counts as two daily visitors.
+// by a one-way hash of the period + IP + browser: `visitor` within one day,
+// `mvisitor` within one calendar month (the headline monthly figure).
 
 const BOTS = /bot|crawl|spider|slurp|preview|scan|monitor|headless|lighthouse|curl|wget|python|http-client|fetch|facebookexternalhit|whatsapp|telegram|gptbot|claude|perplexity|bytespider|ahrefs|semrush|uptime/i;
 
@@ -15,7 +15,8 @@ const SCHEMA = `CREATE TABLE IF NOT EXISTS hits (
   source TEXT NOT NULL,
   country TEXT NOT NULL,
   device TEXT NOT NULL,
-  visitor TEXT NOT NULL
+  visitor TEXT NOT NULL,
+  mvisitor TEXT NOT NULL DEFAULT ''
 )`;
 
 let ready = null;
@@ -26,7 +27,11 @@ export function ensureSchema(db) {
       db.prepare('CREATE INDEX IF NOT EXISTS hits_day ON hits (day)'),
       // Ask hredd: questions visitors chose to send (functions/api/ask.js)
       db.prepare('CREATE TABLE IF NOT EXISTS questions (id INTEGER PRIMARY KEY AUTOINCREMENT, ts TEXT NOT NULL, day TEXT NOT NULL, question TEXT NOT NULL, level TEXT NOT NULL, top TEXT NOT NULL)'),
-    ]).catch((e) => { ready = null; throw e; });
+    ])
+      // a table made before the monthly column existed gains it here; the
+      // error when it is already there is expected and ignored
+      .then(() => db.prepare("ALTER TABLE hits ADD COLUMN mvisitor TEXT NOT NULL DEFAULT ''").run().catch(() => {}))
+      .catch((e) => { ready = null; throw e; });
   }
   return ready;
 }
@@ -72,18 +77,20 @@ export async function onRequestPost({ request, env }) {
     const now = new Date();
     const day = now.toISOString().slice(0, 10);
     const ip = request.headers.get('cf-connecting-ip') || '';
-    const visitor = await hash(`${day}|${ip}|${ua}|${env.STATS_KEY || 'hredd'}`);
+    const salt = env.STATS_KEY || 'hredd';
+    const visitor = await hash(`${day}|${ip}|${ua}|${salt}`);
+    const mvisitor = await hash(`${day.slice(0, 7)}|${ip}|${ua}|${salt}`);
     const width = Number(body.w) || 0;
 
     await ensureSchema(env.DB);
     await env.DB.prepare(
-      'INSERT INTO hits (ts, day, path, source, country, device, visitor) VALUES (?, ?, ?, ?, ?, ?, ?)'
+      'INSERT INTO hits (ts, day, path, source, country, device, visitor, mvisitor) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
     ).bind(
       now.toISOString(), day, body.p.replace(/\/+$/, '/') || '/',
       sourceOf(String(body.r || ''), String(body.s || ''), url.hostname),
       (request.cf && request.cf.country) || 'unknown',
       width && width < 700 ? 'mobile' : width && width < 1100 ? 'tablet' : 'desktop',
-      visitor
+      visitor, mvisitor
     ).run();
   } catch (e) {
     // Counting must never break the page, so errors are swallowed.

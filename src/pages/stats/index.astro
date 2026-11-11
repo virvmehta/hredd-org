@@ -21,6 +21,15 @@ import Base from '../../layouts/Base.astro';
     </div>
 
     <div id="st-out" hidden>
+      <div class="panel st-month">
+        <div class="st-heroes">
+          <div><h4>Real visitors today</h4><p class="st-hero" id="st-today">0</p></div>
+          <div><h4 id="st-month-label">Real visitors this month</h4><p class="st-hero" id="st-month">0</p></div>
+        </div>
+        <p class="form-note" id="st-month-note" style="text-align:left; margin:0"></p>
+        <table class="st-table" id="st-months" style="margin-top:20px; max-width:460px"></table>
+      </div>
+
       <div class="st-bar">
         <div class="st-range" role="group" aria-label="Period">
           <button type="button" data-days="7">7 days</button>
@@ -33,13 +42,13 @@ import Base from '../../layouts/Base.astro';
 
       <div class="st-tiles">
         <div class="panel"><h4>Page views</h4><p class="st-big" id="st-views">0</p></div>
-        <div class="panel"><h4>Daily visitors</h4><p class="st-big" id="st-visitors">0</p></div>
+        <div class="panel"><h4>Daily visitors, added up</h4><p class="st-big" id="st-visitors">0</p></div>
         <div class="panel"><h4>Views per visitor</h4><p class="st-big" id="st-ratio">0</p></div>
       </div>
-      <p class="form-note" style="text-align:left">A daily visitor is one person on one day. The same person on two days counts twice, because nothing is stored that could recognise them across days. Bots and your own opted-out browsers are left out.</p>
+      <p class="form-note" style="text-align:left">These boxes cover the period chosen above. Daily visitors are added up across its days, so a person who came on two days counts twice here. For separate people, use the monthly figure at the top.</p>
 
       <div class="panel" style="margin-top:24px">
-        <h4>Page views per day</h4>
+        <h4>Real visitors per day</h4>
         <div id="st-chart" class="st-chart"></div>
       </div>
 
@@ -71,14 +80,18 @@ import Base from '../../layouts/Base.astro';
     font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; }
   .st-range button[aria-pressed="true"]{ background:var(--gold); color:#14120d; border-color:var(--gold); }
   .st-tiles{ display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:16px; margin-bottom:14px; }
+  .st-month{ margin-top:28px; border-left:2px solid var(--gold); }
+  .st-heroes{ display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px 40px; }
+  .st-hero{ font:400 clamp(64px,9vw,104px)/1 var(--serif); color:var(--gold-hi); margin:6px 0 14px; font-variant-numeric:tabular-nums; }
   .st-big{ font:400 44px/1.1 var(--serif); margin:0; font-variant-numeric:tabular-nums; }
   .st-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:16px; margin-top:16px; }
   .st-grid .panel{ min-width:0; overflow-x:auto; }
   .st-chart{ display:flex; align-items:flex-end; gap:2px; height:180px; }
-  .st-chart div{ flex:1 1 0; min-width:1px; background:var(--gold); border-radius:3px 3px 0 0; }
-  .st-chart div:hover{ background:var(--gold-hi); }
 </style>
 <style is:global>
+  /* the bars are made in the browser, so their rules must be global */
+  .st-chart div{ flex:1 1 0; min-width:1px; background:var(--gold); border-radius:3px 3px 0 0; }
+  .st-chart div:hover{ background:var(--gold-hi); }
   .st-table{ width:100%; border-collapse:collapse; font-size:14px; font-variant-numeric:tabular-nums; }
   .st-table th{ text-align:left; font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase;
     color:var(--ink-faint); font-weight:500; padding:0 0 8px; }
@@ -122,12 +135,12 @@ import Base from '../../layouts/Base.astro';
         var day = new Date(start + i * 86400000).toISOString().slice(0, 10);
         list.push(by[day] || { day: day, views: 0, visitors: 0 });
       }
-      var max = Math.max.apply(null, list.map(function (d) { return d.views; }).concat([1]));
+      var max = Math.max.apply(null, list.map(function (d) { return d.visitors; }).concat([1]));
       list.forEach(function (d) {
         var bar = document.createElement('div');
-        bar.style.height = Math.max(1, Math.round(d.views / max * 100)) + '%';
-        if (!d.views) bar.style.opacity = '.25';
-        bar.title = d.day + ': ' + fmt(d.views) + ' views, ' + fmt(d.visitors) + ' visitors';
+        bar.style.height = Math.max(1, Math.round(d.visitors / max * 100)) + '%';
+        if (!d.visitors) bar.style.opacity = '.25';
+        bar.title = d.day + ': ' + fmt(d.visitors) + ' visitors, ' + fmt(d.views) + ' page views';
         box.appendChild(bar);
       });
     }
@@ -141,6 +154,26 @@ import Base from '../../layouts/Base.astro';
           try { sessionStorage.setItem('hredd_stats_key', key); } catch (e) {}
           var d = res.j;
           $('st-login').hidden = true; $('st-out').hidden = false;
+          // headline: people this calendar month, with earlier months below
+          var nowMonth = new Date().toISOString().slice(0, 7);
+          var monthName = function (m) { return new Date(m + '-01T00:00:00Z').toLocaleDateString('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' }); };
+          var months = d.months || [];
+          var cur = months.find(function (m) { return m.month === nowMonth; });
+          $('st-month-label').textContent = 'Real visitors in ' + monthName(nowMonth);
+          $('st-month').textContent = fmt(cur ? cur.visitors : 0);
+          var today = (d.daily || []).find(function (x) { return x.day === new Date().toISOString().slice(0, 10); });
+          $('st-today').textContent = fmt(today ? today.visitors : 0);
+          $('st-month-note').textContent = 'Each person counts once a day and once a month, on each device they use. Days and months run on UTC time. Bots and your own opted-out browsers are left out.';
+          var mt = $('st-months'); mt.textContent = '';
+          var mh = mt.insertRow();
+          ['Month', 'Visitors', 'Page views'].forEach(function (h, i) { var th = document.createElement('th'); th.textContent = h; if (i) th.className = 'n'; mh.appendChild(th); });
+          months.forEach(function (m) {
+            var tr = mt.insertRow();
+            tr.insertCell().textContent = monthName(m.month);
+            var a = tr.insertCell(); a.textContent = fmt(m.visitors); a.className = 'n';
+            var b = tr.insertCell(); b.textContent = fmt(m.views); b.className = 'n';
+          });
+          if (!months.length) { var me = mt.insertRow().insertCell(); me.colSpan = 3; me.textContent = 'Nothing counted yet.'; }
           $('st-views').textContent = fmt(d.totals.views);
           $('st-visitors').textContent = fmt(d.totals.visitors);
           $('st-ratio').textContent = d.totals.visitors ? (d.totals.views / d.totals.visitors).toFixed(1) : '0';
