@@ -89,7 +89,8 @@ export function renderBody(body) {
           const ref = value?.asset?._ref || '';
           if (!ref) return '';
           const [, id, size, ext] = ref.split('-');
-          const url = `https://cdn.sanity.io/images/${projectId}/${dataset}/${id}-${size}.${ext}`;
+          // sized and compressed by Sanity's image service, so phone data costs stay low
+          const url = `https://cdn.sanity.io/images/${projectId}/${dataset}/${id}-${size}.${ext}?w=1400&auto=format&q=80`;
           const caption = value.caption ? `<figcaption>${value.caption}</figcaption>` : '';
           return `<figure><img src="${url}" alt="${value.alt || ''}" loading="lazy" />${caption}</figure>`;
         },

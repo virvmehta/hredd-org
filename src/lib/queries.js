@@ -16,6 +16,8 @@ export const queries = {
     "slug": slug.current,
     title, deck, excerpt, category, authorName, authorBio, authorLocation,
     publishedAt, readTime, featured, heroCaption, heroCredit, body,
+    "heroImage": heroImage{ "url": asset->url, hotspot,
+      "w": asset->metadata.dimensions.width, "h": asset->metadata.dimensions.height },
     disclosureOverride,
     "relatedLaws": relatedLaws[]->{ "slug": slug.current, name, shortName, status, statusType, jurisdiction, oneLineSummary },
     "relatedArticles": relatedArticles[]->{ "slug": slug.current, title, category, publishedAt, readTime }
