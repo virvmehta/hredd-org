@@ -224,7 +224,9 @@ does nothing and `/stats/` says what is missing. Test locally with
 - **Globe** (`HomeContent.astro`): opens on Africa and South Asia, drag or
   arrow keys to turn. Arcs join each supplier country to the capitals of its
   two largest regulated markets, read from `trade-exposure.json`.
-- **Countdown** on the homepage and the **map hover's next date** both read
+- **Countdowns** on the homepage (three: EUDR, EU FLR, CSDDD, each to its
+  next step, list in `COUNTDOWN_LAWS` in `HomeContent.astro`) and the
+  **map hover's next date** both read
   the `steps` in `pipeline/law_scope.json`. Keep that file's dates right.
 - **Exposure report** shows one question at a time. It is a display layer
   only (`.stepper` class); answers, validation, report text and PDF are the
