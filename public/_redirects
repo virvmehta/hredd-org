@@ -1,4 +1,8 @@
 # Served by Cloudflare Pages. One rule per line: from, to, status.
+# The usual sitemap address serves the real one, so tools that assume
+# /sitemap.xml get XML rather than the HTML "page not found" page.
+/sitemap.xml /sitemap-index.xml 200
+
 /salient-risks /tracker/ 301
 /salient-risks/ /tracker/ 301
 
