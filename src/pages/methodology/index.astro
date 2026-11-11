@@ -50,7 +50,7 @@ const datasetSchema = buildDatasetSchema(data, scope, 'https://hredd.org/methodo
         <div class="law-row" style="grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) auto; cursor:default">
           <div>
             <h3>{r.shortName}</h3>
-            <p class="sub">{r.granularity} · {r.steps && r.steps.length ? 'applies ' + r.steps.map(s => s.date).join(', ') : 'no statutory dates, excluded from projection'} · <a href={r.legal_source_url} style="color:var(--gold)">{r.legal_source}</a></p>
+            <p class="sub nojust">{r.granularity} · {r.steps && r.steps.length ? 'applies ' + r.steps.map(s => s.date).join(', ') : 'no statutory dates, excluded from projection'} · <a href={r.legal_source_url} style="color:var(--gold)">{r.legal_source}</a></p>
           </div>
           <span class="jur">{r.market} · {r.mechanism}</span>
           <span class="chip">Class {r.class}</span>

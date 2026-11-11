@@ -378,13 +378,23 @@ p{ text-wrap:pretty; }
 .crumb a:hover{ color:var(--gold); }
 
 .prose{ max-width:680px; margin:0 auto; font-size:18.5px; line-height:1.75; }
-/* Ragged right on long-form pages. Justified text left wide rivers between
-   words in this narrow column, which read worse than an uneven right edge. */
-.prose p{ text-align:left; hyphens:manual; -webkit-hyphens:manual; }
+/* Justified text on every page except the homepage (Vir, November 2026).
+   British hyphenation keeps the gaps between words even. The rule is written
+   with :where() so it has no weight: anything that sets its own alignment
+   (centred bands, labels, small mono notes, menus, the footer) keeps it.
+   Phones stay ragged right, where a narrow justified column opens gaps.
+   Add class="nojust" to a label-like line (names, dates, codes) to opt out. */
+@media (min-width:640px){
+  :where(body:not(.is-home)) :where(p, li, dd):not(:where(
+      .mono, .kicker, .byline, .crumb, .chip, .jur, .form-note, .search-empty, .nojust, .l-name *,
+      .site-foot *, .masthead *, .search-overlay *, .statement-band *, .sub-band *, .quote-band *,
+      [style*="text-align"])){
+    text-align:justify; hyphens:auto; -webkit-hyphens:auto; }
+}
 /* Prose lists (report law lists, article bullets) get a gold diamond marker
    and stay left-aligned, which reads better than justified list items. */
 .prose ul{ margin:0 0 1.4em; padding:0; list-style:none; }
-.prose li{ position:relative; padding:0 0 .7em 26px; text-align:left; }
+.prose li{ position:relative; padding:0 0 .7em 26px; }
 .prose li::before{ content:"◆"; position:absolute; left:0; top:.2em;
   color:var(--gold); font-size:10px; }
 .prose p{ margin:0 0 1.4em; }

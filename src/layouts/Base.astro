@@ -139,7 +139,7 @@ const label = (n) => n.label || t(locale, n.key);
   });
 </script>
 </head>
-<body>
+<body class={/^\/(bn\/?)?$/.test(Astro.url.pathname) ? 'is-home' : undefined}>
 
 <header class="masthead">
   <div class="mast-main">
