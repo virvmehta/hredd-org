@@ -267,5 +267,13 @@ cost grounds.
 - **Preview drafts locally** with `ASK_PREVIEW=1 npm run build`. A normal
   build hides drafts, marks `/ask/` noindex and leaves it out of the sitemap
   and footer until at least one answer is approved.
+- **Went live on 11 November 2026** with 86 answers (EUDR, CSDDD, EU FLR),
+  approved by Vir unchanged. The answer list defaults to `'approved'`, so a
+  new draft must set `status: 'draft'` explicitly.
+- **Ways in:** "Ask hredd" replaces About in the desktop top bar (About stays
+  in the phone menu and footer), a question box on the homepage under
+  "Start here" (a plain GET form to `/ask/?q=`), answers in the header site
+  search (`search-index.json.js`, type `answer`) with a closing "Ask hredd"
+  row, the footer, and each law page's "Common questions".
 - **Unanswered questions** are stored by `functions/api/ask.js` in the D1
   table `questions` and listed on `/stats/`. They feed next month's answers.

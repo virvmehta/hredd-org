@@ -4,10 +4,12 @@
 // matching. Small enough (well under 100KB for 18 laws + articles) to fetch
 // once and keep in memory for the session.
 import { getAllLaws, getAllArticles } from '../lib/sanity.js';
+import { liveAnswers } from '../lib/answers.js';
 
 export async function GET() {
   const laws = await getAllLaws();
   const articles = await getAllArticles();
+  const lawName = (slug) => { const l = laws.find((x) => x.slug === slug); return l ? (l.shortName || l.name) : ''; };
 
   const items = [
     ...laws.map((l) => ({
@@ -24,6 +26,14 @@ export async function GET() {
       sub: `${a.category || 'Article'} · ${a.authorName || ''}`,
       href: `/articles/${a.slug}/`,
       text: [a.title, a.deck, a.excerpt, a.category].filter(Boolean).join(' ').toLowerCase(),
+    })),
+    // Ask hredd answers: approved ones only, so drafts never leak into search
+    ...liveAnswers().map((x) => ({
+      type: 'answer',
+      title: x.q,
+      sub: `Ask hredd · ${lawName(x.law)}`,
+      href: `/ask/${x.slug}/`,
+      text: [x.q, lawName(x.law), x.tags].filter(Boolean).join(' ').toLowerCase(),
     })),
   ];
 

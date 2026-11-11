@@ -101,7 +101,9 @@ p{ text-wrap:pretty; }
 .mast-nav{ display:flex; gap:26px; align-items:center; }
 .mast-nav.right{ justify-content:flex-end; }
 .mast-nav a{ font-family:var(--mono); font-weight:500; font-size:11px; letter-spacing:.11em; text-transform:uppercase;
-  color:var(--ink-dim); position:relative; padding:4px 0; transition:color .25s; }
+  color:var(--ink-dim); position:relative; padding:4px 0; transition:color .25s; white-space:nowrap; }
+/* just above the hamburger breakpoint the links sit closer, so none wraps */
+@media (max-width:1280px){ .mast-nav{ gap:18px; } }
 .mast-nav a::after{ content:""; position:absolute; left:0; bottom:0; height:1px; width:0;
   background:var(--gold); transition:width .3s cubic-bezier(.16,1,.3,1); }
 .mast-nav a:hover, .mast-nav a[aria-current]{ color:var(--ink); }

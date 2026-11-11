@@ -3,6 +3,8 @@
 // Every answer here was drafted against the official consolidated text of the
 // law it covers and is shown on the site ONLY when its status is 'approved'.
 // Vir reviews each one. To approve an answer, change status to 'approved'.
+// Vir approved the first 86 answers, unchanged, on 11 November 2026. New
+// answers should set status: 'draft' explicitly until he approves them.
 //
 //   slug     address of the answer page (/ask/<slug>/)
 //   law      slug of the tracker law the answer depends on. When that law's
@@ -544,7 +546,7 @@ const flr = [
     tags: 'consumers end users recall already sold withdrawal' },
 ].map((x) => ({ ...x, law: 'eu-forced-labour-regulation' }));
 
-export const answers = [...eudr, ...csddd, ...flr].map((x) => ({ status: 'draft', checked: CHECKED, ...x }));
+export const answers = [...eudr, ...csddd, ...flr].map((x) => ({ status: 'approved', checked: CHECKED, ...x }));
 
 export const approvedAnswers = () => answers.filter((x) => x.status === 'approved');
 

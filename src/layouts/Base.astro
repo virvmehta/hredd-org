@@ -47,6 +47,14 @@ const nav = [
   { key: 'nav.about', href: '/about/', active: 'about' },
   { key: 'nav.subscribe', href: '/subscribe/', active: 'subscribe' },
 ];
+// Ask hredd joins the menus once an answer is approved. The desktop bar has
+// no room for a ninth link, so it takes About's place there; About stays in
+// the phone menu and the footer.
+const askLive = liveAnswers().length > 0;
+const askItem = { label: 'Ask hredd', href: '/ask/', active: 'ask' };
+const navRight = askLive ? [...nav.slice(4, 6), askItem, nav[7]] : nav.slice(4);
+const navMobile = askLive ? [...nav.slice(0, 6), askItem, ...nav.slice(6)] : nav;
+const label = (n) => n.label || t(locale, n.key);
 ---
 <!DOCTYPE html>
 <html lang={htmlLang}>
@@ -143,8 +151,8 @@ const nav = [
       </nav>
       <a class="wordmark" href={homeHref}><b>hredd</b><i>.org</i></a>
       <nav class="mast-nav right">
-        {nav.slice(4).map((n) => (
-          <a href={n.href} class={n.active === 'subscribe' ? 'nav-cta' : undefined} aria-current={active === n.active ? 'page' : undefined}>{t(locale, n.key)}</a>
+        {navRight.map((n) => (
+          <a href={n.href} class={n.active === 'subscribe' ? 'nav-cta' : undefined} aria-current={active === n.active ? 'page' : undefined}>{label(n)}</a>
         ))}
         {localized && <a class="lang-switch" href={altHref(locale === 'bn' ? 'en' : 'bn')}>{locale === 'bn' ? 'EN' : 'বাংলা'}</a>}
         <button class="search-toggle" id="search-open" aria-label={t(locale, 'nav.search')}>⌕</button>
@@ -153,13 +161,13 @@ const nav = [
     </div>
   </div>
   <nav class="mobile-menu">
-    {nav.map((n) => (<a href={n.href} class={n.active === 'subscribe' ? 'nav-cta' : undefined}>{t(locale, n.key)}</a>))}
+    {navMobile.map((n) => (<a href={n.href} class={n.active === 'subscribe' ? 'nav-cta' : undefined}>{label(n)}</a>))}
     {localized && <a class="lang-switch mobile" href={altHref(locale === 'bn' ? 'en' : 'bn')}>{locale === 'bn' ? 'English' : 'বাংলা'}</a>}
     <button class="search-toggle mobile" id="search-open-mobile">⌕ {t(locale, 'nav.search')}</button>
   </nav>
 </header>
 
-<div class="search-overlay" id="search-overlay" hidden>
+<div class="search-overlay" id="search-overlay" data-ask={askLive ? '1' : undefined} hidden>
   <div class="search-box">
     <div class="search-field">
       <span aria-hidden="true">⌕</span>
@@ -185,7 +193,7 @@ const nav = [
       </div>
       <div class="foot-col">
         <h4>{t(locale, 'foot.brand')}</h4>
-        <a href="/about/">{t(locale, 'foot.about')}</a><a href="/what-is-hredd/">What is HREDD?</a>{liveAnswers().length > 0 && <a href="/ask/">Ask hredd</a>}<a href="/methodology/">{t(locale, 'foot.methodology')}</a><a href="/subscribe/">{t(locale, 'foot.subscribe')}</a><a href="/about/#contact">{t(locale, 'foot.contact')}</a>
+        <a href="/about/">{t(locale, 'foot.about')}</a><a href="/what-is-hredd/">What is HREDD?</a>{askLive && <a href="/ask/">Ask hredd</a>}<a href="/methodology/">{t(locale, 'foot.methodology')}</a><a href="/subscribe/">{t(locale, 'foot.subscribe')}</a><a href="/about/#contact">{t(locale, 'foot.contact')}</a>
       </div>
     </div>
     <div class="foot-base">
@@ -250,25 +258,41 @@ const nav = [
     if (e.key === 'Escape' && !overlay?.hidden) closeSearch();
   });
 
-  function render(items) {
+  const TYPE = { law: 'Law', article: 'Article', answer: 'Answer' };
+  const askOn = overlay?.dataset.ask === '1';
+  const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+  function render(items, raw) {
     if (!results) return;
+    // once answers are live, the last row always offers the full Ask hredd search
+    const askRow = askOn && raw.length >= 3 ? `
+      <a class="search-row" href="/ask/?q=${encodeURIComponent(raw)}">
+        <span class="search-type mono">Ask</span>
+        <span class="search-text"><b>Ask hredd: “${esc(raw)}”</b><i>Search the answer library for a plain answer</i></span>
+      </a>` : '';
     if (!items.length) {
-      results.innerHTML = '<p class="search-empty">No matches. Try a law name, jurisdiction, or topic.</p>';
+      results.innerHTML = '<p class="search-empty">No matches. Try a law name, jurisdiction, or topic.</p>' + askRow;
       return;
     }
     results.innerHTML = items.slice(0, 20).map(i => `
       <a class="search-row" href="${i.href}">
-        <span class="search-type mono">${i.type === 'law' ? 'Law' : 'Article'}</span>
+        <span class="search-type mono">${TYPE[i.type] || 'Page'}</span>
         <span class="search-text"><b>${i.title}</b><i>${i.sub}</i></span>
-      </a>`).join('');
+      </a>`).join('') + askRow;
   }
 
   input?.addEventListener('input', async () => {
-    const q = input.value.trim().toLowerCase();
+    const raw = input.value.trim();
+    const q = raw.toLowerCase();
     if (!q) { results.innerHTML = ''; return; }
     const items = index || await loadIndex();
-    const matches = items.filter(i => i.text.includes(q) || i.title.toLowerCase().includes(q));
-    render(matches);
+    // every word must appear somewhere, so "leather eudr" finds the leather answer
+    const words = q.split(/\s+/).filter(Boolean);
+    const matches = items.filter(i => {
+      const hay = i.text + ' ' + i.title.toLowerCase();
+      return words.every(w => hay.includes(w));
+    });
+    render(matches, raw);
   });
 
   // reveal on scroll

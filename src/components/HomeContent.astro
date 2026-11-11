@@ -6,6 +6,9 @@
 import { getAllLaws, getAllArticles, formatDate, formatMonthYear } from '../lib/sanity.js';
 import { buildMovements, trackedGeoIds } from '../lib/redesignData.js';
 import { t } from '../lib/i18n.js';
+import { liveAnswers } from '../lib/answers.js';
+// The homepage question box appears once at least one answer is approved.
+const askLive = liveAnswers().length > 0;
 
 const { locale = 'en' } = Astro.props;
 
@@ -117,6 +120,25 @@ const steps = [
     </div>
   </div>
 </section>
+
+{locale === 'en' && askLive && (
+  <section class="section" style="padding-top:0">
+    <div class="wrap">
+      <form class="home-ask reveal" action="/ask/" method="get" role="search">
+        <div class="home-ask-head">
+          <p class="kicker">Ask hredd</p>
+          <h2 class="h2">Have a question about <em>these laws?</em></h2>
+        </div>
+        <div class="home-ask-field">
+          <input type="search" name="q" required minlength="3" maxlength="200" autocomplete="off"
+            aria-label="Your question" placeholder="For example: is leather covered by the EUDR?" />
+          <button class="btn solid" type="submit"><span>Find the answer</span> <i>→</i></button>
+        </div>
+        <p class="home-ask-note mono faint">Plain answers, each checked against the text of the law</p>
+      </form>
+    </div>
+  </section>
+)}
 
 <section class="section" style="padding-top:0">
   <div class="wrap">
@@ -309,6 +331,15 @@ const steps = [
   .countdown{ display:inline-flex; align-items:center; gap:18px; margin-top:34px; padding:14px 22px 14px 18px;
     border:1px solid var(--line); border-left:2px solid var(--gold); background:var(--bg-raise);
     transition:border-color .3s, background .3s; }
+  .home-ask{ border:1px solid var(--gold-dim); background:radial-gradient(120% 160% at 0% 0%, var(--panel-2), var(--bg) 70%);
+    padding:clamp(22px,3.4vw,40px); display:flex; flex-direction:column; gap:20px; }
+  .home-ask-head .h2{ margin:0; }
+  .home-ask-field{ display:flex; gap:12px; flex-wrap:wrap; }
+  .home-ask-field input{ flex:1 1 280px; min-width:0; background:var(--bg); color:var(--ink); border:1px solid var(--line);
+    padding:16px 18px; font:400 clamp(17px,1.8vw,21px) var(--serif); outline:none; transition:border-color .25s; }
+  .home-ask-field input:focus{ border-color:var(--gold); }
+  .home-ask-field input::placeholder{ color:var(--ink-faint); }
+  .home-ask-note{ margin:0; }
   .countdown:hover{ border-color:var(--gold-dim); border-left-color:var(--gold-hi); background:var(--panel); }
   .countdown b{ font:400 clamp(40px,4.4vw,56px)/1 var(--serif); color:var(--gold-hi);
     font-variant-numeric:tabular-nums; min-width:1.2em; text-align:right; }
