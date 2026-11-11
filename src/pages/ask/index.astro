@@ -1,0 +1,209 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getAllLaws } from '../../lib/sanity.js';
+import { liveAnswers } from '../../lib/answers.js';
+
+// Ask hredd: a library of reviewed answers with instant search. No AI runs
+// when a visitor asks; the search (src/lib/askSearch.js) matches their words
+// against answers the editor has already approved.
+const live = liveAnswers();
+const laws = await getAllLaws();
+const lawName = (slug) => { const l = laws.find((x) => x.slug === slug); return l ? (l.shortName || l.name) : slug; };
+const groups = [...new Set(live.map((x) => x.law))].map((slug) => ({ slug, name: lawName(slug), items: live.filter((x) => x.law === slug) }));
+const lawNames = Object.fromEntries(groups.map((g) => [g.slug, g.name]));
+const examples = ['Is leather covered by the EUDR?', 'Who pays for audits under the CSDDD?', 'When does the forced labour ban start?'];
+---
+<Base
+  title="Ask hredd: Plain Answers on Due Diligence Law | hredd.org"
+  description="Ask a question about the EUDR, the CSDDD or the EU Forced Labour Regulation and get a plain answer, checked against the legal text and written for suppliers."
+  active="ask"
+  noindex={live.length === 0}
+>
+
+<section class="section" style="padding-bottom:clamp(30px,4vw,48px)">
+  <div class="wrap">
+    <p class="kicker reveal">Ask hredd</p>
+    <h1 class="display reveal" data-delay="1" style="font-size:clamp(40px,5.6vw,80px)">Plain answers,<br /><em>checked against the law</em></h1>
+    {live.length === 0 ? (
+      <p class="standfirst reveal" data-delay="2" style="margin-top:26px">The answer library is being prepared and reviewed. Until it opens, every law is explained on <a href="/tracker/" style="color:var(--gold)">the tracker</a>.</p>
+    ) : (
+      <p class="standfirst reveal" data-delay="2" style="margin-top:26px">Type a question in your own words. Every answer here was checked against the legal text before it was published, and each one names the article it rests on.</p>
+    )}
+  </div>
+</section>
+
+{live.length > 0 && (
+<section class="section" style="padding-top:0">
+  <div class="wrap ask-wrap">
+    <div class="ask-box">
+      <label class="mono" for="ask-input">Your question</label>
+      <div class="ask-field">
+        <input id="ask-input" type="search" autocomplete="off" placeholder="For example: is leather covered by the EUDR?" />
+        <button class="btn" id="ask-clear" type="button" hidden><span>Clear</span></button>
+      </div>
+      <div class="ask-examples">
+        <span class="mono faint">Try</span>
+        {examples.map((e) => (<button type="button" class="ask-example">{e}</button>))}
+      </div>
+    </div>
+
+    <div id="ask-results" aria-live="polite" hidden>
+      <p class="mono ask-status" id="ask-status"></p>
+      <div id="ask-list"></div>
+
+      <div class="panel ask-missing" id="ask-missing">
+        <h4>Not the answer you needed?</h4>
+        <p class="ask-missing-text">Send us your question exactly as you typed it. We read every one, and the common ones become new answers in the library.</p>
+        <div class="ask-send">
+          <button class="btn solid" id="ask-send" type="button"><span>Send my question</span></button>
+          <p class="mono" id="ask-sent" role="status"></p>
+        </div>
+      </div>
+    </div>
+
+    <div id="ask-browse">
+      {groups.map((g) => (
+        <div class="ask-group">
+          <div class="section-head" style="margin-bottom:18px">
+            <div><p class="kicker">{g.items.length} answers</p><h2 class="h2">{g.name}</h2></div>
+            <a class="textlink" href={`/laws/${g.slug}/`}>Full tracker entry <i>→</i></a>
+          </div>
+          <div class="law-rows">
+            {g.items.map((x) => (
+              <a class="law-row ask-row" href={`/ask/${x.slug}/`}><div><h3>{x.q}</h3></div><i class="ask-arrow">→</i></a>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <p class="form-note ask-note">Answers explain what each law says in general terms. They are drafted with AI assistance, checked by the editor against the legal text, and are not legal advice on any one business.</p>
+  </div>
+</section>
+)}
+
+<script type="application/json" id="ask-laws" set:html={JSON.stringify(lawNames)}></script>
+
+</Base>
+
+<style>
+  .ask-wrap{ max-width:900px; }
+  .ask-box{ border:1px solid var(--gold-dim); background:radial-gradient(120% 160% at 0% 0%, var(--panel-2), var(--bg) 70%);
+    padding:clamp(20px,3vw,34px); }
+  .ask-box label{ display:block; color:var(--gold); margin-bottom:12px; }
+  .ask-field{ display:flex; gap:10px; flex-wrap:wrap; }
+  .ask-field input{ flex:1 1 260px; min-width:0; background:var(--bg); color:var(--ink); border:1px solid var(--line);
+    padding:16px 18px; font:400 clamp(17px,1.8vw,21px) var(--serif); outline:none; transition:border-color .25s; }
+  .ask-field input:focus{ border-color:var(--gold); }
+  .ask-field input::placeholder{ color:var(--ink-faint); }
+  .ask-examples{ display:flex; flex-wrap:wrap; gap:8px 10px; align-items:center; margin-top:16px; }
+  .ask-example{ background:none; border:1px solid var(--line); color:var(--ink-dim); padding:7px 12px; cursor:pointer;
+    font:400 14px/1.3 var(--serif); transition:border-color .25s, color .25s; }
+  .ask-example:hover{ border-color:var(--gold-dim); color:var(--ink); }
+  .ask-status{ margin:34px 0 16px; color:var(--gold); }
+  .ask-group{ margin-top:clamp(44px,6vw,72px); }
+  .ask-row{ grid-template-columns:minmax(0,1fr) auto; }
+  .ask-row h3{ font-size:19px; margin:0; }
+  .ask-arrow{ font-style:normal; color:var(--gold); }
+  .ask-missing{ margin-top:26px; }
+  .ask-missing-text{ margin:0 0 18px; color:var(--ink-dim); max-width:60ch; }
+  .ask-send{ display:flex; gap:16px; align-items:center; flex-wrap:wrap; }
+  .ask-send p{ margin:0; color:var(--gold-hi); }
+  .ask-note{ margin-top:clamp(44px,6vw,72px); text-align:left; max-width:74ch; line-height:1.7; }
+</style>
+<style is:global>
+  /* result cards are built in the browser, so these rules must be global */
+  .ask-card{ border:1px solid var(--line); border-left:2px solid var(--gold-dim); background:var(--bg-raise);
+    padding:clamp(18px,2.6vw,28px); margin-bottom:12px; }
+  .ask-card.best{ border-left-color:var(--gold-hi); background:var(--panel); }
+  .ask-card .ask-law{ font-family:var(--mono); font-size:11px; letter-spacing:.11em; text-transform:uppercase; color:var(--gold); margin:0 0 10px; }
+  .ask-card h3{ font:400 clamp(20px,2.2vw,25px)/1.3 var(--serif); margin:0 0 12px; }
+  .ask-card h3 a:hover{ color:var(--gold-hi); }
+  .ask-card p.ask-a{ margin:0 0 10px; font-size:17px; line-height:1.65; color:var(--ink); max-width:68ch; }
+  .ask-card .ask-basis{ margin:14px 0 0; font-size:14px; color:var(--ink-faint); font-style:italic; max-width:68ch; }
+  .ask-card .ask-links{ display:flex; gap:22px; flex-wrap:wrap; margin-top:16px; }
+  .ask-card.compact p.ask-a, .ask-card.compact .ask-basis{ display:none; }
+  .ask-card.compact h3{ font-size:19px; margin:0; }
+  .ask-card.compact .ask-links{ margin-top:10px; }
+</style>
+
+<script>
+  import { buildIndex, search } from '../../lib/askSearch.js';
+
+  const input = document.getElementById('ask-input');
+  if (input instanceof HTMLInputElement) {
+    const results = document.getElementById('ask-results');
+    const list = document.getElementById('ask-list');
+    const status = document.getElementById('ask-status');
+    const browse = document.getElementById('ask-browse');
+    const clear = document.getElementById('ask-clear');
+    const send = document.getElementById('ask-send');
+    const sent = document.getElementById('ask-sent');
+    const lawNames = JSON.parse(document.getElementById('ask-laws')?.textContent || '{}');
+    let index = null, last = { level: 'none', top: '' };
+
+    const ready = fetch('/ask/index.json').then((r) => r.json()).then((items) => {
+      index = buildIndex(items.map((x) => ({ ...x, a: x.a.join(' '), paras: x.a })));
+    });
+
+    const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text) n.textContent = text; return n; };
+
+    function card(item, best) {
+      const c = el('article', 'ask-card' + (best ? ' best' : ' compact'));
+      c.appendChild(el('p', 'ask-law', lawNames[item.law] || ''));
+      const h = el('h3'); const a = el('a', '', item.q); a.href = '/ask/' + item.slug + '/'; h.appendChild(a); c.appendChild(h);
+      for (const p of item.paras) c.appendChild(el('p', 'ask-a', p));
+      c.appendChild(el('p', 'ask-basis', 'Legal basis: ' + item.basis + '.'));
+      const links = el('div', 'ask-links');
+      const more = el('a', 'textlink', best ? 'Open this answer' : 'Read the answer'); more.href = '/ask/' + item.slug + '/';
+      const law = el('a', 'textlink', 'Law page'); law.href = '/laws/' + item.law + '/';
+      links.append(more, law); c.appendChild(links);
+      return c;
+    }
+
+    async function run() {
+      const q = input.value.trim();
+      clear.hidden = !q;
+      if (q.length < 3) { results.hidden = true; browse.hidden = false; return; }
+      await ready;
+      const r = search(index, q, 4);
+      last = { level: r.level, top: r.results[0]?.item.slug || '' };
+      list.replaceChildren();
+      sent.textContent = ''; send.disabled = false;
+      if (r.level === 'good') {
+        status.textContent = 'Best match';
+        // below the best match, show only answers that are themselves a fair match
+        r.results.filter((x, i) => i === 0 || x.score >= 0.3).forEach((x, i) => list.appendChild(card(x.item, i === 0)));
+      } else if (r.level === 'close') {
+        status.textContent = 'We have not answered that exact question. These are the closest answers';
+        r.results.slice(0, 3).forEach((x) => list.appendChild(card(x.item, false)));
+      } else {
+        status.textContent = 'We have not answered this question yet';
+      }
+      results.hidden = false; browse.hidden = true;
+    }
+
+    let timer = 0;
+    input.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(run, 140); });
+    clear.addEventListener('click', () => { input.value = ''; run(); input.focus(); });
+    document.querySelectorAll('.ask-example').forEach((b) => b.addEventListener('click', () => { input.value = b.textContent || ''; run(); }));
+
+    // a question can arrive in the address, so answers can link into the search
+    const fromUrl = new URLSearchParams(location.search).get('q');
+    if (fromUrl) { input.value = fromUrl.slice(0, 200); run(); }
+
+    send.addEventListener('click', async () => {
+      const q = input.value.trim();
+      if (q.length < 5) { sent.textContent = 'Please type your question in the box first.'; return; }
+      send.disabled = true; sent.textContent = 'Sending your question to us now.';
+      try {
+        const res = await fetch('/api/ask', { method: 'POST', headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ q, level: last.level, top: last.top }) });
+        sent.textContent = res.ok ? 'Thank you. Your question has reached us.' : 'We could not save it. Please email it to hello@hredd.org.';
+        if (!res.ok) send.disabled = false;
+      } catch (e) {
+        sent.textContent = 'We could not save it. Please email it to hello@hredd.org.'; send.disabled = false;
+      }
+    });
+  }
+</script>

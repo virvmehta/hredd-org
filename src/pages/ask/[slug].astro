@@ -1,0 +1,92 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getAllLaws, formatDate } from '../../lib/sanity.js';
+import { liveAnswers } from '../../lib/answers.js';
+
+// One page per approved answer, so each question can be found by search
+// engines and shared as a link.
+export async function getStaticPaths() {
+  const live = liveAnswers();
+  return live.map((answer) => ({ params: { slug: answer.slug }, props: { answer } }));
+}
+
+const { answer } = Astro.props;
+const laws = await getAllLaws();
+const law = laws.find((l) => l.slug === answer.law);
+const lawShort = law ? (law.shortName || law.name) : '';
+const related = liveAnswers().filter((x) => x.law === answer.law && x.slug !== answer.slug).slice(0, 6);
+const plain = answer.a.join(' ');
+const description = plain.length <= 158 ? plain : plain.slice(0, 155).replace(/\s+\S*$/, '') + '…';
+
+const faqJson = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{ '@type': 'Question', name: answer.q, acceptedAnswer: { '@type': 'Answer', text: plain } }],
+};
+const crumbJson = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'hredd.org', item: 'https://hredd.org/' },
+    { '@type': 'ListItem', position: 2, name: 'Ask hredd', item: 'https://hredd.org/ask/' },
+    { '@type': 'ListItem', position: 3, name: answer.q, item: `https://hredd.org/ask/${answer.slug}/` },
+  ],
+};
+---
+<Base title={`${answer.q} | hredd.org`} description={description} active="ask" modifiedTime={answer.checked}>
+
+<script type="application/ld+json" set:html={JSON.stringify(faqJson)} />
+<script type="application/ld+json" set:html={JSON.stringify(crumbJson)} />
+
+<section class="section" style="padding-bottom:clamp(30px,4vw,48px)">
+  <div class="wrap" style="max-width:900px">
+    <nav class="crumb reveal"><a href="/">hredd·org</a><span>/</span><a href="/ask/">Ask hredd</a><span>/</span><span>{lawShort}</span></nav>
+    <h1 class="display reveal" data-delay="1" style="font-size:clamp(32px,4.4vw,56px); margin-top:28px">{answer.q}</h1>
+  </div>
+</section>
+
+<hr class="hairline" />
+
+<section class="section" style="padding-top:clamp(40px,5vw,64px)">
+  <div class="wrap" style="max-width:900px">
+    <div class="answer">
+      {answer.a.map((p) => (<p>{p}</p>))}
+    </div>
+
+    <dl class="facts" style="margin-top:36px">
+      <div class="fact"><dt>Legal basis</dt><dd>{answer.basis}</dd></div>
+      <div class="fact"><dt>Last checked</dt><dd>{formatDate(answer.checked)}</dd></div>
+    </dl>
+
+    <div class="hero-ctas" style="margin-top:30px">
+      {law && <a class="btn solid" href={`/laws/${law.slug}/`}><span>Read the full {lawShort} entry</span> <i>→</i></a>}
+      <a class="btn" href="/ask/"><span>Ask another question</span></a>
+    </div>
+
+    <p class="form-note" style="text-align:left; margin-top:30px; max-width:74ch; line-height:1.7">This answer explains what the law says in general terms. It was drafted with AI assistance, checked by the editor against the legal text, and is not legal advice on any one business.</p>
+  </div>
+</section>
+
+{related.length > 0 && (
+  <section class="section" style="padding-top:0">
+    <div class="wrap" style="max-width:900px">
+      <div class="section-head" style="margin-bottom:18px">
+        <div><p class="kicker">Keep reading</p><h2 class="h2">More on the {lawShort}</h2></div>
+        <a class="textlink" href="/ask/">All answers <i>→</i></a>
+      </div>
+      <div class="law-rows">
+        {related.map((x) => (
+          <a class="law-row" href={`/ask/${x.slug}/`} style="grid-template-columns:minmax(0,1fr) auto"><div><h3 style="font-size:19px; margin:0">{x.q}</h3></div><i style="font-style:normal; color:var(--gold)">→</i></a>
+        ))}
+      </div>
+    </div>
+  </section>
+)}
+
+</Base>
+
+<style>
+  .answer p{ font:400 clamp(19px,2vw,23px)/1.6 var(--serif); margin:0 0 1em; max-width:64ch; color:var(--ink); }
+  .answer p:first-child{ color:var(--ink); }
+  .answer p:last-child{ margin-bottom:0; }
+</style>

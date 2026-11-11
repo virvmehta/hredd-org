@@ -26,6 +26,8 @@ export async function onRequestGet({ request, env }) {
     top('path', 25), top('source', 15), top('country', 15), top('device', 5),
     db.prepare('SELECT MIN(day) AS day FROM hits'),
   ]);
+  // questions sent through Ask hredd, newest first
+  const questions = await db.prepare('SELECT day, question, level, top FROM questions ORDER BY id DESC LIMIT 100').all();
 
   return json({
     days, since,
@@ -36,5 +38,6 @@ export async function onRequestGet({ request, env }) {
     sources: sources.results,
     countries: countries.results,
     devices: devices.results,
+    questions: questions.results,
   });
 }

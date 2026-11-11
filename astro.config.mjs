@@ -1,5 +1,9 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
+import { liveAnswers } from './src/lib/answers.js';
+
+// Ask hredd stays out of the sitemap until at least one answer is approved.
+const askLive = liveAnswers().length > 0;
 
 // https://astro.build/config
 export default defineConfig({
@@ -13,6 +17,7 @@ export default defineConfig({
   },
   integrations: [sitemap({
     filter: (page) => !page.includes('/buyer-compliance/') && !page.includes('/stats/') &&
+      (askLive || !page.includes('/ask/')) &&
       !(/\/tracker\/.+\//.test(new URL(page).pathname))
   })],
   output: 'static',

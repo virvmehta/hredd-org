@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import { getAllArticles, getSiteSettings } from '../lib/sanity.js';
 import { computeVolIssue } from '../lib/volIssue.js';
+import { liveAnswers } from '../lib/answers.js';
 import { t, localeOf, pathInLocale, LOCALES, LOCALE_LABEL, LOCALE_DRAFT } from '../lib/i18n.js';
 
 const {
@@ -184,7 +185,7 @@ const nav = [
       </div>
       <div class="foot-col">
         <h4>{t(locale, 'foot.brand')}</h4>
-        <a href="/about/">{t(locale, 'foot.about')}</a><a href="/what-is-hredd/">What is HREDD?</a><a href="/methodology/">{t(locale, 'foot.methodology')}</a><a href="/subscribe/">{t(locale, 'foot.subscribe')}</a><a href="/about/#contact">{t(locale, 'foot.contact')}</a>
+        <a href="/about/">{t(locale, 'foot.about')}</a><a href="/what-is-hredd/">What is HREDD?</a>{liveAnswers().length > 0 && <a href="/ask/">Ask hredd</a>}<a href="/methodology/">{t(locale, 'foot.methodology')}</a><a href="/subscribe/">{t(locale, 'foot.subscribe')}</a><a href="/about/#contact">{t(locale, 'foot.contact')}</a>
       </div>
     </div>
     <div class="foot-base">

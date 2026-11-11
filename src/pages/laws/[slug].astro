@@ -148,6 +148,10 @@ const jsonLd = [
   }] : [])
 ];
 
+// Ask hredd answers for this law (approved ones only)
+import { liveAnswers } from '../../lib/answers.js';
+const lawAnswers = liveAnswers().filter((x) => x.law === law.slug);
+
 // "On this page" menu: only the sections this law actually has.
 const toc = [
   facts.length > 0 && { id: 'facts', label: 'Key facts' },
@@ -157,6 +161,7 @@ const toc = [
   law.timeline?.length > 0 && { id: 'history', label: 'How it got here' },
   law.changelog?.length > 0 && { id: 'changes', label: 'Entry history' },
   tradeRows.length > 0 && { id: 'trade', label: 'Trade under this law' },
+  lawAnswers.length > 0 && { id: 'questions', label: 'Common questions' },
   law.sources?.length > 0 && { id: 'sources', label: 'Primary documents' },
   relatedArticles.length > 0 && { id: 'coverage', label: 'We wrote about this' },
 ].filter(Boolean);
@@ -307,6 +312,23 @@ const toc = [
           </a>
         ))}
       </div>
+    </div>
+  </section>
+)}
+
+{lawAnswers.length > 0 && (
+  <section class="section" style="padding-bottom:0">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div><p class="kicker">Ask hredd</p><h2 class="h2" id="questions">Common questions</h2></div>
+        <a class="textlink" href="/ask/">Ask your own question <i>→</i></a>
+      </div>
+      <div class="law-rows reveal" data-delay="1">
+        {lawAnswers.slice(0, 10).map((x) => (
+          <a class="law-row" href={`/ask/${x.slug}/`} style="grid-template-columns:minmax(0,1fr) auto"><div><h3 style="font-size:19px; margin:0">{x.q}</h3></div><i style="font-style:normal; color:var(--gold)">→</i></a>
+        ))}
+      </div>
+      {lawAnswers.length > 10 && <p style="margin:18px 0 0"><a class="textlink" href="/ask/">All {lawAnswers.length} answers on this law <i>→</i></a></p>}
     </div>
   </section>
 )}

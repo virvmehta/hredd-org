@@ -49,6 +49,12 @@ import Base from '../../layouts/Base.astro';
         <div class="panel"><h4>Countries</h4><table class="st-table" id="st-countries"></table></div>
         <div class="panel"><h4>Devices</h4><table class="st-table" id="st-devices"></table></div>
       </div>
+
+      <div class="panel" style="margin-top:16px; overflow-x:auto">
+        <h4>Questions sent through Ask hredd</h4>
+        <p class="form-note" style="text-align:left; margin:0 0 14px">The latest 100 questions the library did not answer well. The common ones are next month's new answers.</p>
+        <table class="st-table" id="st-questions"></table>
+      </div>
     </div>
   </div>
 </section>
@@ -144,6 +150,16 @@ import Base from '../../layouts/Base.astro';
           table('st-sources', d.sources, 'Source');
           table('st-countries', d.countries, 'Country');
           table('st-devices', d.devices, 'Device');
+          var qt = $('st-questions'); qt.textContent = '';
+          var qh = qt.insertRow();
+          ['Question', 'Day', 'Search found'].forEach(function (h, i) { var th = document.createElement('th'); th.textContent = h; if (i) th.className = 'n'; qh.appendChild(th); });
+          (d.questions || []).forEach(function (q) {
+            var tr = qt.insertRow();
+            tr.insertCell().textContent = q.question;
+            var a = tr.insertCell(); a.textContent = q.day; a.className = 'n';
+            var b = tr.insertCell(); b.textContent = q.level === 'close' ? 'close match' : q.level === 'good' ? 'a match' : 'nothing'; b.className = 'n';
+          });
+          if (!(d.questions || []).length) { var e = qt.insertRow().insertCell(); e.colSpan = 3; e.textContent = 'No questions have been sent yet.'; }
         })
         .catch(function () { $('st-msg').textContent = 'Could not reach the statistics service.'; });
     }

@@ -24,6 +24,8 @@ export function ensureSchema(db) {
     ready = db.batch([
       db.prepare(SCHEMA),
       db.prepare('CREATE INDEX IF NOT EXISTS hits_day ON hits (day)'),
+      // Ask hredd: questions visitors chose to send (functions/api/ask.js)
+      db.prepare('CREATE TABLE IF NOT EXISTS questions (id INTEGER PRIMARY KEY AUTOINCREMENT, ts TEXT NOT NULL, day TEXT NOT NULL, question TEXT NOT NULL, level TEXT NOT NULL, top TEXT NOT NULL)'),
     ]).catch((e) => { ready = null; throw e; });
   }
   return ready;

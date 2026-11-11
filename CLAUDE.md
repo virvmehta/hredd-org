@@ -244,3 +244,28 @@ does nothing and `/stats/` says what is missing. Test locally with
 - Known data issue, not yet fixed: on the tracker map the CSDDD's country
   list in Sanity includes the UK and omits France and Bulgaria, and the EU
   FLR's omits Hungary and Bulgaria.
+
+## Ask hredd: the answer library (added 11 November 2026)
+A library of reviewed answers with instant in-browser search. No AI runs for
+visitors and there is no running cost; Vir rejected a live AI assistant on
+cost grounds.
+- **Answers** live in `src/lib/answers.js`. Each has a `status`. Only
+  `'approved'` answers are built into the site. Vir must review every answer
+  before it is approved: never flip a status without his say-so.
+- **Each answer names its law** (`law` slug) and its legal `basis`. When a
+  law changes in the monthly update, recheck every answer with that slug and
+  update its `checked` date.
+- **Drafting rules:** work from the official consolidated text (see the
+  Publications Office note above), explain the law in general terms only,
+  never advise on one reader's situation, and follow the house style. The
+  pages carry a line saying answers are AI-drafted and editor-checked, which
+  Anthropic's usage policy requires for legal topics.
+- **Search** is `src/lib/askSearch.js` (word stems, synonyms, rarity
+  weighting). After changing it or adding answers, run the search test in
+  `node tests/ask-search.test.mjs`: real-world phrasings with the expected
+  slug, plus off-topic questions that must not return a confident match.
+- **Preview drafts locally** with `ASK_PREVIEW=1 npm run build`. A normal
+  build hides drafts, marks `/ask/` noindex and leaves it out of the sitemap
+  and footer until at least one answer is approved.
+- **Unanswered questions** are stored by `functions/api/ask.js` in the D1
+  table `questions` and listed on `/stats/`. They feed next month's answers.
