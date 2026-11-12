@@ -40,6 +40,12 @@ import Base from '../../layouts/Base.astro';
         <span class="mono faint" id="st-since"></span>
       </div>
 
+      <div class="st-dl">
+        <button class="btn solid" id="st-pdf" type="button" disabled><span>Download report (PDF)</span> <i>↓</i></button>
+        <button class="btn" id="st-csv" type="button" disabled><span>Download data (CSV)</span> <i>↓</i></button>
+        <span class="mono faint">Both cover the period chosen above</span>
+      </div>
+
       <div class="st-tiles">
         <div class="panel"><h4>Page views</h4><p class="st-big" id="st-views">0</p></div>
         <div class="panel"><h4>Daily visitors, added up</h4><p class="st-big" id="st-visitors">0</p></div>
@@ -86,6 +92,8 @@ import Base from '../../layouts/Base.astro';
   .st-big{ font:400 44px/1.1 var(--serif); margin:0; font-variant-numeric:tabular-nums; }
   .st-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:16px; margin-top:16px; }
   .st-grid .panel{ min-width:0; overflow-x:auto; }
+  .st-dl{ display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin:0 0 20px; }
+  .st-dl .btn[disabled]{ opacity:.45; cursor:wait; }
   .st-chart{ display:flex; align-items:flex-end; gap:2px; height:180px; }
 </style>
 <style is:global>
@@ -99,6 +107,142 @@ import Base from '../../layouts/Base.astro';
   .st-table td:first-child{ color:var(--ink); padding-right:12px; }
   .st-table .n{ text-align:right; white-space:nowrap; padding-left:12px; }
 </style>
+
+<script>
+  // Downloads: a PDF report with a plain account of how the numbers are
+  // collected, and a CSV of the same tables for a spreadsheet. Both use the
+  // figures already loaded on the page (window.__hreddStats).
+  import { jsPDF } from 'jspdf';
+
+  const METHOD = [
+    ['What is counted', 'Every time a page on hredd.org finishes loading in a browser, the page sends one small message to a counter that runs on the same site, on Cloudflare. The counter stores one row for that page view in a private database that only this site can read. Google Analytics and Cloudflare traffic figures are separate and play no part in these numbers.'],
+    ['What each row holds', 'Each row records the page address, the date and time, the broad source of the visit (for example Google, LinkedIn, the newsletter, ChatGPT or a direct visit), the visitor’s country as reported by Cloudflare, and whether the screen was a phone, tablet or computer. It also holds two short visitor codes that are explained below.'],
+    ['What is never stored', 'No cookies are set, and no name, email address or IP address is ever written to the database. Nothing is shared with Google, advertisers or any other party. The page itself never learns who is reading it.'],
+    ['How a visitor is recognised', 'A visitor code is made by passing the internet address, the browser description and the current day through a one way scrambling function with a secret key. The same browser on the same day always gives the same code, so a person who reads five pages in one day counts as one visitor. A second code is made in exactly the same way with the month in place of the day, which gives the monthly visitor figure. The codes cannot be turned back into an address, and they change every day and every month, so no one can be followed over time.'],
+    ['What is left out', 'Search engine crawlers, AI crawlers, link preview tools and other automated programs are excluded by their browser description, and most of them never run the page code in the first place. Visits from the editor’s own browsers, which were switched off with the notrack setting, are excluded, as are local previews and visits to the statistics page itself.'],
+    ['Limits worth knowing', 'One person reading on both a phone and a laptop counts as two visitors, and so does a phone that moves from Wi‑Fi to mobile data during the day. A small number of readers who block all scripts are not counted at all. Days and months follow Coordinated Universal Time, which is five and a half hours behind India. The country is Cloudflare’s estimate from the network, and it can be wrong for readers using a VPN.'],
+    ['How to read the figures', 'Real visitors this month is the best single measure of how many people the site reached. Daily visitors added up over a period count a returning reader once for each day they came back, so that figure measures reading activity rather than separate people. These numbers are usually higher than Google Analytics, which ad blockers often stop, and far lower than Cloudflare, which counts automated traffic.'],
+  ];
+
+  const fmt = (n) => Number(n || 0).toLocaleString('en-GB');
+  const longDate = (iso) => new Date(iso + (iso.length === 7 ? '-01' : '') + 'T00:00:00Z')
+    .toLocaleDateString('en-GB', iso.length === 7 ? { month: 'long', year: 'numeric', timeZone: 'UTC' } : { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+  let names = null;
+  try { names = new Intl.DisplayNames(['en-GB'], { type: 'region' }); } catch (e) {}
+  const country = (c) => { if (!c || c === 'unknown' || c === 'XX' || c === 'T1') return 'Unknown'; try { return names ? names.of(c) : c; } catch (e) { return c; } };
+  const todayISO = () => new Date().toISOString().slice(0, 10);
+
+  function tables(d) {
+    const month = todayISO().slice(0, 7);
+    const cur = (d.months || []).find((m) => m.month === month);
+    const today = (d.daily || []).find((x) => x.day === todayISO());
+    return {
+      headline: [
+        ['Real visitors today', fmt(today ? today.visitors : 0)],
+        ['Real visitors in ' + longDate(month), fmt(cur ? cur.visitors : 0)],
+        ['Page views in the period', fmt(d.totals.views)],
+        ['Daily visitors added up over the period', fmt(d.totals.visitors)],
+        ['Pages read per daily visitor', d.totals.visitors ? (d.totals.views / d.totals.visitors).toFixed(1) : '0'],
+      ],
+      months: { head: ['Month', 'Visitors', 'Page views'], rows: (d.months || []).map((m) => [longDate(m.month), fmt(m.visitors), fmt(m.views)]) },
+      daily: { head: ['Day', 'Visitors', 'Page views'], rows: (d.daily || []).slice().reverse().map((x) => [longDate(x.day), fmt(x.visitors), fmt(x.views)]) },
+      pages: { head: ['Page', 'Views', 'Visitors'], rows: (d.pages || []).map((r) => [r.label, fmt(r.views), fmt(r.visitors)]) },
+      sources: { head: ['Source', 'Views', 'Visitors'], rows: (d.sources || []).map((r) => [r.label, fmt(r.views), fmt(r.visitors)]) },
+      countries: { head: ['Country', 'Views', 'Visitors'], rows: (d.countries || []).map((r) => [country(r.label), fmt(r.views), fmt(r.visitors)]) },
+      devices: { head: ['Device', 'Views', 'Visitors'], rows: (d.devices || []).map((r) => [r.label, fmt(r.views), fmt(r.visitors)]) },
+      questions: { head: ['Question', 'Day', 'Search found'], rows: (d.questions || []).map((q) => [q.question, q.day, q.level === 'good' ? 'a match' : q.level === 'close' ? 'close match' : 'nothing']) },
+    };
+  }
+
+  function pdf() {
+    const d = window.__hreddStats; if (!d) return;
+    const t = tables(d);
+    const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+    // the built-in PDF fonts lack curly quotes and some symbols, so plain ones are used
+    const plain = (s) => String(s).replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/[‐-―]/g, '-').replace(/[^\x00-\xff]/g, '?');
+    const _text = doc.text.bind(doc);
+    doc.text = (s, ...rest) => _text(Array.isArray(s) ? s.map(plain) : plain(s), ...rest);
+    const W = 210, M = 20, maxW = W - M * 2, bottom = 276;
+    const period = longDate(d.since) + ' to ' + longDate(todayISO());
+    let y = 0;
+    const foot = () => { doc.setFont('courier', 'normal'); doc.setFontSize(7); doc.setTextColor(140);
+      doc.text('hredd.org  ·  site statistics  ·  ' + period, M, 289); doc.setTextColor(30); };
+    const newPage = () => { doc.addPage(); y = 22; foot(); };
+    const ensure = (h) => { if (y + h > bottom) newPage(); };
+    const label = (s) => { ensure(12); doc.setFont('courier', 'normal'); doc.setFontSize(8); doc.setTextColor(150, 110, 40);
+      doc.text(s.toUpperCase(), M, y); doc.setTextColor(30); y += 6; };
+    const para = (s, size = 10.5) => { doc.setFont('times', 'normal'); doc.setFontSize(size);
+      doc.splitTextToSize(s, maxW).forEach((line) => { ensure(5); doc.setFont('times', 'normal'); doc.setFontSize(size); doc.setTextColor(30); doc.text(line, M, y); y += 5; }); y += 2.5; };
+    // a table with the first column wrapping and the number columns on the right
+    const table = (title, tb, empty) => {
+      label(title);
+      if (!tb.rows.length) { para(empty); y += 3; return; }
+      const nums = tb.head.length - 1, numW = 24, firstW = maxW - nums * numW;
+      const row = (cells, head) => {
+        doc.setFont(head ? 'courier' : 'times', 'normal'); doc.setFontSize(head ? 7.5 : 10);
+        const lines = doc.splitTextToSize(String(cells[0]), firstW - 3);
+        const h = lines.length * 4.6 + 1.8;
+        ensure(h);
+        doc.setFont(head ? 'courier' : 'times', 'normal'); doc.setFontSize(head ? 7.5 : 10); doc.setTextColor(head ? 120 : 30);
+        lines.forEach((l, i) => doc.text(l, M, y + i * 4.6));
+        cells.slice(1).forEach((c, i) => doc.text(String(c), M + firstW + (i + 1) * numW, y, { align: 'right' }));
+        y += h; doc.setDrawColor(215); doc.setLineWidth(.2); doc.line(M, y - 3.4, W - M, y - 3.4);
+      };
+      row(tb.head, true); tb.rows.forEach((r) => row(r, false)); y += 6;
+    };
+
+    // masthead
+    y = 26;
+    doc.setFont('times', 'normal'); doc.setFontSize(26); doc.setTextColor(30); doc.text('hredd.org', M, y);
+    doc.setFont('courier', 'normal'); doc.setFontSize(8); doc.setTextColor(120);
+    doc.text('SITE STATISTICS REPORT  ·  ' + period.toUpperCase(), M, y + 7);
+    doc.text('Generated ' + longDate(todayISO()) + (d.counting_since ? '  ·  counting since ' + longDate(d.counting_since) : ''), M, y + 11.5);
+    doc.setDrawColor(180); doc.setLineWidth(.3); doc.line(M, y + 15, W - M, y + 15);
+    y += 26; foot();
+
+    label('The headline figures');
+    t.headline.forEach(([k, v]) => { ensure(8); doc.setFont('times', 'normal'); doc.setFontSize(11); doc.setTextColor(60); doc.text(k, M, y);
+      doc.setFontSize(16); doc.setTextColor(30); doc.text(v, W - M, y, { align: 'right' }); y += 8; });
+    y += 4;
+
+    table('Visitors by month', t.months, 'Nothing has been counted in any month yet.');
+    table('Visitors by day, newest first', t.daily, 'Nothing was counted in this period.');
+    table('Most read pages', t.pages, 'Nothing was counted in this period.');
+    table('Where visitors came from', t.sources, 'Nothing was counted in this period.');
+    table('Countries', t.countries, 'Nothing was counted in this period.');
+    table('Devices', t.devices, 'Nothing was counted in this period.');
+    table('Questions sent through Ask hredd', t.questions, 'No reader has sent a question through Ask hredd yet.');
+
+    newPage();
+    doc.setFont('times', 'normal'); doc.setFontSize(17); doc.text('How this data is collected', M, y); y += 9;
+    METHOD.forEach(([h, s]) => { label(h); para(s); y += 2; });
+
+    doc.save('hredd-site-statistics-' + todayISO() + '.pdf');
+  }
+
+  function csv() {
+    const d = window.__hreddStats; if (!d) return;
+    const t = tables(d);
+    const q = (v) => '"' + String(v).replace(/"/g, '""') + '"';
+    const block = (title, tb) => [q(title), tb.head.map(q).join(','), ...tb.rows.map((r) => r.map(q).join(',')), ''].join('\r\n');
+    const out = [
+      q('hredd.org site statistics, ' + longDate(d.since) + ' to ' + longDate(todayISO())), '',
+      q('Headline'), ...t.headline.map(([k, v]) => q(k) + ',' + q(v)), '',
+      block('Visitors by month', t.months), block('Visitors by day', t.daily), block('Pages', t.pages),
+      block('Sources', t.sources), block('Countries', t.countries), block('Devices', t.devices),
+      block('Questions sent through Ask hredd', t.questions),
+      q('How this data is collected'), ...METHOD.map(([h, s]) => q(h) + ',' + q(s)),
+    ].join('\r\n');
+    // the byte order mark makes Excel read the file as UTF-8
+    const blob = new Blob(['﻿' + out], { type: 'text/csv;charset=utf-8' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = 'hredd-site-statistics-' + todayISO() + '.csv'; document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  }
+
+  document.getElementById('st-pdf')?.addEventListener('click', pdf);
+  document.getElementById('st-csv')?.addEventListener('click', csv);
+</script>
 
 <script is:inline>
   (function () {
@@ -153,6 +297,9 @@ import Base from '../../layouts/Base.astro';
           if (!res.ok) { $('st-msg').textContent = res.j.error || 'Could not load the statistics.'; $('st-out').hidden = true; $('st-login').hidden = false; return; }
           try { sessionStorage.setItem('hredd_stats_key', key); } catch (e) {}
           var d = res.j;
+          // shared with the download script below
+          window.__hreddStats = d;
+          $('st-pdf').disabled = false; $('st-csv').disabled = false;
           $('st-login').hidden = true; $('st-out').hidden = false;
           // headline: people this calendar month, with earlier months below
           var nowMonth = new Date().toISOString().slice(0, 7);
