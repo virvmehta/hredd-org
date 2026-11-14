@@ -3,6 +3,13 @@
 # /sitemap.xml get XML rather than the HTML "page not found" page.
 /sitemap.xml /sitemap-index.xml 200
 
+# Damaged shared links to the AI article (a link tracker appended or swapped in
+# encoded fragments), seen in the stats in November 2026.
+/articles/just-enough-of-its-shadow/JnNvdXJjZT /articles/just-enough-of-its-shadow/ 301
+/articles/just-enough-of-its-shadow/JnNvdXJjZT/ /articles/just-enough-of-its-shadow/ 301
+/articles/anVzdC1lbm /articles/just-enough-of-its-shadow/ 301
+/articles/anVzdC1lbm/ /articles/just-enough-of-its-shadow/ 301
+
 /salient-risks /tracker/ 301
 /salient-risks/ /tracker/ 301
 
